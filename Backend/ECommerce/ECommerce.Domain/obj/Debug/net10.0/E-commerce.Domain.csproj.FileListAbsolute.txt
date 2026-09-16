@@ -1,0 +1,11 @@
+D:\reposcsharp\E-commerce\Domain\bin\Debug\net10.0\E-commerce.Domain.deps.json
+D:\reposcsharp\E-commerce\Domain\bin\Debug\net10.0\E-commerce.Domain.dll
+D:\reposcsharp\E-commerce\Domain\bin\Debug\net10.0\E-commerce.Domain.pdb
+D:\reposcsharp\E-commerce\Domain\obj\Debug\net10.0\E-commerce.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\reposcsharp\E-commerce\Domain\obj\Debug\net10.0\E-commerce.Domain.AssemblyInfoInputs.cache
+D:\reposcsharp\E-commerce\Domain\obj\Debug\net10.0\E-commerce.Domain.AssemblyInfo.cs
+D:\reposcsharp\E-commerce\Domain\obj\Debug\net10.0\E-commerce.Domain.csproj.CoreCompileInputs.cache
+D:\reposcsharp\E-commerce\Domain\obj\Debug\net10.0\E-commerce.Domain.dll
+D:\reposcsharp\E-commerce\Domain\obj\Debug\net10.0\refint\E-commerce.Domain.dll
+D:\reposcsharp\E-commerce\Domain\obj\Debug\net10.0\E-commerce.Domain.pdb
+D:\reposcsharp\E-commerce\Domain\obj\Debug\net10.0\ref\E-commerce.Domain.dll
