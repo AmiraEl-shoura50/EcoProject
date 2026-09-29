@@ -1,0 +1,23 @@
+<a
+  [routerLink]="['/products', product.id]"
+  class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 group block"
+>
+  <div class="h-48 w-full overflow-hidden bg-gray-100">
+    @if (product.imageUrl) {
+      <img
+        [src]="product.imageUrl"
+        [alt]="product.name"
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      />
+    } @else {
+      <div class="w-full h-full flex items-center justify-center text-gray-300 text-sm">
+        لا توجد صورة
+      </div>
+    }
+  </div>
+  <div class="p-4">
+    <p class="text-xs text-brand-brown mb-1">{{ product.categoryName }}</p>
+    <h3 class="text-sm font-medium text-brand-black mb-2 line-clamp-1">{{ product.name }}</h3>
+    <p class="font-serif text-lg text-brand-gold font-semibold">{{ product.price | number }} جنيه</p>
+  </div>
+</a>

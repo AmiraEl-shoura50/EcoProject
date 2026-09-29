@@ -1,0 +1,142 @@
+<div class="min-h-screen bg-brand-cream flex items-center justify-center px-4 py-10">
+  <div class="bg-white p-10 rounded-2xl shadow-xl w-full max-w-lg animate-fade-in">
+
+    <div class="text-center mb-8">
+      <h1 class="font-serif text-4xl text-brand-black mb-2">
+        Smart <span class="text-brand-gold">Shop</span>
+      </h1>
+      <p class="text-brand-brown text-sm">اعمل حسابك وابدأ تسوقك أو بيعك</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
+
+      <!-- اختيار الدور -->
+      <div class="grid grid-cols-2 gap-3">
+        <label
+          class="flex items-center justify-center gap-2 border-2 rounded-lg py-3 cursor-pointer transition-all"
+          [class.border-brand-gold]="registerForm.get('role')?.value === 'Customer'"
+          [class.border-gray-200]="registerForm.get('role')?.value !== 'Customer'"
+        >
+          <input type="radio" formControlName="role" value="Customer" class="hidden" />
+          <span class="text-sm font-medium">عميل (تسوق)</span>
+        </label>
+
+        <label
+          class="flex items-center justify-center gap-2 border-2 rounded-lg py-3 cursor-pointer transition-all"
+          [class.border-brand-gold]="registerForm.get('role')?.value === 'Seller'"
+          [class.border-gray-200]="registerForm.get('role')?.value !== 'Seller'"
+        >
+          <input type="radio" formControlName="role" value="Seller" class="hidden" />
+          <span class="text-sm font-medium">بائع (بيع منتجاتك)</span>
+        </label>
+      </div>
+
+      <!-- الاسم الأول والأخير -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">الاسم الأول</label>
+          <input
+            type="text"
+            formControlName="firstName"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+          />
+        </div>
+        <div>
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">الاسم الأخير</label>
+          <input
+            type="text"
+            formControlName="lastName"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+          />
+        </div>
+      </div>
+
+      <!-- الإيميل -->
+      <div>
+        <label class="block text-sm text-brand-black mb-1.5 font-medium">البريد الإلكتروني</label>
+        <input
+          type="email"
+          formControlName="email"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+        />
+        @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+          <p class="text-red-500 text-xs mt-1.5">من فضلك ادخل بريد إلكتروني صحيح</p>
+        }
+      </div>
+
+      <!-- رقم الهاتف -->
+      <div>
+        <label class="block text-sm text-brand-black mb-1.5 font-medium">رقم الهاتف</label>
+        <input
+          type="tel"
+          formControlName="phoneNumber"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+        />
+      </div>
+
+      <!-- كلمة المرور -->
+      <div>
+        <label class="block text-sm text-brand-black mb-1.5 font-medium">كلمة المرور</label>
+        <div class="relative">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 pl-11 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+          />
+          <button
+            type="button"
+            (click)="togglePassword()"
+            class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-gold transition-colors"
+          >
+            <lucide-angular [img]="showPassword ? EyeOffIcon : EyeIcon" [size]="18"></lucide-angular>
+          </button>
+        </div>
+        @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+          <p class="text-red-500 text-xs mt-1.5">كلمة المرور لازم تكون 6 أحرف على الأقل</p>
+        }
+      </div>
+
+      <!-- حقل العنوان - يظهر بس لو Customer -->
+      @if (registerForm.get('role')?.value === 'Customer') {
+        <div>
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">العنوان</label>
+          <input
+            type="text"
+            formControlName="address"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+          />
+        </div>
+      }
+
+      <!-- حقل اسم المتجر - يظهر بس لو Seller -->
+      @if (registerForm.get('role')?.value === 'Seller') {
+        <div>
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">اسم المتجر</label>
+          <input
+            type="text"
+            formControlName="storeName"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+          />
+        </div>
+      }
+
+
+      <button
+        type="submit"
+        [disabled]="isLoading"
+        class="w-full bg-brand-black text-white py-3.5 rounded-lg font-medium hover:bg-brand-gold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+      >
+        {{ isLoading ? 'جاري الإنشاء...' : 'إنشاء الحساب' }}
+      </button>
+
+    </form>
+
+    <p class="text-center text-sm text-brand-brown mt-6">
+      عندك حساب بالفعل؟
+      <a routerLink="/login" class="text-brand-gold font-semibold hover:underline">
+        سجل دخولك
+      </a>
+    </p>
+
+  </div>
+</div>

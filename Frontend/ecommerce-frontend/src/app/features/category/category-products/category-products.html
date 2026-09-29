@@ -1,0 +1,61 @@
+<div class="bg-brand-cream min-h-screen">
+
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <h1 class="font-serif text-3xl text-brand-black mb-8">
+      {{ categoryName() || 'جاري التحميل...' }}
+    </h1>
+
+    @if (isLoading()) {
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        @for (i of skeletonItems; track i) {
+          <div class="bg-white rounded-xl overflow-hidden shadow-sm animate-pulse">
+            <div class="bg-gray-200 h-48 w-full"></div>
+            <div class="p-4 space-y-2">
+              <div class="bg-gray-200 h-4 w-3/4 rounded"></div>
+              <div class="bg-gray-200 h-4 w-1/2 rounded"></div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else if (products().length === 0) {
+      <p class="text-center text-brand-brown py-20">لا يوجد منتجات في هذا القسم حاليًا</p>
+    } @else {
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        @for (product of products(); track product.id) {
+          <app-product-card [product]="product"></app-product-card>
+        }
+      </div>
+
+      @if (totalPages() > 1) {
+        <div class="flex items-center justify-center gap-2 mt-10">
+
+          <button
+            type="button"
+            (click)="goToPage(currentPage() - 1)"
+            [disabled]="!hasPreviousPage()"
+            class="px-4 py-2 rounded-lg border border-gray-300 text-sm text-brand-black hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:text-brand-black"
+          >
+            السابق
+          </button>
+
+          <span class="text-sm text-brand-brown px-4">
+            صفحة {{ currentPage() }} من {{ totalPages() }}
+          </span>
+
+          <button
+            type="button"
+            (click)="goToPage(currentPage() + 1)"
+            [disabled]="!hasNextPage()"
+            class="px-4 py-2 rounded-lg border border-gray-300 text-sm text-brand-black hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:text-brand-black"
+          >
+            التالي
+          </button>
+
+        </div>
+      }
+    }
+
+  </section>
+
+</div>

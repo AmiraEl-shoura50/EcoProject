@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "/ZHRO7p+gKQ=",
+  "dgSpecHash": "Af6dqkhsmiQ=",
   "success": true,
-  "projectFilePath": "D:\\reposcsharp\\ECommerce\\ECommerce.Application\\ECommerce.Application.csproj",
+  "projectFilePath": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\ECommerce.Application.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\YAS\\.nuget\\packages\\automapper\\16.2.0\\automapper.16.2.0.nupkg.sha512",
     "C:\\Users\\YAS\\.nuget\\packages\\fluentvalidation\\12.1.1\\fluentvalidation.12.1.1.nupkg.sha512",

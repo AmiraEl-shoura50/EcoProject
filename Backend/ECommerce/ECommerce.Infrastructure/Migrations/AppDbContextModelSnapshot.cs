@@ -155,7 +155,12 @@ namespace ECommerce.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ParentCategoryId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentCategoryId");
 
                     b.ToTable("Categories");
                 });
@@ -754,6 +759,16 @@ namespace ECommerce.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("ECommerce.Domain.Entities.Category", b =>
+                {
+                    b.HasOne("ECommerce.Domain.Entities.Category", "ParentCategory")
+                        .WithMany("SubCategories")
+                        .HasForeignKey("ParentCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ParentCategory");
+                });
+
             modelBuilder.Entity("ECommerce.Domain.Entities.Customer", b =>
                 {
                     b.HasOne("ECommerce.Domain.Entities.ApplicationUser", "User")
@@ -989,6 +1004,8 @@ namespace ECommerce.Infrastructure.Migrations
             modelBuilder.Entity("ECommerce.Domain.Entities.Category", b =>
                 {
                     b.Navigation("Products");
+
+                    b.Navigation("SubCategories");
                 });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.Customer", b =>

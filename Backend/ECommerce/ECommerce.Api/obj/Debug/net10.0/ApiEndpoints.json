@@ -54,6 +54,22 @@
   },
   {
     "ContainingType": "ECommerce.API.Controllers.AuthController",
+    "Method": "ForgotPassword",
+    "RelativePath": "api/Auth/forgot-password",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "ECommerce.Application.DTOs.Auth.ForgotPasswordDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AuthController",
     "Method": "Login",
     "RelativePath": "api/Auth/login",
     "HttpMethod": "POST",
@@ -95,6 +111,22 @@
       {
         "Name": "dto",
         "Type": "ECommerce.Application.DTOs.Auth.RegisterDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AuthController",
+    "Method": "ResetPassword",
+    "RelativePath": "api/Auth/reset-password",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "ECommerce.Application.DTOs.Auth.ResetPasswordDto",
         "IsRequired": true
       }
     ],
@@ -227,6 +259,11 @@
         "Name": "Image",
         "Type": "Microsoft.AspNetCore.Http.IFormFile",
         "IsRequired": false
+      },
+      {
+        "Name": "ParentCategoryId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []
@@ -292,6 +329,16 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.CategoriesController",
+    "Method": "GetTree",
+    "RelativePath": "api/Categories/tree",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {

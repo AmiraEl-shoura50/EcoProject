@@ -42,11 +42,24 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Seller}")]
     public async Task<IActionResult> Create([FromForm] CreateCategoryDto dto)
     {
-        var created = await _categoryService.CreateAsync(dto);
+        var userRole = User.IsInRole(Roles.Admin) ? Roles.Admin : Roles.Seller;
+        var created = await _categoryService.CreateAsync(dto, userRole);
+
+        if (created is null)
+            return BadRequest("غير مسموح لك بإنشاء هذا النوع من الأقسام، أو القسم الرئيسي غير موجود");
+
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+    }
+
+    [HttpGet("tree")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetTree()
+    {
+        var categories = await _categoryService.GetTopLevelWithChildrenAsync();
+        return Ok(categories);
     }
 
     [HttpPut("{id}")]

@@ -1282,11 +1282,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\reposcsharp\\ECommerce\\ECommerce.Application\\ECommerce.Application.csproj",
+      "projectUniqueName": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\ECommerce.Application.csproj",
       "projectName": "ECommerce.Application",
-      "projectPath": "D:\\reposcsharp\\ECommerce\\ECommerce.Application\\ECommerce.Application.csproj",
+      "projectPath": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\ECommerce.Application.csproj",
       "packagesPath": "C:\\Users\\YAS\\.nuget\\packages\\",
-      "outputPath": "D:\\reposcsharp\\ECommerce\\ECommerce.Application\\obj\\",
+      "outputPath": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -1308,8 +1308,8 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "D:\\reposcsharp\\ECommerce\\ECommerce.Domain\\ECommerce.Domain.csproj": {
-              "projectPath": "D:\\reposcsharp\\ECommerce\\ECommerce.Domain\\ECommerce.Domain.csproj"
+            "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Domain\\ECommerce.Domain.csproj": {
+              "projectPath": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Domain\\ECommerce.Domain.csproj"
             }
           }
         }
@@ -1368,7 +1368,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",

@@ -31,6 +31,15 @@ public class ApiResponseWrapperFilter : IAsyncResultFilter
                         data = null;
                         message = textMessage;
                     }
+                    // ✅ جديد - أي Dto فيه Property اسمه Message (زي AuthResponseDto)
+                    else if (objectResult.Value is not null)
+                    {
+                        var messageProperty = objectResult.Value.GetType().GetProperty("Message");
+                        if (messageProperty?.GetValue(objectResult.Value) is string dtoMessage)
+                        {
+                            message = dtoMessage;
+                        }
+                    }
 
                     context.Result = new ObjectResult(new ApiResponse
                     {

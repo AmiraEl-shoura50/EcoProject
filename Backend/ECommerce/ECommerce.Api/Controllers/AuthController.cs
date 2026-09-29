@@ -50,4 +50,19 @@ public class AuthController : ControllerBase
         if (!revoked) return NotFound();
         return NoContent();
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+    {
+        var result = await _authService.ForgotPasswordAsync(dto);
+        return Ok(result);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+    {
+        var result = await _authService.ResetPasswordAsync(dto);
+        if (!result.Success) return BadRequest(result);
+        return Ok(result);
+    }
 }

@@ -3,6 +3,7 @@ using ECommerce.Application.DTOs.Category;
 using ECommerce.Application.DTOs.Common;
 using ECommerce.Application.Interfaces.Repositories;
 using ECommerce.Application.Interfaces.Services;
+using ECommerce.Domain.Constants;
 using ECommerce.Domain.Entities;
 
 namespace ECommerce.Application.Services;
@@ -44,8 +45,39 @@ public class CategoryService : ICategoryService
         return category is null ? null : _mapper.Map<CategoryDto>(category);
     }
 
-    public async Task<CategoryDto> CreateAsync(CreateCategoryDto dto)
+    public async Task<IEnumerable<CategoryDto>> GetTopLevelWithChildrenAsync()
     {
+        var allCategories = await _unitOfWork.Categories.GetAllAsync();
+
+        var topLevel = allCategories.Where(c => c.ParentCategoryId is null);
+        var dtos = _mapper.Map<List<CategoryDto>>(topLevel);
+
+        foreach (var dto in dtos)
+        {
+            var children = allCategories.Where(c => c.ParentCategoryId == dto.Id);
+            dto.SubCategories = _mapper.Map<List<CategoryDto>>(children);
+        }
+
+        return dtos;
+    }
+    public async Task<CategoryDto?> CreateAsync(CreateCategoryDto dto, string userRole)
+    {
+        // ✅ الأدمن بس يقدر يعمل قسم رئيسي
+        if (dto.ParentCategoryId is null && userRole != Roles.Admin)
+        {
+            return null;
+        }
+
+        // ✅ لو فيه ParentCategoryId، لازم يكون حقيقي وقسم رئيسي فعلاً (مش فرعي تاني)
+        if (dto.ParentCategoryId is not null)
+        {
+            var parent = await _unitOfWork.Categories.GetByIdAsync(dto.ParentCategoryId.Value);
+            if (parent is null || parent.ParentCategoryId is not null)
+            {
+                return null;
+            }
+        }
+
         var category = _mapper.Map<Category>(dto);
 
         if (dto.Image is not null)

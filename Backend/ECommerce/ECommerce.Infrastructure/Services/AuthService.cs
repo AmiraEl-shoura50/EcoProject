@@ -222,5 +222,50 @@ public class AuthService : IAuthService
             signingCredentials: creds);
 
         return (new JwtSecurityTokenHandler().WriteToken(token), expiresAt);
+
+    }
+    public async Task<AuthResponseDto> ForgotPasswordAsync(ForgotPasswordDto dto)
+    {
+        var user = await _userManager.FindByEmailAsync(dto.Email);
+
+        // ✅ نفس الرسالة سواء الإيميل موجود أو لأ - حماية من Enumeration Attack
+        const string genericMessage = "لو الإيميل ده مسجل عندنا، هيوصلك رابط إعادة تعيين كلمة المرور";
+
+        if (user is null)
+        {
+            return new AuthResponseDto { Success = true, Message = genericMessage };
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var encodedToken = Uri.EscapeDataString(token);
+        var encodedEmail = Uri.EscapeDataString(user.Email!);
+
+        var clientBaseUrl = _configuration["ClientApp:BaseUrl"];
+        var resetLink = $"{clientBaseUrl}/reset-password?email={encodedEmail}&token={encodedToken}";
+
+        _ = _emailService.SendEmailAsync(
+            user.Email!,
+            "إعادة تعيين كلمة المرور 🔑",
+            $"<p>مرحبًا {user.FirstName}،</p><p>اضغط على الرابط ده عشان تعيد تعيين كلمة المرور بتاعتك:</p><p><a href='{resetLink}'>إعادة تعيين كلمة المرور</a></p><p>لو انت مطلبتش الطلب ده، تجاهل الإيميل ده ببساطة.</p>");
+
+        return new AuthResponseDto { Success = true, Message = genericMessage };
+    }
+
+    public async Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordDto dto)
+    {
+        var user = await _userManager.FindByEmailAsync(dto.Email);
+        if (user is null)
+        {
+            return new AuthResponseDto { Success = false, Message = "الرابط غير صالح أو منتهي الصلاحية" };
+        }
+
+        var result = await _userManager.ResetPasswordAsync(user, dto.Token, dto.NewPassword);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            return new AuthResponseDto { Success = false, Message = errors };
+        }
+
+        return new AuthResponseDto { Success = true, Message = "تم تغيير كلمة المرور بنجاح، يمكنك تسجيل الدخول الآن" };
     }
 }

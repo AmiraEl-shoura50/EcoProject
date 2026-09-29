@@ -215,6 +215,68 @@
         }
       }
     },
+    "/api/Auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Auth/reset-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/cart": {
       "get": {
         "tags": [
@@ -376,6 +438,10 @@
                   "Image": {
                     "type": "string",
                     "format": "binary"
+                  },
+                  "ParentCategoryId": {
+                    "type": "integer",
+                    "format": "int32"
                   }
                 }
               },
@@ -387,6 +453,9 @@
                   "style": "form"
                 },
                 "Image": {
+                  "style": "form"
+                },
+                "ParentCategoryId": {
                   "style": "form"
                 }
               }
@@ -489,6 +558,18 @@
               "format": "int32"
             }
           }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Categories/tree": {
+      "get": {
+        "tags": [
+          "Categories"
         ],
         "responses": {
           "200": {
@@ -1587,6 +1668,16 @@
         },
         "additionalProperties": false
       },
+      "ForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "LoginDto": {
         "type": "object",
         "properties": {
@@ -1651,6 +1742,24 @@
             "nullable": true
           },
           "storeName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "token": {
+            "type": "string",
+            "nullable": true
+          },
+          "newPassword": {
             "type": "string",
             "nullable": true
           }

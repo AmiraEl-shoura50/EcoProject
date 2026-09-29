@@ -1,0 +1,71 @@
+<div class="min-h-screen bg-brand-cream flex items-center justify-center px-4">
+  <div class="bg-white p-10 rounded-2xl shadow-xl w-full max-w-md animate-fade-in">
+
+    <div class="text-center mb-8">
+      <h1 class="font-serif text-4xl text-brand-black mb-2">
+        Smart <span class="text-brand-gold">Shop</span>
+      </h1>
+      <p class="text-brand-brown text-sm">أهلاً بيك تاني، سجل دخولك للمتابعة</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
+
+      <div>
+        <label class="block text-sm text-brand-black mb-1.5 font-medium">البريد الإلكتروني</label>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="example@email.com"
+          class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+        />
+        @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+          <p class="text-red-500 text-xs mt-1.5">من فضلك ادخل بريد إلكتروني صحيح</p>
+        }
+      </div>
+
+      <div>
+        <label class="block text-sm text-brand-black mb-1.5 font-medium">كلمة المرور</label>
+        <div class="relative">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="••••••••"
+            class="w-full border border-gray-300 rounded-lg px-4 py-3 pl-11 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+          />
+          <button
+            type="button"
+            (click)="togglePassword()"
+            class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-gold transition-colors"
+          >
+            <lucide-angular [img]="showPassword ? EyeOffIcon : EyeIcon" [size]="18"></lucide-angular>
+          </button>
+        </div>
+        @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+          <p class="text-red-500 text-xs mt-1.5">كلمة المرور مطلوبة</p>
+        }
+      </div>
+
+      
+      <button
+        type="submit"
+        [disabled]="isLoading"
+        class="w-full bg-brand-black text-white py-3.5 rounded-lg font-medium hover:bg-brand-gold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {{ isLoading ? 'جاري الدخول...' : 'تسجيل الدخول' }}
+      </button>
+
+    </form>
+
+    <p class="text-center text-sm text-brand-brown mt-6">
+      معندكش حساب؟
+      <a routerLink="/register" class="text-brand-gold font-semibold hover:underline">
+        اعمل حساب جديد
+      </a>
+    </p>
+<p class="text-center text-sm mt-3">
+  <a routerLink="/forgot-password" class="text-brand-brown hover:text-brand-gold transition-colors">
+    نسيت كلمة المرور؟
+  </a>
+</p>
+  </div>
+</div>

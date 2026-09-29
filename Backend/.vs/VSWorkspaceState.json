@@ -1,0 +1,10 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\ECommerce",
+    "\\ECommerce\\ECommerce.Infrastructure",
+    "\\ECommerce\\ECommerce.Infrastructure\\Persistence"
+  ],
+  "SelectedNode": "\\ECommerce\\ECommerce.Infrastructure\\Persistence\\AppDbContext.cs",
+  "PreviewInSolutionExplorer": false
+}

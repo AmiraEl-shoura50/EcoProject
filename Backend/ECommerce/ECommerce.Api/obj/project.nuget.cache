@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "NjA7aAb/UTc=",
+  "dgSpecHash": "kccEvj8Y7p0=",
   "success": true,
-  "projectFilePath": "D:\\reposcsharp\\ECommerce\\ECommerce.Api\\ECommerce.API.csproj",
+  "projectFilePath": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Api\\ECommerce.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\YAS\\.nuget\\packages\\automapper\\16.2.0\\automapper.16.2.0.nupkg.sha512",
     "C:\\Users\\YAS\\.nuget\\packages\\azure.core\\1.47.1\\azure.core.1.47.1.nupkg.sha512",
