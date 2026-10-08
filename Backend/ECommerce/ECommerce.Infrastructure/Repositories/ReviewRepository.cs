@@ -35,4 +35,15 @@ public class ReviewRepository : GenericRepository<Review>, IReviewRepository
         var ratings = await _dbSet.Where(r => r.ProductId == productId).Select(r => r.Rating).ToListAsync();
         return ratings.Any() ? ratings.Average() : 0;
     }
+    public async Task<List<Review>> GetLatestAsync(int count)
+    {
+        return await _dbSet
+            .Include(r => r.Customer)
+                .ThenInclude(c => c.User)
+            .Include(r => r.Product)
+            .Where(r => r.Rating >= 4) // ✅ بس التقييمات الإيجابية (4 أو 5 نجوم) نعرضها في الصفحة الرئيسية
+            .OrderByDescending(r => r.CreatedAt)
+            .Take(count)
+            .ToListAsync();
+    }
 }

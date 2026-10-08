@@ -7,4 +7,6 @@ public interface IReviewService
 {
     Task<PaginatedResultDto<ReviewDto>> GetByProductAsync(int productId, int pageNumber, int pageSize);
     Task<ReviewDto?> CreateAsync(int customerId, CreateReviewDto dto);
+
+    Task<IEnumerable<LatestReviewDto>> GetLatestAsync(int count);
 }

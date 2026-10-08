@@ -20,7 +20,13 @@ public class ReviewsController : ControllerBase
         _reviewService = reviewService;
         _unitOfWork = unitOfWork;
     }
-
+    [HttpGet("latest")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetLatest([FromQuery] int count = 6)
+    {
+        var reviews = await _reviewService.GetLatestAsync(count);
+        return Ok(reviews);
+    }
     [HttpGet("product/{productId}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetByProduct(int productId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -52,4 +58,5 @@ public class ReviewsController : ControllerBase
         var customers = await _unitOfWork.Customers.FindAsync(c => c.UserId == userId);
         return customers.FirstOrDefault()?.Id;
     }
+
 }

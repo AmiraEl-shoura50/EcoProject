@@ -16,6 +16,8 @@ public class Order
     public DateTime? CompletedDate { get; set; }
     public decimal TotalAmount { get; set; }
 
+    public bool IsDeletedByCustomer { get; set; }
+
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
     public ICollection<PaymentProof> PaymentProofs { get; set; } = new List<PaymentProof>();
     public ICollection<PaymentTransaction> PaymentTransactions { get; set; } = new List<PaymentTransaction>(); // ✅ جديد

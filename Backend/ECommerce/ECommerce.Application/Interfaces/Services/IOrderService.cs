@@ -14,4 +14,6 @@ public interface IOrderService
 
     Task<PaymentProofDto?> SubmitPaymentProofAsync(int customerId, int orderId, SubmitPaymentProofDto dto);
     Task<bool> ReviewPaymentProofAsync(int sellerId, int orderId, ReviewPaymentProofDto dto);
+
+    Task<int> DeleteCancelledAsync(int customerId, List<int> orderIds);
 }

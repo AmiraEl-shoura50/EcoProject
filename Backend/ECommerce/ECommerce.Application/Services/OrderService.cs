@@ -28,7 +28,7 @@ public class OrderService : IOrderService
         _paymentService = paymentService;
     }
 
-   
+
 
     public async Task<IEnumerable<CheckoutResultDto>> CheckoutAsync(int customerId, CreateOrderDto dto)
     {
@@ -47,7 +47,7 @@ public class OrderService : IOrderService
         }
 
         var groupedBySeller = cart.Items.GroupBy(i => i.Product.SellerId);
-        var createdOrderIds = new List<(int OrderId, int SellerId)>();
+        var createdOrders = new List<(Order Order, int SellerId)>(); // ✅ بنخزن الـ Object نفسه، مش الـ Id
 
         foreach (var group in groupedBySeller)
         {
@@ -78,32 +78,26 @@ public class OrderService : IOrderService
 
             order.TotalAmount = totalAmount;
             await _unitOfWork.Orders.AddAsync(order);
-            createdOrderIds.Add((order.Id, group.Key)); // ✅ Id بيتحدد بعد SaveChanges - هنعدلها تحت
+            createdOrders.Add((order, group.Key)); // ✅ بنخزن مرجع الـ order نفسه
         }
 
         cart.Items.Clear();
-        await _unitOfWork.SaveChangesAsync(); // ✅ دلوقتي كل الـ order.Id بقت متاحة
+        await _unitOfWork.SaveChangesAsync(); // ✅ دلوقتي كل order.Id في القائمة بقت الأرقام الحقيقية تلقائيًا
 
         var results = new List<CheckoutResultDto>();
-
-        //foreach (var group in groupedBySeller)
-        //{
-        //    var order = group.First().Cart.Items == null ? null : null; // (تجاهلي السطر ده - هيتشال، موجود بس عشان التوضيح)
-        //}
-
-        // ✅ الطريقة الأنضف - نلف تاني على الأوردرات اللي اتعملت فعليًا من الداتابيز
         var allCreatedOrders = new List<Order>();
-        foreach (var (orderId, sellerId) in createdOrderIds)
+
+        foreach (var (order, sellerId) in createdOrders) // ✅ بنستخدم order.Id دلوقتي بعد ما بقى حقيقي
         {
             var seller = await _unitOfWork.Sellers.GetByIdAsync(sellerId);
             if (seller is not null)
             {
                 await _notificationService.CreateAndSendAsync(
-                    seller.UserId, "طلب جديد! 📦", $"وصلك طلب جديد رقم #{orderId}");
+                    seller.UserId, "طلب جديد! 📦", $"وصلك طلب جديد رقم #{order.Id}");
             }
 
-            var full = await _unitOfWork.Orders.GetWithItemsAsync(orderId);
-            if (full is null) continue;
+            var full = await _unitOfWork.Orders.GetWithItemsAsync(order.Id);
+            if (full is null) continue; // ✅ رجّعناها زي ما كانت بعد ما اتأكدنا إن السبب اتحل
             allCreatedOrders.Add(full);
         }
 
@@ -126,7 +120,7 @@ public class OrderService : IOrderService
                 }
             }
 
-            var refreshedOrder = await _unitOfWork.Orders.GetWithItemsAsync(order.Id); // ✅ لأخذ الـ Status المحدّث بعد InitiateGatewayPaymentAsync
+            var refreshedOrder = await _unitOfWork.Orders.GetWithItemsAsync(order.Id);
             results.Add(new CheckoutResultDto
             {
                 Order = _mapper.Map<OrderDto>(refreshedOrder),
@@ -136,7 +130,6 @@ public class OrderService : IOrderService
 
         return results;
     }
-
     public async Task<OrderDto?> GetByIdAsync(int orderId, int customerId)
     {
         var order = await _unitOfWork.Orders.GetWithItemsAsync(orderId);
@@ -306,5 +299,23 @@ public class OrderService : IOrderService
             order.Customer.UserId, "تحديث حالة الطلب", $"طلبك #{order.Id} أصبح: {status}");
 
         return true;
+    }
+    public async Task<int> DeleteCancelledAsync(int customerId, List<int> orderIds)
+    {
+        // ✅ بنفلتر بالـ customerId والحالة، فمحدش يقدر يمسح طلب غيره أو طلب لسه شغال
+        var orders = (await _unitOfWork.Orders.FindAsync(o =>
+            orderIds.Contains(o.Id) &&
+            o.CustomerId == customerId &&
+            o.Status == OrderStatus.Cancelled &&
+            !o.IsDeletedByCustomer)).ToList();
+
+        foreach (var order in orders)
+        {
+            order.IsDeletedByCustomer = true;
+            _unitOfWork.Orders.Update(order);
+        }
+
+        await _unitOfWork.SaveChangesAsync();
+        return orders.Count;
     }
 }

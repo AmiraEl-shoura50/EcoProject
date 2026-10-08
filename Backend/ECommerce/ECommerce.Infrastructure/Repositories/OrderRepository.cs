@@ -12,10 +12,10 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
     public async Task<(List<Order> Items, int TotalCount)> GetByCustomerPagedAsync(int customerId, int pageNumber, int pageSize)
     {
         var query = _dbSet
-            .Include(o => o.Items).ThenInclude(i => i.Product)
-            .Include(o => o.PaymentMethod)
-            .Where(o => o.CustomerId == customerId)
-            .OrderByDescending(o => o.CreatedDate);
+     .Include(o => o.Items).ThenInclude(i => i.Product)
+     .Include(o => o.PaymentMethod)
+     .Where(o => o.CustomerId == customerId && !o.IsDeletedByCustomer)
+     .OrderByDescending(o => o.CreatedDate);
 
         var totalCount = await query.CountAsync();
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();

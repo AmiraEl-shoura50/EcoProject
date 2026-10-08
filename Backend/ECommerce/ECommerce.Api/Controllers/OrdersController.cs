@@ -30,8 +30,8 @@ public class OrdersController : ControllerBase
         if (customerId is null) return Forbid();
 
         var results = await _orderService.CheckoutAsync(customerId.Value, dto);
-        if (!results.Any())
-            return BadRequest("تعذر إتمام الطلب - تأكدي من الكارت وطريقة الدفع والمخزون المتاح");
+        //if (!results.Any())
+        //    return BadRequest("تعذر إتمام الطلب - تأكدي من الكارت وطريقة الدفع والمخزون المتاح");
 
         return Ok(results);
     }
@@ -139,5 +139,19 @@ public class OrdersController : ControllerBase
 
         var sellers = await _unitOfWork.Sellers.FindAsync(s => s.UserId == userId);
         return sellers.FirstOrDefault()?.Id;
+    }
+
+    [HttpPost("delete-cancelled")]
+    [Authorize(Roles = Roles.Customer)]
+    public async Task<IActionResult> DeleteCancelled([FromBody] DeleteOrdersDto dto)
+    {
+        var customerId = await GetCurrentCustomerIdAsync();
+        if (customerId is null) return Forbid();
+
+        var deleted = await _orderService.DeleteCancelledAsync(customerId.Value, dto.OrderIds);
+        if (deleted == 0)
+            return BadRequest("لا توجد طلبات ملغية قابلة للحذف ضمن المحدد");
+
+        return Ok(new { deletedCount = deleted });
     }
 }

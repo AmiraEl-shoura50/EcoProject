@@ -78,4 +78,17 @@ public class ReviewService : IReviewService
 
         return resultDto;
     }
+    public async Task<IEnumerable<LatestReviewDto>> GetLatestAsync(int count)
+    {
+        var reviews = await _unitOfWork.Reviews.GetLatestAsync(count);
+
+        return reviews.Select(r => new LatestReviewDto
+        {
+            CustomerName = $"{r.Customer.User.FirstName} {r.Customer.User.LastName}",
+            ProductName = r.Product.Name,
+            Rating = r.Rating,
+            Comment = r.Comment,
+            CreatedAt = r.CreatedAt
+        });
+    }
 }

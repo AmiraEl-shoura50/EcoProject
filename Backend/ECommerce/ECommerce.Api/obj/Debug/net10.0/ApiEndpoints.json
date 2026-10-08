@@ -606,6 +606,22 @@
   },
   {
     "ContainingType": "ECommerce.API.Controllers.OrdersController",
+    "Method": "DeleteCancelled",
+    "RelativePath": "api/orders/delete-cancelled",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "ECommerce.Application.DTOs.Order.DeleteOrdersDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.OrdersController",
     "Method": "GetSellerOrders",
     "RelativePath": "api/orders/seller/mine",
     "HttpMethod": "GET",
@@ -854,6 +870,22 @@
         "Name": "dto",
         "Type": "ECommerce.Application.DTOs.Review.CreateReviewDto",
         "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.ReviewsController",
+    "Method": "GetLatest",
+    "RelativePath": "api/reviews/latest",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "count",
+        "Type": "System.Int32",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []
