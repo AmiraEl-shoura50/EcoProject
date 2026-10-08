@@ -6,6 +6,6 @@ public class WishlistItemDto
     public string ProductName { get; set; } = string.Empty;
     public string? ProductImageUrl { get; set; }
     public decimal Price { get; set; }
-
+    public float Rating { get; set; }
     public int StockQuantity { get; set; }
 }

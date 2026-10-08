@@ -10,11 +10,12 @@ public class WishlistProfile : Profile
     {
         CreateMap<Wishlist, WishlistDto>();
 
-       
+
         CreateMap<WishlistItem, WishlistItemDto>()
-                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
-                .ForMember(dest => dest.ProductImageUrl, opt => opt.MapFrom(src => src.Product.ImageUrl))
-                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Product.Price))
-                .ForMember(dest => dest.StockQuantity, opt => opt.MapFrom(src => src.Product.StockQuantity));
+             .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+             .ForMember(dest => dest.ProductImageUrl, opt => opt.MapFrom(src => src.Product.ImageUrl))
+             .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Product.Price))
+             .ForMember(dest => dest.StockQuantity, opt => opt.MapFrom(src => src.Product.StockQuantity))
+             .ForMember(dest => dest.Rating, opt => opt.MapFrom(src => src.Product.Rating));
     }
 }
