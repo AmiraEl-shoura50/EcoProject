@@ -1,0 +1,111 @@
+<div class="bg-brand-cream min-h-screen py-10">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <h1 class="font-serif text-3xl text-brand-black mb-8">سلة المشتريات</h1>
+
+    @if (cartService.cart() === null) {
+      <!-- جاري التحميل -->
+      <div class="space-y-4 animate-pulse">
+        @for (i of [1,2,3]; track i) {
+          <div class="bg-white rounded-xl h-28"></div>
+        }
+      </div>
+    } @else if (cartService.cart()!.items.length === 0) {
+      <div class="text-center py-20">
+        <p class="text-brand-brown mb-4">سلتك فارغة حاليًا</p>
+        <a routerLink="/" class="text-brand-gold font-medium hover:underline">تصفح المنتجات</a>
+      </div>
+    } @else {
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- قائمة المنتجات -->
+        <div class="lg:col-span-2 space-y-4">
+          @for (item of cartService.cart()!.items; track item.productId) {
+            <div class="bg-white rounded-xl p-4">
+
+              <!-- الصف العلوي: صورة + اسم + سعر -->
+              <div class="flex items-center gap-4 mb-4">
+                <div class="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden shrink-0">
+                  @if (item.productImageUrl) {
+                    <img [src]="item.productImageUrl" [alt]="item.productName" class="w-full h-full object-cover" />
+                  } @else {
+                    <div class="w-full h-full flex items-center justify-center text-gray-300 text-xs">لا توجد صورة</div>
+                  }
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-sm font-medium text-brand-black mb-1 line-clamp-1">{{ item.productName }}</h3>
+                  <p class="text-sm text-brand-gold font-semibold">{{ item.unitPrice | number }} جنيه</p>
+                </div>
+              </div>
+
+              <!-- الصف السفلي: كمية + إجمالي + حذف -->
+              <div class="flex items-center justify-between border-t border-gray-100 pt-3">
+
+                <div class="flex items-center border border-gray-300 rounded-lg shrink-0">
+                  <button
+                    type="button"
+                    (click)="decreaseQuantity(item.productId, item.quantity)"
+                    class="w-8 h-8 flex items-center justify-center text-brand-black hover:text-brand-gold transition-colors"
+                  >
+                    <lucide-angular [img]="MinusIcon" [size]="14"></lucide-angular>
+                  </button>
+                  <span class="w-8 text-center text-sm">{{ item.quantity }}</span>
+                  <button
+                    type="button"
+                    (click)="increaseQuantity(item.productId, item.quantity)"
+                    class="w-8 h-8 flex items-center justify-center text-brand-black hover:text-brand-gold transition-colors"
+                  >
+                    <lucide-angular [img]="PlusIcon" [size]="14"></lucide-angular>
+                  </button>
+                </div>
+
+                <div class="flex items-center gap-4">
+                  <p class="text-sm font-semibold text-brand-black">
+                    {{ item.subtotal | number }} جنيه
+                  </p>
+
+                  <button
+                    type="button"
+                    (click)="removeItem(item.productId)"
+                    class="text-gray-400 hover:text-red-500 transition-colors"
+                  >
+                    <lucide-angular [img]="TrashIcon" [size]="18"></lucide-angular>
+                  </button>
+                </div>
+
+              </div>
+
+            </div>
+          }
+        </div>
+
+        <!-- ملخص الطلب -->
+        <div class="bg-white rounded-xl p-6 h-fit">
+          <h2 class="font-serif text-xl text-brand-black mb-4">ملخص الطلب</h2>
+
+          <div class="flex items-center justify-between text-sm text-brand-brown mb-2">
+            <span>عدد المنتجات</span>
+            <span>{{ cartService.itemsCount() }}</span>
+          </div>
+
+          <div class="flex items-center justify-between text-lg font-semibold text-brand-black border-t border-gray-100 pt-4 mt-4">
+            <span>الإجمالي</span>
+            <span class="text-brand-gold">{{ cartService.cart()!.totalPrice | number }} جنيه</span>
+          </div>
+
+          <a
+            routerLink="/checkout"
+            class="block text-center bg-brand-black text-white py-3.5 rounded-lg font-medium hover:bg-brand-gold transition-colors mt-6"
+          >
+            إتمام الطلب
+          </a>
+        </div>
+
+      </div>
+
+    }
+
+  </div>
+</div>

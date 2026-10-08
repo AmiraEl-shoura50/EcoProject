@@ -1,0 +1,74 @@
+<footer class="bg-brand-black text-white ">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
+      <!-- عن الموقع -->
+      <div>
+        <h3 class="font-serif text-2xl mb-4">
+          Smart <span class="text-brand-gold">Shop</span>
+        </h3>
+        <p class="text-sm text-gray-400 leading-relaxed mb-5">
+          وجهتك الأولى للتسوق الأونلاين، منتجات متنوعة من بائعين موثوقين في مكان واحد.
+        </p>
+        <div class="flex items-center gap-4">
+          <a href="#" class="text-gray-400 hover:text-brand-gold transition-colors">
+            <lucide-angular [img]="FacebookIcon" [size]="18"></lucide-angular>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-brand-gold transition-colors">
+            <lucide-angular [img]="InstagramIcon" [size]="18"></lucide-angular>
+          </a>
+          <a href="#" class="text-gray-400 hover:text-brand-gold transition-colors">
+            <lucide-angular [img]="TwitterIcon" [size]="18"></lucide-angular>
+          </a>
+        </div>
+      </div>
+
+      <!-- روابط سريعة -->
+      <div>
+        <h4 class="text-sm font-semibold mb-4 text-gray-200">روابط سريعة</h4>
+        <ul class="space-y-3 text-sm text-gray-400">
+          <li><a routerLink="/" class="hover:text-brand-gold transition-colors">الرئيسية</a></li>
+          <li><a routerLink="/about" class="hover:text-brand-gold transition-colors">من نحن</a></li>
+          <li><a routerLink="/contact" class="hover:text-brand-gold transition-colors">تواصل معنا</a></li>
+        </ul>
+      </div>
+
+      <!-- خدمة العملاء -->
+      <div>
+        <h4 class="text-sm font-semibold mb-4 text-gray-200">روابط هامة</h4>
+        <ul class="space-y-3 text-sm text-gray-400">
+          <li><a routerLink="/faq" class="hover:text-brand-gold transition-colors">الأسئلة الشائعة</a></li>
+          <li><a routerLink="/shipping-policy" class="hover:text-brand-gold transition-colors">الشحن والتوصيل</a></li>
+          <li><a routerLink="/return-policy" class="hover:text-brand-gold transition-colors">سياسة الإرجاع</a></li>
+        </ul>
+      </div>
+
+      <!-- تواصل معنا -->
+      <div>
+        <h4 class="text-sm font-semibold mb-4 text-gray-200">تواصل معنا</h4>
+        <ul class="space-y-3 text-sm text-gray-400">
+          <!-- <li class="flex items-center gap-2">
+            <lucide-angular [img]="PhoneIcon" [size]="16"></lucide-angular>
+            <span dir="ltr">+20 100 000 0000</span>
+          </li> -->
+          <li class="flex items-center gap-2">
+            <lucide-angular [img]="MailIcon" [size]="16"></lucide-angular>
+            <span>support&#64;smartshop.com</span>
+          </li>
+          <li class="flex items-center gap-2">
+            <lucide-angular [img]="MapPinIcon" [size]="16"></lucide-angular>
+            <span>الغربية، مصر</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- حقوق النشر -->
+    <div class="border-t border-gray-800 mt-10 pt-6 text-center text-xs text-gray-500">
+      © {{ currentYear }} Smart Shop. جميع الحقوق محفوظة.
+    </div>
+
+  </div>
+</footer>

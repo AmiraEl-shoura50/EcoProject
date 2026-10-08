@@ -40,3 +40,15 @@
 .animate-slide-down {
   animation: slide-down 0.3s ease-out;
 }
+/* تعبئة أيقونات Lucide (النجوم، القلب...) */
+.icon-filled svg {
+  fill: currentColor;
+}
+
+/* إخفاء شريط السكرول مع الاحتفاظ بالسكرول نفسه */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

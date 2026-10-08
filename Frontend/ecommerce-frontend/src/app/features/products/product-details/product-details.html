@@ -1,0 +1,113 @@
+<div class="bg-brand-cream min-h-screen">
+
+  @if (isLoading()) {
+    <div class="max-w-6xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-2 gap-10 animate-pulse">
+      <div class="bg-gray-200 h-96 rounded-xl"></div>
+      <div class="space-y-4">
+        <div class="bg-gray-200 h-8 w-3/4 rounded"></div>
+        <div class="bg-gray-200 h-6 w-1/4 rounded"></div>
+        <div class="bg-gray-200 h-24 w-full rounded"></div>
+      </div>
+    </div>
+  } @else if (!product()) {
+    <p class="text-center text-brand-brown py-20">المنتج غير موجود</p>
+  } @else {
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+
+        <!-- صورة المنتج -->
+        <div class="bg-white rounded-xl overflow-hidden h-96 md:h-[500px]">
+          @if (product()!.imageUrl) {
+            <img
+              [src]="product()!.imageUrl"
+              [alt]="product()!.name"
+              class="w-full h-full object-cover"
+            />
+          } @else {
+            <div class="w-full h-full flex items-center justify-center text-gray-300">
+              لا توجد صورة
+            </div>
+          }
+        </div>
+
+        <!-- تفاصيل المنتج -->
+        <div>
+          <p class="text-sm text-brand-brown mb-2">{{ product()!.categoryName }}</p>
+          <h1 class="font-serif text-3xl text-brand-black mb-3">{{ product()!.name }}</h1>
+
+          <p class="text-sm text-brand-brown mb-4">
+            بائع: <span class="text-brand-black font-medium">{{ product()!.sellerStoreName }}</span>
+          </p>
+
+          <p class="font-serif text-3xl text-brand-gold font-semibold mb-6">
+            {{ product()!.price | number }} جنيه
+          </p>
+
+          <p class="text-sm text-gray-600 leading-relaxed mb-8">
+            {{ product()!.description }}
+          </p>
+
+          @if (product()!.stockQuantity > 0) {
+
+            <!-- Quantity Selector -->
+            <div class="flex items-center gap-4 mb-6">
+              <span class="text-sm font-medium text-brand-black">الكمية</span>
+              <div class="flex items-center border border-gray-300 rounded-lg">
+                <button
+                  type="button"
+                  (click)="decreaseQuantity()"
+                  class="w-10 h-10 flex items-center justify-center text-brand-black hover:text-brand-gold transition-colors"
+                >
+                  <lucide-angular [img]="MinusIcon" [size]="16"></lucide-angular>
+                </button>
+                <span class="w-10 text-center text-sm font-medium">{{ quantity() }}</span>
+                <button
+                  type="button"
+                  (click)="increaseQuantity()"
+                  class="w-10 h-10 flex items-center justify-center text-brand-black hover:text-brand-gold transition-colors"
+                >
+                  <lucide-angular [img]="PlusIcon" [size]="16"></lucide-angular>
+                </button>
+              </div>
+              <span class="text-xs text-gray-400">({{ product()!.stockQuantity }} متاح)</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-3">
+              <button
+                type="button"
+                (click)="addToCart()"
+                [disabled]="isAddingToCart()"
+                class="flex-1 flex items-center justify-center gap-2 bg-brand-black text-white py-3.5 rounded-lg font-medium hover:bg-brand-gold transition-colors disabled:opacity-50"
+              >
+                <lucide-angular [img]="CartIcon" [size]="18"></lucide-angular>
+                {{ isAddingToCart() ? 'جاري الإضافة...' : 'أضف للسلة' }}
+              </button>
+
+              <button
+  type="button"
+  (click)="toggleWishlist()"
+  class="w-14 h-14 flex items-center justify-center border border-gray-300 rounded-lg hover:border-brand-gold transition-colors"
+  [class.text-brand-gold]="wishlistService.isInWishlist(product()!.id)"
+>
+  <lucide-angular
+    [img]="HeartIcon"
+    [size]="20"
+    [class.icon-filled]="wishlistService.isInWishlist(product()!.id)"
+  ></lucide-angular>
+</button>
+            </div>
+
+          } @else {
+            <p class="text-red-500 font-medium">نفذت الكمية المتاحة من هذا المنتج</p>
+          }
+
+        </div>
+
+      </div>
+    </div>
+
+  }
+
+</div>

@@ -1,0 +1,75 @@
+<div class="bg-brand-cream min-h-screen py-10">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <h1 class="font-serif text-3xl text-brand-black mb-8">إتمام الطلب</h1>
+
+    @if (cartService.cart() && cartService.cart()!.items.length > 0) {
+
+      <!-- ملخص سريع -->
+      <div class="bg-white rounded-xl p-6 mb-6">
+        <h2 class="font-serif text-lg text-brand-black mb-4">ملخص الطلب</h2>
+        @for (item of cartService.cart()!.items; track item.productId) {
+          <div class="flex items-center justify-between text-sm py-2 border-b border-gray-50 last:border-0">
+            <span class="text-brand-brown">{{ item.productName }} × {{ item.quantity }}</span>
+            <span class="text-brand-black font-medium">{{ item.subtotal | number }} جنيه</span>
+          </div>
+        }
+        <div class="flex items-center justify-between text-lg font-semibold mt-4 pt-4 border-t border-gray-100">
+          <span class="text-brand-black">الإجمالي</span>
+          <span class="text-brand-gold">{{ cartService.cart()!.totalPrice | number }} جنيه</span>
+        </div>
+      </div>
+
+      <!-- طرق الدفع -->
+      <div class="bg-white rounded-xl p-6">
+        <h2 class="font-serif text-lg text-brand-black mb-4">طريقة الدفع</h2>
+
+        @if (isLoading()) {
+          <div class="space-y-3 animate-pulse">
+            @for (i of [1,2]; track i) {
+              <div class="bg-gray-100 h-14 rounded-lg"></div>
+            }
+          </div>
+        } @else {
+          <div class="space-y-3">
+           @for (method of paymentMethods(); track method.id) {
+  <label
+    class="flex items-center justify-between gap-3 border-2 rounded-lg p-4 cursor-pointer transition-all"
+    [class.border-brand-gold]="selectedMethodId() === method.id"
+    [class.border-gray-200]="selectedMethodId() !== method.id"
+  >
+    <div class="flex items-center gap-3">
+      <input
+        type="radio"
+        name="paymentMethod"
+        [checked]="selectedMethodId() === method.id"
+        (change)="selectMethod(method.id)"
+        class="accent-brand-gold"
+      />
+      <span class="text-sm font-medium text-brand-black">{{ method.methodName }}</span>
+    </div>
+
+    <span class="text-xs text-gray-400">
+      {{ method.type === 'Gateway' ? 'دفع إلكتروني مباشر' : 'تحويل + رفع إثبات' }}
+    </span>
+  </label>
+}
+          </div>
+        }
+
+        <button
+          type="button"
+          (click)="confirmOrder()"
+          [disabled]="isProcessing()"
+          class="w-full bg-brand-black text-white py-3.5 rounded-lg font-medium hover:bg-brand-gold transition-colors mt-6 disabled:opacity-50"
+        >
+          {{ isProcessing() ? 'جاري التنفيذ...' : 'تأكيد الطلب' }}
+        </button>
+      </div>
+
+    } @else {
+      <p class="text-center text-brand-brown py-20">سلتك فارغة، لا يمكن إتمام الطلب</p>
+    }
+
+  </div>
+</div>

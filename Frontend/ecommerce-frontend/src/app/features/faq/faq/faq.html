@@ -1,0 +1,36 @@
+<div class="bg-brand-cream min-h-screen py-16">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <h1 class="font-serif text-4xl text-brand-black text-center mb-4">الأسئلة الشائعة</h1>
+    <p class="text-center text-brand-brown mb-12">إجابات على أكثر الأسئلة اللي بتوصلنا</p>
+
+    <div class="space-y-4">
+      @for (faq of faqs; track faq.question; let i = $index) {
+        <div class="bg-white rounded-xl overflow-hidden">
+
+          <button
+            type="button"
+            (click)="toggle(i)"
+            class="w-full flex items-center justify-between gap-4 p-5 text-right"
+          >
+            <span class="text-sm font-medium text-brand-black">{{ faq.question }}</span>
+            <lucide-angular
+              [img]="ChevronDownIcon"
+              [size]="18"
+              [class.rotate-180]="openIndex() === i"
+              class="text-brand-gold transition-transform duration-200 shrink-0"
+            ></lucide-angular>
+          </button>
+
+          @if (openIndex() === i) {
+            <div class="px-5 pb-5 text-sm text-gray-600 leading-relaxed animate-fade-in">
+              {{ faq.answer }}
+            </div>
+          }
+
+        </div>
+      }
+    </div>
+
+  </div>
+</div>

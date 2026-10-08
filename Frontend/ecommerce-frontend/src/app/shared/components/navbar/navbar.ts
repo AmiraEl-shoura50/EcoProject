@@ -5,7 +5,8 @@ import { LucideAngularModule, ShoppingCart, Heart, User, LogOut, Search, Menu, X
 import { AuthService } from '../../../core/services/auth';
 import { CategoryService } from '../../../core/services/category';
 import { Category } from '../../../core/models/category.model';
-
+import { CartService } from '../../../core/services/cart';
+import { WishlistService } from '../../../core/services/wishlist';
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -44,7 +45,9 @@ export class Navbar implements OnInit {
 
   constructor(
     public authService: AuthService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+     public cartService: CartService,
+  public wishlistService: WishlistService
   ) {}
 
   ngOnInit(): void {

@@ -1,0 +1,40 @@
+<div class="bg-brand-cream min-h-screen py-10">
+  <div class="max-w-md mx-auto px-4">
+
+    <div class="bg-white rounded-xl p-8">
+      <h1 class="font-serif text-2xl text-brand-black mb-2">رفع إثبات الدفع</h1>
+      <p class="text-sm text-brand-brown mb-6">
+        قم بتحويل المبلغ المطلوب، ثم ارفع صورة من إثبات التحويل هنا
+      </p>
+
+      <!-- اختيار الصورة -->
+      <label class="block border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-brand-gold transition-colors mb-4">
+        <input type="file" accept="image/*" (change)="onFileSelected($event)" class="hidden" />
+
+        @if (previewUrl()) {
+          <img [src]="previewUrl()" alt="معاينة" class="max-h-48 mx-auto rounded-lg" />
+        } @else {
+          <p class="text-sm text-gray-400">اضغط لاختيار صورة إثبات التحويل</p>
+        }
+      </label>
+
+      <!-- رقم العملية (اختياري) -->
+      <input
+        type="text"
+        [(ngModel)]="transferReference"
+        placeholder="رقم العملية (اختياري)"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all mb-6"
+      />
+
+      <button
+        type="button"
+        (click)="submit()"
+        [disabled]="isSubmitting()"
+        class="w-full bg-brand-black text-white py-3.5 rounded-lg font-medium hover:bg-brand-gold transition-colors disabled:opacity-50"
+      >
+        {{ isSubmitting() ? 'جاري الرفع...' : 'إرسال إثبات الدفع' }}
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,113 @@
+<div class="bg-brand-cream min-h-screen py-10">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <h1 class="font-serif text-3xl text-brand-black mb-8">طلباتي</h1>
+
+    @if (isLoading()) {
+      <div class="space-y-4 animate-pulse">
+        @for (i of [1,2,3]; track i) {
+          <div class="bg-white rounded-xl h-40"></div>
+        }
+      </div>
+    } @else if (orders().length === 0) {
+      <div class="text-center py-20">
+        <p class="text-brand-brown mb-4">لسه معندكيش طلبات</p>
+        <a routerLink="/" class="text-brand-gold font-medium hover:underline">ابدأي التسوق</a>
+      </div>
+    } @else {
+
+      <div class="space-y-5">
+        @for (order of orders(); track order.id) {
+          <div class="bg-white rounded-xl p-5 shadow-sm">
+
+            <!-- رأس الطلب -->
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <div>
+                <p class="text-sm font-semibold text-brand-black">طلب رقم #{{ order.id }}</p>
+                <p class="text-xs text-brand-brown mt-0.5">{{ order.createdDate | date:'dd/MM/yyyy' }}</p>
+              </div>
+              <span class="text-xs font-medium px-3 py-1 rounded-full" [ngClass]="statusClass(order.status)">
+                {{ statusLabel(order.status) }}
+              </span>
+            </div>
+
+            <!-- المنتجات -->
+            <div class="space-y-3 border-t border-gray-100 pt-4">
+              @for (item of order.items; track item.productId) {
+                <div class="flex items-center gap-3">
+                  <div class="w-14 h-14 bg-gray-100 rounded-lg overflow-hidden shrink-0">
+                    @if (item.productImageUrl) {
+                      <img [src]="item.productImageUrl" [alt]="item.productName" class="w-full h-full object-cover" />
+                    }
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm text-brand-black line-clamp-1">{{ item.productName }}</p>
+                    <p class="text-xs text-brand-brown">الكمية: {{ item.quantity }}</p>
+                  </div>
+                  <p class="text-sm font-medium text-brand-black">{{ item.subtotal | number }} جنيه</p>
+                </div>
+              }
+            </div>
+
+            <!-- الإجمالي والدفع -->
+            <div class="flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 mt-4 pt-4">
+              <p class="text-xs text-brand-brown">طريقة الدفع: {{ order.paymentMethodName }}</p>
+              <p class="text-base font-semibold text-brand-black">
+                الإجمالي: <span class="text-brand-gold">{{ order.totalAmount | number }} جنيه</span>
+              </p>
+            </div>
+
+            <!-- الأزرار -->
+            @if (canUploadProof(order) || canCancel(order)) {
+              <div class="flex flex-wrap items-center gap-3 mt-4">
+                @if (canUploadProof(order)) {
+                  <a
+                    [routerLink]="['/orders', order.id, 'payment-proof']"
+                    class="bg-brand-black text-white text-sm px-4 py-2 rounded-lg hover:bg-brand-gold transition-colors"
+                  >
+                    ارفعي إثبات الدفع
+                  </a>
+                }
+                @if (canCancel(order)) {
+                  <button
+                    type="button"
+                    (click)="cancelOrder(order)"
+                    [disabled]="cancellingId() === order.id"
+                    class="text-sm text-red-500 border border-red-200 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                  >
+                    {{ cancellingId() === order.id ? 'جاري الإلغاء...' : 'إلغاء الطلب' }}
+                  </button>
+                }
+              </div>
+            }
+
+          </div>
+        }
+      </div>
+
+      @if (totalPages() > 1) {
+        <div class="flex items-center justify-center gap-2 mt-10">
+          <button
+            type="button"
+            (click)="goToPage(currentPage() - 1)"
+            [disabled]="!hasPreviousPage()"
+            class="px-4 py-2 rounded-lg border border-gray-300 text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            السابق
+          </button>
+          <span class="text-sm text-brand-brown px-4">صفحة {{ currentPage() }} من {{ totalPages() }}</span>
+          <button
+            type="button"
+            (click)="goToPage(currentPage() + 1)"
+            [disabled]="!hasNextPage()"
+            class="px-4 py-2 rounded-lg border border-gray-300 text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            التالي
+          </button>
+        </div>
+      }
+
+    }
+
+  </div>
+</div>

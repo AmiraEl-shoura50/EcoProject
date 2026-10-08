@@ -15,12 +15,47 @@
     </div>
   </section>
 
+  <!-- ✅ Categories Section -->
+@if (categories().length > 0) {
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h2 class="font-serif text-3xl text-brand-black mb-8 text-center">
+      أقســامنـــا
+    </h2>
+
+    <div class="flex flex-wrap justify-center gap-8">
+      @for (category of categories(); track category.id) {
+        <a
+          [routerLink]="['/category', category.id]"
+          class="group relative rounded-xl overflow-hidden h-56 md:h-72 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm bg-gray-100"
+        >
+          @if (category.imageUrl) {
+            <img
+              [src]="category.imageUrl"
+              [alt]="category.name"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          } @else {
+            <div class="w-full h-full bg-brand-black/10"></div>
+          }
+
+          <div
+            class="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center"
+          >
+            <h3 class="text-white font-serif text-xl md:text-2xl">
+              {{ category.name }}
+            </h3>
+          </div>
+        </a>
+      }
+    </div>
+  </section>
+}
 
   <!-- Products Section -->
   <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-    <h2 class="font-serif text-3xl text-brand-black mb-8">
-      منتجات مميزة
+    <h2 class="font-serif text-3xl text-brand-black mb-8 text-center">
+      منتجــــات ممـيــزة
     </h2>
 
 
@@ -69,5 +104,56 @@
     }
 
   </section>
+  <!-- آراء العملاء -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
+    <div class="bg-white border border-brand-gold/30 rounded-2xl shadow-lg p-6 md:p-10">
+
+      <h2 class="font-serif text-3xl text-brand-black mb-10 text-center">آراء عملائنا</h2>
+
+      <div class="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-4 no-scrollbar">
+
+        <!-- الآراء الثابتة -->
+        @for (testimonial of staticTestimonials; track testimonial.customerName) {
+          <div class="bg-brand-cream border border-gray-200 rounded-xl p-6 w-72 md:w-80 shrink-0 snap-start">
+            <div class="flex items-center gap-1 mb-3 text-brand-gold">
+              @for (star of stars; track star) {
+                <lucide-angular
+                  [img]="StarIcon"
+                  [size]="16"
+                  [class.icon-filled]="star <= testimonial.rating"
+                ></lucide-angular>
+              }
+            </div>
+            <p class="text-sm text-gray-600 leading-relaxed mb-4">{{ testimonial.comment }}</p>
+            <p class="text-sm font-medium text-brand-black">{{ testimonial.customerName }}</p>
+          </div>
+        }
+
+        <!-- الآراء الحقيقية من الباك إند -->
+        @for (review of latestReviews(); track review.createdAt) {
+          <div class="bg-brand-cream border border-gray-200 rounded-xl p-6 w-72 md:w-80 shrink-0 snap-start">
+            <div class="flex items-center gap-1 mb-3 text-brand-gold">
+              @for (star of stars; track star) {
+                <lucide-angular
+                  [img]="StarIcon"
+                  [size]="16"
+                  [class.icon-filled]="star <= review.rating"
+                ></lucide-angular>
+              }
+            </div>
+            @if (review.comment) {
+              <p class="text-sm text-gray-600 leading-relaxed mb-4 line-clamp-3">{{ review.comment }}</p>
+            }
+            <p class="text-sm font-medium text-brand-black">{{ review.customerName }}</p>
+            <p class="text-xs text-brand-brown mt-1">عن منتج: {{ review.productName }}</p>
+          </div>
+        }
+
+      </div>
+
+    </div>
+
+  </section>
+ 
 </div>

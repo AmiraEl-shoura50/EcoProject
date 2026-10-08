@@ -14,7 +14,7 @@
       </a>
 
       <!-- Categories - Desktop (في النص) -->
-      <div class="hidden md:flex flex-1 items-center justify-center gap-6 text-sm font-medium">
+      <div class="hidden  md:flex flex-1 items-center justify-center gap-6 text-sm font-medium">
 
         @for (category of visibleCategories(); track category.id) {
           <div
@@ -101,27 +101,31 @@
 
         @if (authService.isLoggedIn()) {
 
-          <!-- Wishlist - Desktop -->
-            <a
-            routerLink="/wishlist"
-            class="hidden md:block text-brand-black hover:text-brand-gold transition-colors"
-          >
-            <lucide-angular
-              [img]="HeartIcon"
-              [size]="22"
-            ></lucide-angular>
-          </a>
+         <!-- Wishlist - Desktop -->
+<a
+  routerLink="/wishlist"
+  class="hidden md:block relative text-brand-black hover:text-brand-gold transition-colors"
+>
+  <lucide-angular [img]="HeartIcon" [size]="22"></lucide-angular>
+  @if (wishlistService.itemsCount() > 0) {
+    <span class="absolute -top-2 -left-2 bg-brand-gold text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+      {{ wishlistService.itemsCount() }}
+    </span>
+  }
+</a>
 
-          <!-- Cart - Desktop -->
-            <a
-            routerLink="/cart"
-            class="hidden md:block text-brand-black hover:text-brand-gold transition-colors"
-          >
-            <lucide-angular
-              [img]="CartIcon"
-              [size]="22"
-            ></lucide-angular>
-          </a>
+<!-- Cart - Desktop -->
+<a
+  routerLink="/cart"
+  class="hidden md:block relative text-brand-black hover:text-brand-gold transition-colors"
+>
+  <lucide-angular [img]="CartIcon" [size]="22"></lucide-angular>
+  @if (cartService.itemsCount() > 0) {
+    <span class="absolute -top-2 -left-2 bg-brand-gold text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+      {{ cartService.itemsCount() }}
+    </span>
+  }
+</a>
 
           <!-- User Dropdown - Desktop -->
           <div class="relative hidden md:block">
