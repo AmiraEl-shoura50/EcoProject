@@ -39,7 +39,7 @@ public class CartController : ControllerBase
         if (customerId is null) return Forbid();
 
         var added = await _cartService.AddItemAsync(customerId.Value, dto);
-        if (!added) return BadRequest("تعذر إضافة المنتج - تأكدي من الكمية والمخزون المتاح");
+        if (!added) return BadRequest("تعذر إضافة المنتج - تأكد من الكمية والمخزون المتاح");
         return Ok();
     }
 

@@ -44,7 +44,7 @@ public class ReviewsController : ControllerBase
 
         var created = await _reviewService.CreateAsync(customerId.Value, dto);
         if (created is null)
-            return BadRequest("لا يمكن إضافة التقييم - تأكدي أن الطلب مكتمل وأنك اشتريتِ هذا المنتج ولم تقيّميه من قبل");
+            return BadRequest("لا يمكن إضافة التقييم - تأكد أن الطلب مكتمل وأنك اشتريت هذا المنتج ولم تقيّميه من قبل");
 
         return Ok(created);
     }

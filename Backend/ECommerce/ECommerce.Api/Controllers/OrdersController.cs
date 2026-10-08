@@ -44,7 +44,7 @@ public class OrdersController : ControllerBase
         if (customerId is null) return Forbid();
 
         var proof = await _orderService.SubmitPaymentProofAsync(customerId.Value, id, dto);
-        if (proof is null) return BadRequest("تعذر رفع إثبات الدفع - تأكدي من حالة الطلب وطريقة الدفع");
+        if (proof is null) return BadRequest("تعذر رفع إثبات الدفع - تأكد من حالة الطلب وطريقة الدفع");
 
         return Ok(proof);
     }
@@ -125,7 +125,7 @@ public class OrdersController : ControllerBase
         if (sellerId is null) return Forbid();
 
         var updated = await _orderService.UpdateStatusAsync(id, sellerId.Value, dto.NewStatus);
-        if (!updated) return BadRequest("لا يمكن تحديث حالة الطلب - تأكدي من صحة الانتقال المطلوب");
+        if (!updated) return BadRequest("لا يمكن تحديث حالة الطلب - تأكد من صحة الانتقال المطلوب");
 
         return NoContent();
     }
