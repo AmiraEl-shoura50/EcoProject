@@ -3,8 +3,28 @@
   "WorkspaceRootPath": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Infrastructure\\Migrations\\20261008111712_AddOrderIsDeletedByCustomer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:ECommerce.Infrastructure\\Migrations\\20261008111712_AddOrderIsDeletedByCustomer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{F57E33FB-CDB3-6F39-453C-B2F68A5DC768}|ECommerce.Api\\ECommerce.API.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.api\\controllers\\orderscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F57E33FB-CDB3-6F39-453C-B2F68A5DC768}|ECommerce.Api\\ECommerce.API.csproj|solutionrelative:ecommerce.api\\controllers\\orderscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\services\\orderservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|solutionrelative:ecommerce.application\\services\\orderservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\interfaces\\services\\iorderservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|solutionrelative:ecommerce.application\\interfaces\\services\\iorderservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\validators\\order\\deleteordersdtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|solutionrelative:ecommerce.application\\validators\\order\\deleteordersdtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\dtos\\order\\deleteordersdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|solutionrelative:ecommerce.application\\dtos\\order\\deleteordersdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5FADC3C0-1F67-920F-5C71-8D15AD76BB65}|ECommerce.Infrastructure\\ECommerce.Infrastructure.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.infrastructure\\repositories\\orderrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5FADC3C0-1F67-920F-5C71-8D15AD76BB65}|ECommerce.Infrastructure\\ECommerce.Infrastructure.csproj|solutionrelative:ecommerce.infrastructure\\repositories\\orderrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{17F99BF9-7DFE-F3DF-8AF8-E1F96903B5E4}|ECommerce.Domain\\ECommerce.Domain.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.domain\\entities\\order.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -33,7 +53,7 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 9,
               "Title": "secrets.json",
               "DocumentMoniker": "C:\\Users\\YAS\\AppData\\Roaming\\Microsoft\\UserSecrets\\7b5eb2bf-83bf-466b-b96a-c647e979818e\\secrets.json",
               "ToolTip": "C:\\Users\\YAS\\AppData\\Roaming\\Microsoft\\UserSecrets\\7b5eb2bf-83bf-466b-b96a-c647e979818e\\secrets.json",
@@ -46,19 +66,84 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "20261008111712_AddOrderIsDeletedByCustomer.cs",
-              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Infrastructure\\Migrations\\20261008111712_AddOrderIsDeletedByCustomer.cs",
-              "RelativeDocumentMoniker": "ECommerce.Infrastructure\\Migrations\\20261008111712_AddOrderIsDeletedByCustomer.cs",
-              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Infrastructure\\Migrations\\20261008111712_AddOrderIsDeletedByCustomer.cs",
-              "RelativeToolTip": "ECommerce.Infrastructure\\Migrations\\20261008111712_AddOrderIsDeletedByCustomer.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "OrdersController.cs",
+              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Api\\Controllers\\OrdersController.cs",
+              "RelativeDocumentMoniker": "ECommerce.Api\\Controllers\\OrdersController.cs",
+              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Api\\Controllers\\OrdersController.cs*",
+              "RelativeToolTip": "ECommerce.Api\\Controllers\\OrdersController.cs*",
+              "ViewState": "AgIAAJEAAAAAAAAAAAAAAI4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-08T11:17:12.42Z",
+              "WhenOpened": "2026-10-08T11:24:50.071Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "OrderService.cs",
+              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Services\\OrderService.cs",
+              "RelativeDocumentMoniker": "ECommerce.Application\\Services\\OrderService.cs",
+              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Services\\OrderService.cs*",
+              "RelativeToolTip": "ECommerce.Application\\Services\\OrderService.cs*",
+              "ViewState": "AgIAAOAAAAAAAAAAAAAcwA0BAABaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-08T11:23:08.907Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "IOrderService.cs",
+              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Interfaces\\Services\\IOrderService.cs",
+              "RelativeDocumentMoniker": "ECommerce.Application\\Interfaces\\Services\\IOrderService.cs",
+              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Interfaces\\Services\\IOrderService.cs*",
+              "RelativeToolTip": "ECommerce.Application\\Interfaces\\Services\\IOrderService.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-08T11:22:18.201Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "DeleteOrdersDtoValidator.cs",
+              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Validators\\Order\\DeleteOrdersDtoValidator.cs",
+              "RelativeDocumentMoniker": "ECommerce.Application\\Validators\\Order\\DeleteOrdersDtoValidator.cs",
+              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Validators\\Order\\DeleteOrdersDtoValidator.cs*",
+              "RelativeToolTip": "ECommerce.Application\\Validators\\Order\\DeleteOrdersDtoValidator.cs*",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAxwA0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-08T11:21:26.586Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "DeleteOrdersDto.cs",
+              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\DTOs\\Order\\DeleteOrdersDto.cs",
+              "RelativeDocumentMoniker": "ECommerce.Application\\DTOs\\Order\\DeleteOrdersDto.cs",
+              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\DTOs\\Order\\DeleteOrdersDto.cs*",
+              "RelativeToolTip": "ECommerce.Application\\DTOs\\Order\\DeleteOrdersDto.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-08T11:20:23.159Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "OrderRepository.cs",
+              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Infrastructure\\Repositories\\OrderRepository.cs",
+              "RelativeDocumentMoniker": "ECommerce.Infrastructure\\Repositories\\OrderRepository.cs",
+              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Infrastructure\\Repositories\\OrderRepository.cs*",
+              "RelativeToolTip": "ECommerce.Infrastructure\\Repositories\\OrderRepository.cs*",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAwBIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-08T11:18:16.724Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "Order.cs",
               "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Domain\\Entities\\Order.cs",
               "RelativeDocumentMoniker": "ECommerce.Domain\\Entities\\Order.cs",
@@ -71,7 +156,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 7,
               "Title": "OrderProfile.cs",
               "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Mappings\\OrderProfile.cs",
               "RelativeDocumentMoniker": "ECommerce.Application\\Mappings\\OrderProfile.cs",
@@ -84,7 +169,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 8,
               "Title": "OrderDto.cs",
               "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\DTOs\\Order\\OrderDto.cs",
               "RelativeDocumentMoniker": "ECommerce.Application\\DTOs\\Order\\OrderDto.cs",
