@@ -11,20 +11,59 @@
       </div>
     } @else if (orders().length === 0) {
       <div class="text-center py-20">
-        <p class="text-brand-brown mb-4">لسه معندكيش طلبات</p>
-        <a routerLink="/" class="text-brand-gold font-medium hover:underline">ابدأي التسوق</a>
+        <p class="text-brand-brown mb-4">لا توجد طلبات</p>
+        <a routerLink="/" class="text-brand-gold font-medium hover:underline">ابدأ التسوق</a>
       </div>
     } @else {
 
+      <!-- شريط حذف الطلبات الملغية: بيظهر بس لو في طلبات ملغية في الصفحة -->
+      @if (cancelledOrders().length > 0) {
+        <div class="bg-white rounded-xl p-4 mb-5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+          <label class="flex items-center gap-2 text-sm text-brand-black cursor-pointer">
+            <input
+              type="checkbox"
+              [checked]="allCancelledSelected()"
+              (change)="toggleSelectAll()"
+              class="accent-brand-gold w-4 h-4"
+            />
+            تحديد كل الطلبات الملغية
+          </label>
+
+          <button
+            type="button"
+            (click)="deleteSelected()"
+            [disabled]="selectedIds().length === 0 || isDeleting()"
+            class="text-sm text-white bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {{ isDeleting() ? 'جاري الحذف...' : 'حذف المحدد (' + selectedIds().length + ')' }}
+          </button>
+        </div>
+      }
+
       <div class="space-y-5">
         @for (order of orders(); track order.id) {
-          <div class="bg-white rounded-xl p-5 shadow-sm">
+          <div
+            class="bg-white rounded-xl p-5 shadow-sm border-2 transition-colors"
+            [class.border-red-200]="isSelected(order.id)"
+            [class.border-transparent]="!isSelected(order.id)"
+          >
 
             <!-- رأس الطلب -->
             <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-              <div>
-                <p class="text-sm font-semibold text-brand-black">طلب رقم #{{ order.id }}</p>
-                <p class="text-xs text-brand-brown mt-0.5">{{ order.createdDate | date:'dd/MM/yyyy' }}</p>
+              <div class="flex items-center gap-3">
+                @if (order.status === 'Cancelled') {
+                  <input
+                    type="checkbox"
+                    [checked]="isSelected(order.id)"
+                    (change)="toggleSelect(order.id)"
+                    class="accent-brand-gold w-4 h-4 cursor-pointer"
+                    [attr.aria-label]="'تحديد الطلب رقم ' + order.id"
+                  />
+                }
+                <div>
+                  <p class="text-sm font-semibold text-brand-black">طلب رقم #{{ order.id }}</p>
+                  <p class="text-xs text-brand-brown mt-0.5">{{ order.createdDate | date:'dd/MM/yyyy' }}</p>
+                </div>
               </div>
               <span class="text-xs font-medium px-3 py-1 rounded-full" [ngClass]="statusClass(order.status)">
                 {{ statusLabel(order.status) }}
@@ -65,7 +104,7 @@
                     [routerLink]="['/orders', order.id, 'payment-proof']"
                     class="bg-brand-black text-white text-sm px-4 py-2 rounded-lg hover:bg-brand-gold transition-colors"
                   >
-                    ارفعي إثبات الدفع
+                    ارفع إثبات الدفع
                   </a>
                 }
                 @if (canCancel(order)) {

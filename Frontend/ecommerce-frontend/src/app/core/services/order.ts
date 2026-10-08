@@ -42,4 +42,7 @@ getMyOrders(pageNumber: number, pageSize: number): Observable<ApiResponse<Pagina
 cancel(orderId: number): Observable<unknown> {
   return this.http.put(`${this.apiUrl}/${orderId}/cancel`, {});
 }
+deleteCancelled(orderIds: number[]): Observable<unknown> {
+  return this.http.post(`${this.apiUrl}/delete-cancelled`, { orderIds });
+}
 }

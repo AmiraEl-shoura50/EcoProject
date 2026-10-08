@@ -3,6 +3,8 @@ export interface WishlistItem {
   productName: string;
   productImageUrl: string | null;
   price: number;
+  stockQuantity: number;
+  rating: number;
 }
 
 export interface Wishlist {

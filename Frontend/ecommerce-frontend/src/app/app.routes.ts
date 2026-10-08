@@ -33,19 +33,6 @@ export const routes: Routes = [
   loadComponent: () => import('./features/products/product-details/product-details').then(m => m.ProductDetails)
 },
 {
-  path: 'cart',
-  loadComponent: () => import('./features/cart/cart-page/cart-page').then(m => m.CartPage)
-}
-,
-{
-  path: 'checkout',
-  loadComponent: () => import('./features/checkout/checkout/checkout').then(m => m.Checkout)
-},
-{
-  path: 'orders/:id/payment-proof',
-  loadComponent: () => import('./features/orders/payment-proof/payment-proof').then(m => m.PaymentProof)
-}
-,{
   path: 'faq',
   loadComponent: () => import('./features/faq/faq/faq').then(m => m.Faq)
 }
@@ -53,6 +40,31 @@ export const routes: Routes = [
 {
   path: 'orders',
   loadComponent: () => import('./features/orders/orders-page/orders-page').then(m => m.OrdersPage),
+  canActivate: [authGuard]
+},
+{
+  path: 'wishlist',
+  loadComponent: () => import('./features/wishlist/wishlist-page/wishlist-page').then(m => m.WishlistPage),
+  canActivate: [authGuard]
+},
+{
+  path: 'cart',
+  loadComponent: () => import('./features/cart/cart-page/cart-page').then(m => m.CartPage),
+  canActivate: [authGuard]
+},
+{
+  path: 'checkout',
+  loadComponent: () => import('./features/checkout/checkout/checkout').then(m => m.Checkout),
+  canActivate: [authGuard]
+},
+{
+  path: 'orders/:id/payment-proof',
+  loadComponent: () => import('./features/orders/payment-proof/payment-proof').then(m => m.PaymentProof),
+  canActivate: [authGuard]
+},
+{
+  path: 'profile',
+  loadComponent: () => import('./features/profile/profile-page/profile-page').then(m => m.ProfilePage),
   canActivate: [authGuard]
 }
 ];

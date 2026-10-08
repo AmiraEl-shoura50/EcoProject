@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { OrderService } from '../../../core/services/order';
@@ -16,6 +16,19 @@ export class OrdersPage implements OnInit {
   orders = signal<Order[]>([]);
   isLoading = signal<boolean>(true);
   cancellingId = signal<number | null>(null);
+
+  // ✅ جديد - التحديد والحذف
+  selectedIds = signal<number[]>([]);
+  isDeleting = signal<boolean>(false);
+
+  cancelledOrders = computed(() =>
+    this.orders().filter(o => o.status === 'Cancelled')
+  );
+
+  allCancelledSelected = computed(() =>
+    this.cancelledOrders().length > 0 &&
+    this.cancelledOrders().every(o => this.selectedIds().includes(o.id))
+  );
 
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
@@ -67,8 +80,47 @@ export class OrdersPage implements OnInit {
     return order.status === 'Pending' && order.paymentMethodType === 'Manual';
   }
 
+  // ---- التحديد ----
+  isSelected(orderId: number): boolean {
+    return this.selectedIds().includes(orderId);
+  }
+
+  toggleSelect(orderId: number): void {
+    this.selectedIds.update(ids =>
+      ids.includes(orderId) ? ids.filter(id => id !== orderId) : [...ids, orderId]
+    );
+  }
+
+  toggleSelectAll(): void {
+    if (this.allCancelledSelected()) {
+      this.selectedIds.set([]);
+    } else {
+      this.selectedIds.set(this.cancelledOrders().map(o => o.id));
+    }
+  }
+
+  deleteSelected(): void {
+    const ids = this.selectedIds();
+    if (ids.length === 0) return;
+
+    if (!confirm(`متأكدة إنك عايزة تمسحي ${ids.length} طلب؟`)) return;
+
+    this.isDeleting.set(true);
+
+    this.orderService.deleteCancelled(ids).subscribe({
+      next: () => {
+        this.isDeleting.set(false);
+        this.selectedIds.set([]);
+        this.toastService.show('تم حذف الطلبات المحددة', 'success');
+        this.loadOrders();
+      },
+      error: () => this.isDeleting.set(false)
+    });
+  }
+
   goToPage(page: number): void {
     if (page < 1 || page > this.totalPages()) return;
+    this.selectedIds.set([]);
     this.currentPage.set(page);
     this.loadOrders();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -95,6 +147,14 @@ export class OrdersPage implements OnInit {
     this.orderService.getMyOrders(this.currentPage(), this.pageSize).subscribe({
       next: (response) => {
         const result = response.data;
+
+        // ✅ لو مسحنا كل طلبات الصفحة الأخيرة، نرجع صفحة لورا بدل ما نفضل في صفحة فاضية
+        if (result.items.length === 0 && this.currentPage() > 1) {
+          this.currentPage.set(this.currentPage() - 1);
+          this.loadOrders();
+          return;
+        }
+
         this.orders.set(result.items);
         this.totalPages.set(result.totalPages);
         this.hasPreviousPage.set(result.hasPreviousPage);

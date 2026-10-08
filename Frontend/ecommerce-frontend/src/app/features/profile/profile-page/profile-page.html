@@ -1,0 +1,71 @@
+<div class="bg-brand-cream min-h-screen py-10">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <h1 class="font-serif text-3xl text-brand-black mb-8">حسابي</h1>
+
+    @if (isLoading()) {
+
+      <div class="space-y-4 animate-pulse">
+        <div class="bg-white rounded-2xl h-32"></div>
+        <div class="bg-white rounded-2xl h-48"></div>
+      </div>
+
+    } @else if (customer()) {
+
+      <!-- بطاقة المستخدم -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-5 mb-6">
+        <div class="w-16 h-16 rounded-full bg-brand-black text-brand-gold font-serif text-2xl flex items-center justify-center shrink-0">
+          {{ initial() }}
+        </div>
+        <div class="min-w-0">
+          <p class="font-serif text-xl text-brand-black">{{ customer()!.firstName }} {{ customer()!.lastName }}</p>
+          <p class="text-sm text-brand-brown truncate">{{ customer()!.email }}</p>
+          @if (customer()!.phoneNumber) {
+            <p class="text-sm text-brand-brown mt-0.5" dir="ltr">{{ customer()!.phoneNumber }}</p>
+          }
+        </div>
+      </div>
+
+      <!-- روابط سريعة -->
+      <div class="grid grid-cols-3 gap-3 mb-6">
+        <a routerLink="/orders" class="bg-white rounded-xl border border-gray-100 p-4 text-center hover:border-brand-gold hover:text-brand-gold transition-colors">
+          <lucide-angular [img]="OrdersIcon" [size]="22" class="mx-auto mb-2"></lucide-angular>
+          <span class="text-xs sm:text-sm">طلباتي</span>
+        </a>
+        <a routerLink="/wishlist" class="bg-white rounded-xl border border-gray-100 p-4 text-center hover:border-brand-gold hover:text-brand-gold transition-colors">
+          <lucide-angular [img]="HeartIcon" [size]="22" class="mx-auto mb-2"></lucide-angular>
+          <span class="text-xs sm:text-sm">المفضلة</span>
+        </a>
+        <a routerLink="/cart" class="bg-white rounded-xl border border-gray-100 p-4 text-center hover:border-brand-gold hover:text-brand-gold transition-colors">
+          <lucide-angular [img]="CartIcon" [size]="22" class="mx-auto mb-2"></lucide-angular>
+          <span class="text-xs sm:text-sm">السلة</span>
+        </a>
+      </div>
+
+      <!-- تعديل العنوان -->
+      <form [formGroup]="form" (ngSubmit)="save()" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <h2 class="font-serif text-lg text-brand-black mb-4">عنوان التوصيل</h2>
+
+        <textarea
+          formControlName="address"
+          rows="3"
+          class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all resize-none"
+        ></textarea>
+
+        @if (form.get('address')?.invalid && form.get('address')?.touched) {
+          <p class="text-red-500 text-xs mt-1.5">العنوان مطلوب ولا يزيد عن 300 حرف</p>
+        }
+
+        <button
+          type="submit"
+          [disabled]="isSaving() || form.pristine"
+          class="mt-4 bg-brand-black text-white text-sm px-6 py-3 rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {{ isSaving() ? 'جاري الحفظ...' : 'حفظ التعديلات' }}
+        </button>
+      </form>
+
+    }
+
+  </div>
+</div>
