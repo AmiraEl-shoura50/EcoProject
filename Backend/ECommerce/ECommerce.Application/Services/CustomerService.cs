@@ -24,14 +24,16 @@ public class CustomerService : ICustomerService
 
     public async Task<bool> UpdateAsync(int customerId, UpdateCustomerDto dto)
     {
-        var customer = await _unitOfWork.Customers.GetByIdAsync(customerId);
+        
+        var customer = await _unitOfWork.Customers.GetWithUserAsync(customerId);
         if (customer is null) return false;
 
-        customer.Address = dto.Address;
+        customer.Address = dto.Address.Trim();
+        customer.User.FirstName = dto.FirstName.Trim();
+        customer.User.LastName = dto.LastName.Trim();
+        customer.User.PhoneNumber = dto.PhoneNumber.Trim();
 
-        _unitOfWork.Customers.Update(customer);
         await _unitOfWork.SaveChangesAsync();
-
         return true;
     }
 }

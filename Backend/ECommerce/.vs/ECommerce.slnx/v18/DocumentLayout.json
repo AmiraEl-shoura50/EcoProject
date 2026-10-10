@@ -3,16 +3,43 @@
   "WorkspaceRootPath": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\mappings\\wishlistprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|solutionrelative:ecommerce.application\\mappings\\wishlistprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{F57E33FB-CDB3-6F39-453C-B2F68A5DC768}|ECommerce.Api\\ECommerce.API.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F57E33FB-CDB3-6F39-453C-B2F68A5DC768}|ECommerce.Api\\ECommerce.API.csproj|solutionrelative:ecommerce.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\dtos\\wishlist\\wishlistitemdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|solutionrelative:ecommerce.application\\dtos\\wishlist\\wishlistitemdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{5FADC3C0-1F67-920F-5C71-8D15AD76BB65}|ECommerce.Infrastructure\\ECommerce.Infrastructure.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.infrastructure\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5FADC3C0-1F67-920F-5C71-8D15AD76BB65}|ECommerce.Infrastructure\\ECommerce.Infrastructure.csproj|solutionrelative:ecommerce.infrastructure\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\dtos\\wishlist\\wishlistdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|solutionrelative:ecommerce.application\\dtos\\wishlist\\wishlistdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\interfaces\\services\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|solutionrelative:ecommerce.application\\interfaces\\services\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\validators\\auth\\changepassworddtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|solutionrelative:ecommerce.application\\validators\\auth\\changepassworddtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\dtos\\auth\\changepassworddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|solutionrelative:ecommerce.application\\dtos\\auth\\changepassworddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\dtos\\auth\\resetpassworddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|solutionrelative:ecommerce.application\\dtos\\auth\\resetpassworddto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\services\\customerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|solutionrelative:ecommerce.application\\services\\customerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\validators\\customer\\updatecustomerdtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|solutionrelative:ecommerce.application\\validators\\customer\\updatecustomerdtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\dtos\\customer\\updatecustomerdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|solutionrelative:ecommerce.application\\dtos\\customer\\updatecustomerdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\YAS\\AppData\\Roaming\\Microsoft\\UserSecrets\\7b5eb2bf-83bf-466b-b96a-c647e979818e\\secrets.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\mappings\\customerprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -21,9 +48,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|d:\\reposcsharp\\ecoproject\\backend\\ecommerce\\ecommerce.application\\dtos\\customer\\customerdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{FD4C1BBB-E0EB-4FDD-E1E3-C842D826F36B}|ECommerce.Application\\ECommerce.Application.csproj|solutionrelative:ecommerce.application\\dtos\\customer\\customerdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\YAS\\AppData\\Roaming\\Microsoft\\UserSecrets\\7b5eb2bf-83bf-466b-b96a-c647e979818e\\secrets.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     }
   ],
   "DocumentGroupContainers": [
@@ -37,11 +61,11 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 9,
               "Title": "secrets.json",
               "DocumentMoniker": "C:\\Users\\YAS\\AppData\\Roaming\\Microsoft\\UserSecrets\\7b5eb2bf-83bf-466b-b96a-c647e979818e\\secrets.json",
               "ToolTip": "C:\\Users\\YAS\\AppData\\Roaming\\Microsoft\\UserSecrets\\7b5eb2bf-83bf-466b-b96a-c647e979818e\\secrets.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAABIAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAABcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2026-09-05T19:55:05.117Z",
               "IsPinned": true,
@@ -50,45 +74,127 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "WishlistProfile.cs",
-              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Mappings\\WishlistProfile.cs",
-              "RelativeDocumentMoniker": "ECommerce.Application\\Mappings\\WishlistProfile.cs",
-              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Mappings\\WishlistProfile.cs*",
-              "RelativeToolTip": "ECommerce.Application\\Mappings\\WishlistProfile.cs*",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAABAAAAAAAAAA==",
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Api\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "ECommerce.Api\\Controllers\\AuthController.cs",
+              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Api\\Controllers\\AuthController.cs*",
+              "RelativeToolTip": "ECommerce.Api\\Controllers\\AuthController.cs*",
+              "ViewState": "AgIAADYAAAAAAAAAAAAqwFEAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-08T17:39:45.366Z",
+              "WhenOpened": "2026-10-10T11:28:12.828Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "WishlistItemDto.cs",
-              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\DTOs\\Wishlist\\WishlistItemDto.cs",
-              "RelativeDocumentMoniker": "ECommerce.Application\\DTOs\\Wishlist\\WishlistItemDto.cs",
-              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\DTOs\\Wishlist\\WishlistItemDto.cs*",
-              "RelativeToolTip": "ECommerce.Application\\DTOs\\Wishlist\\WishlistItemDto.cs*",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAlAAAAAAAAAA==",
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Infrastructure\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "ECommerce.Infrastructure\\Services\\AuthService.cs",
+              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Infrastructure\\Services\\AuthService.cs*",
+              "RelativeToolTip": "ECommerce.Infrastructure\\Services\\AuthService.cs*",
+              "ViewState": "AgIAABoBAAAAAAAAAAAIwC8BAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-08T17:39:25.221Z",
+              "WhenOpened": "2026-10-10T11:27:17.075Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "WishlistDto.cs",
-              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\DTOs\\Wishlist\\WishlistDto.cs",
-              "RelativeDocumentMoniker": "ECommerce.Application\\DTOs\\Wishlist\\WishlistDto.cs",
-              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\DTOs\\Wishlist\\WishlistDto.cs*",
-              "RelativeToolTip": "ECommerce.Application\\DTOs\\Wishlist\\WishlistDto.cs*",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
+              "Title": "IAuthService.cs",
+              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Interfaces\\Services\\IAuthService.cs",
+              "RelativeDocumentMoniker": "ECommerce.Application\\Interfaces\\Services\\IAuthService.cs",
+              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Interfaces\\Services\\IAuthService.cs*",
+              "RelativeToolTip": "ECommerce.Application\\Interfaces\\Services\\IAuthService.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAABSAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-08T17:39:06.022Z",
+              "WhenOpened": "2026-10-10T11:26:00.57Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
+              "Title": "ChangePasswordDtoValidator.cs",
+              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Validators\\Auth\\ChangePasswordDtoValidator.cs",
+              "RelativeDocumentMoniker": "ECommerce.Application\\Validators\\Auth\\ChangePasswordDtoValidator.cs",
+              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Validators\\Auth\\ChangePasswordDtoValidator.cs*",
+              "RelativeToolTip": "ECommerce.Application\\Validators\\Auth\\ChangePasswordDtoValidator.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-10T11:24:40.345Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ChangePasswordDto.cs",
+              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\DTOs\\Auth\\ChangePasswordDto.cs",
+              "RelativeDocumentMoniker": "ECommerce.Application\\DTOs\\Auth\\ChangePasswordDto.cs",
+              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\DTOs\\Auth\\ChangePasswordDto.cs*",
+              "RelativeToolTip": "ECommerce.Application\\DTOs\\Auth\\ChangePasswordDto.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-10T11:21:06.648Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ResetPasswordDto.cs",
+              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\DTOs\\Auth\\ResetPasswordDto.cs",
+              "RelativeDocumentMoniker": "ECommerce.Application\\DTOs\\Auth\\ResetPasswordDto.cs",
+              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\DTOs\\Auth\\ResetPasswordDto.cs",
+              "RelativeToolTip": "ECommerce.Application\\DTOs\\Auth\\ResetPasswordDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-10T11:20:48.434Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "CustomerService.cs",
+              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Services\\CustomerService.cs",
+              "RelativeDocumentMoniker": "ECommerce.Application\\Services\\CustomerService.cs",
+              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Services\\CustomerService.cs*",
+              "RelativeToolTip": "ECommerce.Application\\Services\\CustomerService.cs*",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAYwBgAAABOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-10T11:19:32.189Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "UpdateCustomerDtoValidator.cs",
+              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Validators\\Customer\\UpdateCustomerDtoValidator.cs",
+              "RelativeDocumentMoniker": "ECommerce.Application\\Validators\\Customer\\UpdateCustomerDtoValidator.cs",
+              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Validators\\Customer\\UpdateCustomerDtoValidator.cs*",
+              "RelativeToolTip": "ECommerce.Application\\Validators\\Customer\\UpdateCustomerDtoValidator.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-10T11:17:53.012Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "UpdateCustomerDto.cs",
+              "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\DTOs\\Customer\\UpdateCustomerDto.cs",
+              "RelativeDocumentMoniker": "ECommerce.Application\\DTOs\\Customer\\UpdateCustomerDto.cs",
+              "ToolTip": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\DTOs\\Customer\\UpdateCustomerDto.cs*",
+              "RelativeToolTip": "ECommerce.Application\\DTOs\\Customer\\UpdateCustomerDto.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-10T11:16:22.202Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{6324226f-61b6-4f28-92ee-18d4b5fe1e48}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
               "Title": "CustomerProfile.cs",
               "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\Mappings\\CustomerProfile.cs",
               "RelativeDocumentMoniker": "ECommerce.Application\\Mappings\\CustomerProfile.cs",
@@ -96,12 +202,11 @@
               "RelativeToolTip": "ECommerce.Application\\Mappings\\CustomerProfile.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-08T12:03:24.036Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-10-08T12:03:24.036Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 11,
               "Title": "CustomerDto.cs",
               "DocumentMoniker": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\DTOs\\Customer\\CustomerDto.cs",
               "RelativeDocumentMoniker": "ECommerce.Application\\DTOs\\Customer\\CustomerDto.cs",
@@ -109,12 +214,7 @@
               "RelativeToolTip": "ECommerce.Application\\DTOs\\Customer\\CustomerDto.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAA1AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-08T12:02:51.328Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{6324226f-61b6-4f28-92ee-18d4b5fe1e48}"
+              "WhenOpened": "2026-10-08T12:02:51.328Z"
             }
           ]
         }

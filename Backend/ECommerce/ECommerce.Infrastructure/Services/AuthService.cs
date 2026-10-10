@@ -268,4 +268,38 @@ public class AuthService : IAuthService
 
         return new AuthResponseDto { Success = true, Message = "تم تغيير كلمة المرور بنجاح، يمكنك تسجيل الدخول الآن" };
     }
+    public async Task<AuthResponseDto> ChangePasswordAsync(Guid userId, ChangePasswordDto dto)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+            return new AuthResponseDto { Success = false, Message = "المستخدم غير موجود" };
+
+        var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join("، ", result.Errors.Select(TranslateIdentityError));
+            return new AuthResponseDto { Success = false, Message = errors };
+        }
+
+        // ✅ نلغي كل الجلسات القديمة (Refresh Tokens)، ونصدر جلسة جديدة للجهاز الحالي
+        var oldTokens = await _unitOfWork.RefreshTokens.FindAsync(rt => rt.UserId == user.Id && !rt.IsRevoked);
+        foreach (var token in oldTokens)
+        {
+            token.IsRevoked = true;
+            _unitOfWork.RefreshTokens.Update(token);
+        }
+
+        return await GenerateAuthResponseAsync(user, "تم تغيير كلمة المرور بنجاح");
+    }
+
+    private static string TranslateIdentityError(IdentityError error) => error.Code switch
+    {
+        "PasswordMismatch" => "كلمة المرور الحالية غير صحيحة",
+        "PasswordTooShort" => "كلمة المرور قصيرة جدًا",
+        "PasswordRequiresDigit" => "كلمة المرور يجب أن تحتوي على رقم",
+        "PasswordRequiresLower" => "كلمة المرور يجب أن تحتوي على حرف صغير",
+        "PasswordRequiresUpper" => "كلمة المرور يجب أن تحتوي على حرف كبير",
+        "PasswordRequiresNonAlphanumeric" => "كلمة المرور يجب أن تحتوي على رمز خاص مثل @ أو #",
+        _ => error.Description
+    };
 }
