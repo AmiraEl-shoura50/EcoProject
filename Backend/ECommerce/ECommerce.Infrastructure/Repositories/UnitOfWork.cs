@@ -24,7 +24,7 @@ public class UnitOfWork : IUnitOfWork
         DiscountTargets = new GenericRepository<DiscountTarget>(_context);
         Categories = new CategoryRepository(_context);
         Reviews = new ReviewRepository(_context);
-        Notifications = new GenericRepository<Notification>(_context);
+        Notifications = new NotificationRepository(_context);
         PaymentProofs = new GenericRepository<PaymentProof>(_context);
         PaymentTransactions = new GenericRepository<PaymentTransaction>(_context);
         RefreshTokens = new GenericRepository<RefreshToken>(_context);
@@ -45,7 +45,7 @@ public class UnitOfWork : IUnitOfWork
 
     public ICategoryRepository Categories { get; }
     public IReviewRepository Reviews { get; }
-    public IGenericRepository<Notification> Notifications { get; }
+    public INotificationRepository Notifications { get; }
     public IGenericRepository<PaymentProof> PaymentProofs { get; }
     public IGenericRepository<PaymentTransaction> PaymentTransactions { get; }
     public IGenericRepository<RefreshToken> RefreshTokens { get; }

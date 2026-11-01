@@ -1,5 +1,6 @@
 ﻿using ECommerce.Application.DTOs.Product;
 using ECommerce.Application.Interfaces.Repositories;
+using ECommerce.Application.Pricing;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,9 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
     public ProductRepository(AppDbContext context) : base(context) { }
 
     public async Task<IEnumerable<Product>> GetByCategoryAsync(int categoryId)
-        => await _dbSet.Where(p => p.CategoryId == categoryId).ToListAsync();
+     => await _dbSet
+         .Where(p => p.CategoryId == categoryId || p.Category.ParentCategoryId == categoryId)
+         .ToListAsync();
 
     public async Task<IEnumerable<Product>> GetBySellerAsync(int sellerId)
         => await _dbSet.Where(p => p.SellerId == sellerId).ToListAsync();
@@ -36,12 +39,12 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
             query = query.Where(p => p.Name.ToLower().Contains(term) || p.Description.ToLower().Contains(term));
         }
 
-        // ✅ فلترة بالقسم
+        // ✅ فلترة بالقسم (القسم نفسه + أقسامه الفرعية لو كان رئيسي)
         if (queryParams.CategoryId.HasValue)
         {
-            query = query.Where(p => p.CategoryId == queryParams.CategoryId.Value);
+            var categoryId = queryParams.CategoryId.Value;
+            query = query.Where(p => p.CategoryId == categoryId || p.Category.ParentCategoryId == categoryId);
         }
-
         // ✅ فلترة بالسعر
         if (queryParams.MinPrice.HasValue)
         {
@@ -50,6 +53,11 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
         if (queryParams.MaxPrice.HasValue)
         {
             query = query.Where(p => p.Price <= queryParams.MaxPrice.Value);
+        }
+        // ✅ فلترة بالبائع
+        if (queryParams.SellerId.HasValue)
+        {
+            query = query.Where(p => p.SellerId == queryParams.SellerId.Value);
         }
 
         // ✅ الترتيب
@@ -71,4 +79,16 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
 
         return (items, totalCount);
     }
+    public async Task<List<ProductPricingInfo>> GetPricingInfoAsync(IReadOnlyCollection<int> sellerIds)
+    => await _dbSet
+        .Where(p => sellerIds.Contains(p.SellerId))
+        .Select(p => new ProductPricingInfo(p.Id, p.CategoryId, p.SellerId, p.Price, p.Rating))
+        .ToListAsync();
+
+    public async Task<List<Product>> GetByIdsWithDetailsAsync(IReadOnlyCollection<int> ids)
+        => await _dbSet
+            .Include(p => p.Category)
+            .Include(p => p.Seller)
+            .Where(p => ids.Contains(p.Id))
+            .ToListAsync();
 }

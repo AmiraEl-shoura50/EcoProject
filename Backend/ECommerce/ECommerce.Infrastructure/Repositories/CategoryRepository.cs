@@ -31,4 +31,65 @@ public class CategoryRepository : GenericRepository<Category>, ICategoryReposito
 
         return (items, totalCount);
     }
+    public async Task<List<SellerCategoryDto>> GetBySellerAsync(int sellerId)
+    => await _dbSet
+        .Where(c => c.CreatedBySellerId == sellerId)
+        .OrderBy(c => c.Name)
+        .Select(c => new SellerCategoryDto
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Description = c.Description,
+            ImageUrl = c.ImageUrl,
+            ParentCategoryId = c.ParentCategoryId,
+            ParentCategoryName = c.ParentCategory != null ? c.ParentCategory.Name : string.Empty,
+            ProductsCount = c.Products.Count()
+        })
+        .ToListAsync();
+
+    public async Task<List<AdminCategoryDto>> GetAdminTreeAsync()
+    {
+        var stores = await _context.Set<Seller>().AsNoTracking()
+            .ToDictionaryAsync(s => s.Id, s => s.StoreName);
+
+        var all = await _dbSet.AsNoTracking()
+            .Select(c => new
+            {
+                c.Id,
+                c.Name,
+                c.Description,
+                c.ImageUrl,
+                c.ParentCategoryId,
+                c.CreatedBySellerId,
+                ProductsCount = c.Products.Count()
+            })
+            .ToListAsync();
+
+        string? StoreOf(int? sellerId) =>
+            sellerId.HasValue && stores.TryGetValue(sellerId.Value, out var name) ? name : null;
+
+        return all
+            .Where(c => c.ParentCategoryId == null)
+            .OrderBy(c => c.Name)
+            .Select(main => new AdminCategoryDto
+            {
+                Id = main.Id,
+                Name = main.Name,
+                Description = main.Description,
+                ImageUrl = main.ImageUrl,
+                ProductsCount = main.ProductsCount,
+                SubCategories = all
+                    .Where(s => s.ParentCategoryId == main.Id)
+                    .OrderBy(s => s.Name)
+                    .Select(s => new AdminSubCategoryDto
+                    {
+                        Id = s.Id,
+                        Name = s.Name,
+                        ProductsCount = s.ProductsCount,
+                        StoreName = StoreOf(s.CreatedBySellerId)
+                    })
+                    .ToList()
+            })
+            .ToList();
+    }
 }

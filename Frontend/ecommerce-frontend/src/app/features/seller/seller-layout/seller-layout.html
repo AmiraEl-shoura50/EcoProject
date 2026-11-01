@@ -1,0 +1,34 @@
+<div class="bg-brand-cream min-h-screen py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <h1 class="font-serif text-3xl text-brand-black mb-6">لوحة تحكم البائع</h1>
+
+    <div class="flex flex-col lg:flex-row gap-6">
+
+      <!-- القائمة: أفقية على الموبايل، عمودية جانبية على اللاب -->
+      <nav class="lg:w-60 shrink-0">
+        <ul class="flex lg:flex-col gap-2 overflow-x-auto no-scrollbar lg:overflow-visible bg-white rounded-2xl border border-gray-100 shadow-sm p-2">
+          @for (link of links; track link.path) {
+            <li class="shrink-0 lg:shrink">
+              <a
+                [routerLink]="link.path"
+                routerLinkActive="bg-brand-black text-white"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-brand-black hover:text-brand-gold transition-colors whitespace-nowrap"
+              >
+                <lucide-angular [img]="link.icon" [size]="18"></lucide-angular>
+                {{ link.label }}
+              </a>
+            </li>
+          }
+        </ul>
+      </nav>
+
+      <!-- محتوى الصفحة -->
+      <div class="flex-1 min-w-0">
+        <router-outlet></router-outlet>
+      </div>
+
+    </div>
+
+  </div>
+</div>

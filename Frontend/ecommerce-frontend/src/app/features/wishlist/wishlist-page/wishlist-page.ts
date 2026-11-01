@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { LucideAngularModule, Heart, Star } from 'lucide-angular';
+import { LucideAngularModule, Heart, Star} from 'lucide-angular';
 import { WishlistService } from '../../../core/services/wishlist';
 import { CartService } from '../../../core/services/cart';
 import { ToastService } from '../../../core/services/toast';
@@ -16,6 +16,7 @@ import { ToastService } from '../../../core/services/toast';
 export class WishlistPage implements OnInit {
   readonly HeartIcon = Heart;
   readonly StarIcon = Star;
+ 
 
   addingToCartId = signal<number | null>(null);
   removingId = signal<number | null>(null);

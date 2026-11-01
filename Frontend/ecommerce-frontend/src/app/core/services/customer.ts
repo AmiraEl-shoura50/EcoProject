@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
-import { Customer } from '../models/customer.model';
+import { Customer, UpdateCustomerRequest } from '../models/customer.model';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +17,7 @@ export class CustomerService {
     return this.http.get<ApiResponse<Customer>>(`${this.apiUrl}/me`);
   }
 
-  updateMe(address: string): Observable<unknown> {
-    return this.http.put(`${this.apiUrl}/me`, { address });
-  }
+  updateMe(data: UpdateCustomerRequest): Observable<unknown> {
+  return this.http.put(`${this.apiUrl}/me`, data);
+}
 }

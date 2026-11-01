@@ -78,7 +78,7 @@ export class Register {
     this.authService.register(this.registerForm.value).subscribe({
       next: () => {
         this.isLoading = false;
-        this.router.navigateByUrl('/');
+      this.router.navigateByUrl(this.authService.userRole() === 'Seller' ? '/seller' : '/');
       },
       error: (err) => {
         this.isLoading = false;

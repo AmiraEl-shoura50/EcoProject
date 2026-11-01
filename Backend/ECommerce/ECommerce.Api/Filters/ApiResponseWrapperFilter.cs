@@ -19,11 +19,19 @@ public class ApiResponseWrapperFilter : IAsyncResultFilter
                     object? data = objectResult.Value;
                     string? message = null;
 
-                    // ✅ التعامل مع أخطاء FluentValidation التلقائية (شكلها مختلف عن باقي الردود)
+                    // ✅ أخطاء FluentValidation: بنحط رسائل الأخطاء الفعلية في الـ message
                     if (objectResult.Value is ValidationProblemDetails validationProblem)
                     {
                         data = validationProblem.Errors;
-                        message = "بيانات غير صحيحة";
+
+                        var errorMessages = validationProblem.Errors.Values
+                            .SelectMany(errors => errors)
+                            .Distinct()
+                            .ToList();
+
+                        message = errorMessages.Count > 0
+                            ? string.Join("، ", errorMessages)
+                            : "بيانات غير صحيحة";
                     }
                     // ✅ التعامل مع كل الأماكن اللي بترجع BadRequest("رسالة نصية") في الكود الحالي
                     else if (objectResult.Value is string textMessage)

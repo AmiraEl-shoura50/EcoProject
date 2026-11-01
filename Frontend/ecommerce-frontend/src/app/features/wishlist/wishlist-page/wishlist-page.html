@@ -1,8 +1,8 @@
 <div class="bg-brand-cream min-h-screen py-10">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
     <!-- العنوان -->
-    <div class="text-center mb-8">
+    <div class="text-center lg:text-start mb-8">
       <h1 class="font-serif text-3xl text-brand-black">المفضلة</h1>
       @if (wishlistService.itemsCount() > 0) {
         <p class="text-sm text-brand-brown mt-1">{{ wishlistService.itemsCount() }} منتج</p>
@@ -12,8 +12,8 @@
     @if (wishlistService.wishlist() === null) {
 
       <!-- تحميل -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 animate-pulse">
-        @for (i of [1,2,3,4]; track i) {
+      <div class="grid grid-cols-1 gap-4 animate-pulse">
+        @for (i of [1,2,3]; track i) {
           <div class="bg-white rounded-3xl p-3 sm:p-4 flex items-center gap-4">
             <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gray-200 shrink-0"></div>
             <div class="flex-1 space-y-3">
@@ -33,18 +33,14 @@
         <svg viewBox="0 0 200 150" fill="none" stroke="currentColor" stroke-width="3"
              stroke-linecap="round" stroke-linejoin="round"
              class="w-52 h-40 mx-auto mb-6 text-brand-black">
-          <!-- جسم الكرتونة -->
           <path d="M40 72 L40 126 L160 126 L160 72" />
           <path d="M40 72 L160 72" />
-          <!-- الغطاءان المفتوحان -->
           <path d="M40 72 L20 48 L82 48 L100 72" />
           <path d="M160 72 L180 48 L118 48 L100 72" />
-          <!-- قلب يطلع من الكرتونة -->
           <g transform="translate(0 -16)">
             <path class="text-brand-gold" fill="currentColor" stroke="none"
                   d="M100 54 C78 40 84 24 96 28 C99 29 100 32 100 32 C100 32 101 29 104 28 C116 24 122 40 100 54 Z" />
           </g>
-          <!-- لمعة -->
           <path d="M56 26 L56 34 M52 30 L60 30" />
           <path d="M146 22 L146 30 M142 26 L150 26" />
         </svg>
@@ -64,16 +60,16 @@
 
     } @else {
 
-      <!-- القائمة -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <!-- القائمة: كروت منفصلة على الموبايل، ولوحة واحدة بصفوف على اللاب -->
+      <div class="grid grid-cols-1 gap-4 lg:gap-0 lg:bg-white lg:rounded-2xl lg:border lg:border-gray-100 lg:shadow-sm lg:px-8">
         @for (item of wishlistService.wishlist()!.items; track item.productId) {
 
-          <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-3 sm:p-4 flex items-center gap-4">
+          <div class="relative bg-white rounded-3xl border border-gray-100 shadow-sm p-3 sm:p-4 flex items-center lg:items-stretch gap-4 lg:gap-8 lg:rounded-none lg:border-x-0 lg:border-t-0 lg:border-b lg:shadow-none lg:px-0 lg:py-6 lg:last:border-b-0">
 
             <!-- الصورة -->
             <a
               [routerLink]="['/products', item.productId]"
-              class="w-24 h-24 sm:w-28 sm:h-28 shrink-0 rounded-2xl bg-gray-100 overflow-hidden"
+              class="w-24 h-24 sm:w-28 sm:h-28 lg:w-36 lg:h-36 shrink-0 rounded-2xl bg-gray-100 overflow-hidden"
             >
               @if (item.productImageUrl) {
                 <img
@@ -88,50 +84,81 @@
               }
             </a>
 
-            <!-- التفاصيل -->
-            <div class="flex-1 min-w-0">
+            <!-- على اللاب الحاوية دي بتختفي وأولادها بيبقوا أعمدة في الصف -->
+            <div class="flex-1 min-w-0 lg:contents">
 
-              <a
-                [routerLink]="['/products', item.productId]"
-                class="block text-sm sm:text-base font-semibold text-brand-black line-clamp-1 hover:text-brand-gold transition-colors"
-              >
-                {{ item.productName }}
-              </a>
+              <!-- المعلومات -->
+              <div class="lg:flex-1 lg:min-w-0">
 
-              <!-- التقييم -->
-              <div class="flex items-center gap-1 mt-1 text-xs text-gray-500">
-                @if (item.rating > 0) {
-                  <span>التقييم</span>
-                  <lucide-angular [img]="StarIcon" [size]="13" class="icon-filled text-brand-gold"></lucide-angular>
-                  <span class="font-medium text-brand-black">{{ item.rating | number:'1.1-1' }}</span>
-                } @else {
-                  <span>لا يوجد تقييم بعد</span>
-                }
+                <a
+                  [routerLink]="['/products', item.productId]"
+                  class="block text-sm sm:text-base lg:text-lg font-semibold text-brand-black line-clamp-1 lg:line-clamp-2 hover:text-brand-gold transition-colors"
+                >
+                  {{ item.productName }}
+                </a>
+
+                <!-- التقييم -->
+                <div class="flex items-center gap-1 mt-1 text-xs text-gray-500">
+                  @if (item.rating > 0) {
+                    <span>التقييم</span>
+                    <lucide-angular [img]="StarIcon" [size]="13" class="icon-filled text-brand-gold"></lucide-angular>
+                    <span class="font-medium text-brand-black">{{ item.rating | number:'1.1-1' }}</span>
+                  } @else {
+                    <span>لا يوجد تقييم بعد</span>
+                  }
+                </div>
+
+                <!-- حالة التوفر -->
+                <div class="flex items-center gap-1.5 mt-1.5 lg:mt-4 text-xs lg:text-sm">
+                  @if (item.stockQuantity > 0) {
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span class="text-green-600 font-medium">متوفر</span>
+                    @if (item.stockQuantity <= 5) {
+                      <span class="text-orange-500">· متبقي {{ item.stockQuantity }} فقط</span>
+                    }
+                  } @else {
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    <span class="text-red-500 font-medium">نفذت الكمية</span>
+                  }
+                </div>
+
               </div>
 
-              <p class="text-base sm:text-lg font-bold text-brand-black mt-1">{{ item.price | number }} جنيه</p>
+              <!-- السعر وزرار الإضافة -->
+              <div class="lg:w-56 lg:shrink-0 lg:flex lg:flex-col lg:items-end lg:justify-end">
 
-              <button
-                type="button"
-                (click)="addToCart(item.productId)"
-                [disabled]="item.stockQuantity === 0 || addingToCartId() === item.productId"
-                class="mt-2 bg-brand-black text-white text-xs px-5 py-2 rounded-full hover:bg-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-brand-black"
-              >
-                @if (item.stockQuantity === 0) {
-                  غير متوفر
-                } @else {
-                  {{ addingToCartId() === item.productId ? 'جاري الإضافة...' : 'أضف للسلة' }}
-                }
-              </button>
+                <div class="mt-1 lg:mt-0 lg:text-end">
+  <p class="text-base sm:text-lg lg:text-2xl font-bold text-brand-black">
+    {{ item.price | number:'1.0-2' }} جنيه
+  </p>
+  @if (item.originalPrice > item.price) {
+    <p class="text-xs lg:text-sm text-gray-400 line-through">{{ item.originalPrice | number:'1.0-2' }} جنيه</p>
+  }
+</div>
+
+                <button
+                  type="button"
+                  (click)="addToCart(item.productId)"
+                  [disabled]="item.stockQuantity === 0 || addingToCartId() === item.productId"
+                  class="mt-2 lg:mt-3 lg:w-full bg-brand-black text-white text-xs lg:text-sm lg:font-medium px-5 py-2 lg:py-3 rounded-full lg:rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-brand-black"
+                >
+                  @if (item.stockQuantity === 0) {
+                    غير متوفر
+                  } @else {
+                    {{ addingToCartId() === item.productId ? 'جاري الإضافة...' : 'أضف للسلة' }}
+                  }
+                </button>
+
+              </div>
 
             </div>
 
-            <!-- إزالة من المفضلة -->
+            <!-- إزالة من المفضلة (قلب على كل الأحجام) -->
             <button
               type="button"
               (click)="remove(item.productId)"
               [disabled]="removingId() === item.productId"
-              class="self-start w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+              class="self-start w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50 lg:absolute lg:top-5 lg:end-0"
               aria-label="إزالة من المفضلة"
             >
               <lucide-angular [img]="HeartIcon" [size]="18" class="icon-filled"></lucide-angular>

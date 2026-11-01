@@ -35,21 +35,57 @@
         <div>
           <p class="text-sm text-brand-brown mb-2">{{ product()!.categoryName }}</p>
           <h1 class="font-serif text-3xl text-brand-black mb-3">{{ product()!.name }}</h1>
+                    @if (product()!.reviewsCount > 0) {
+            <button
+              type="button"
+              (click)="scrollToReviews()"
+              class="inline-flex items-center gap-2 mb-3"
+            >
+              <app-stars [value]="product()!.rating" [size]="16"></app-stars>
+              <span class="text-sm text-brand-brown">
+                {{ product()!.rating | number:'1.1-1' }} ({{ product()!.reviewsCount }} تقييم)
+              </span>
+            </button>
+          }
 
           <p class="text-sm text-brand-brown mb-4">
             بائع: <span class="text-brand-black font-medium">{{ product()!.sellerStoreName }}</span>
           </p>
 
-          <p class="font-serif text-3xl text-brand-gold font-semibold mb-6">
-            {{ product()!.price | number }} جنيه
-          </p>
+         @if (product()!.discountedPrice) {
+  <div class="mb-6">
+    <div class="flex flex-wrap items-center gap-3">
+      <p class="font-serif text-3xl text-brand-gold font-semibold">
+        {{ product()!.discountedPrice | number:'1.0-2' }} جنيه
+      </p>
+      <p class="text-lg text-gray-400 line-through">{{ product()!.price | number:'1.0-2' }} جنيه</p>
+      <span class="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+        خصم {{ product()!.discountPercent }}%
+      </span>
+    </div>
+    @if (product()!.discountEndDate) {
+      <p class="text-xs text-brand-brown mt-2">
+        ينتهي العرض في {{ product()!.discountEndDate | date:'dd/MM/yyyy HH:mm' }}
+      </p>
+    }
+  </div>
+} @else {
+  <p class="font-serif text-3xl text-brand-gold font-semibold mb-6">
+    {{ product()!.price | number:'1.0-2' }} جنيه
+  </p>
+}
 
           <p class="text-sm text-gray-600 leading-relaxed mb-8">
             {{ product()!.description }}
           </p>
 
-          @if (product()!.stockQuantity > 0) {
+            @if (cannotBuy) {
 
+            <p class="text-sm text-brand-brown bg-brand-cream rounded-lg px-4 py-3">
+              حسابات البائعين والمدراء لا يمكنها الشراء
+            </p>
+
+          } @else if (product()!.stockQuantity > 0) {
             <!-- Quantity Selector -->
             <div class="flex items-center gap-4 mb-6">
               <span class="text-sm font-medium text-brand-black">الكمية</span>
@@ -106,6 +142,7 @@
         </div>
 
       </div>
+       <app-product-reviews [productId]="product()!.id"></app-product-reviews>     
     </div>
 
   }

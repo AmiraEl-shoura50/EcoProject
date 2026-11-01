@@ -1,0 +1,348 @@
+<div>
+
+  <!-- العنوان وزر الإضافة -->
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <div>
+      <h2 class="font-serif text-2xl text-brand-black">المنتجات</h2>
+      @if (!isLoading()) {
+        <p class="text-sm text-brand-brown mt-0.5">{{ totalCount() }} منتج</p>
+      }
+    </div>
+
+    <button
+      type="button"
+      (click)="openCreate()"
+      class="flex items-center gap-2 bg-brand-black text-white text-sm px-5 py-2.5 rounded-lg hover:bg-brand-gold transition-colors"
+    >
+      <lucide-angular [img]="PlusIcon" [size]="18"></lucide-angular>
+      إضافة منتج
+    </button>
+  </div>
+
+  <!-- البحث المباشر -->
+  <div class="relative mb-5">
+    <input
+      #searchBox
+      type="text"
+      [value]="searchTerm()"
+      (input)="onSearchInput(searchBox.value)"
+      autocomplete="off"
+      placeholder="ابحث في منتجاتك..."
+      class="w-full bg-white border border-gray-300 rounded-full px-4 py-2.5 pr-10 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+    />
+    <lucide-angular
+      [img]="SearchIcon"
+      [size]="16"
+      class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+    ></lucide-angular>
+
+    @if (searchTerm()) {
+      <button
+        type="button"
+        (click)="clearSearch()"
+        class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-brand-black hover:bg-gray-100 transition-colors"
+        aria-label="مسح البحث"
+      >
+        <lucide-angular [img]="CloseIcon" [size]="14"></lucide-angular>
+      </button>
+    }
+  </div>
+
+  <!-- شريط التحديد والحذف -->
+  @if (!isLoading() && products().length > 0) {
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-5 flex flex-wrap items-center justify-between gap-3">
+      <label class="flex items-center gap-2 text-sm text-brand-black cursor-pointer">
+        <input
+          type="checkbox"
+          [checked]="allSelected()"
+          (change)="toggleSelectAll()"
+          class="accent-brand-gold w-4 h-4"
+        />
+        تحديد كل المنتجات في الصفحة
+      </label>
+
+      <button
+        type="button"
+        (click)="deleteSelected()"
+        [disabled]="selectedIds().length === 0 || isDeletingMany()"
+        class="text-sm text-white bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {{ isDeletingMany() ? 'جاري الحذف...' : 'حذف المحدد (' + selectedIds().length + ')' }}
+      </button>
+    </div>
+  }
+
+  @if (isLoading()) {
+
+    <div class="space-y-4 animate-pulse">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="bg-white rounded-2xl h-28"></div>
+      }
+    </div>
+
+  } @else if (products().length === 0) {
+
+    <div class="bg-white rounded-2xl border border-gray-100 text-center py-16 px-4">
+      @if (searchTerm()) {
+        <p class="text-brand-brown">لا توجد منتجات مطابقة للبحث</p>
+      } @else {
+        <p class="text-brand-brown mb-4">لم تضف أي منتجات بعد</p>
+        <button
+          type="button"
+          (click)="openCreate()"
+          class="bg-brand-black text-white text-sm px-6 py-3 rounded-lg hover:bg-brand-gold transition-colors"
+        >
+          أضف أول منتج
+        </button>
+      }
+    </div>
+
+  } @else {
+
+    <div class="space-y-4">
+      @for (product of products(); track product.id) {
+
+        <div
+          class="bg-white rounded-2xl border-2 shadow-sm p-4 flex flex-col sm:flex-row sm:items-center gap-4 transition-colors"
+          [class.border-red-200]="isSelected(product.id)"
+          [class.border-transparent]="!isSelected(product.id)"
+        >
+
+          <!-- التحديد والصورة والمعلومات -->
+          <div class="flex items-center gap-4 flex-1 min-w-0">
+
+            <input
+              type="checkbox"
+              [checked]="isSelected(product.id)"
+              (change)="toggleSelect(product.id)"
+              class="accent-brand-gold w-4 h-4 shrink-0 cursor-pointer"
+              [attr.aria-label]="'تحديد المنتج ' + product.name"
+            />
+
+            <div class="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden shrink-0">
+              @if (product.imageUrl) {
+                <img [src]="product.imageUrl" [alt]="product.name" class="w-full h-full object-cover" />
+              } @else {
+                <div class="w-full h-full flex items-center justify-center text-gray-300 text-xs">لا توجد صورة</div>
+              }
+            </div>
+
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-brand-black line-clamp-1">{{ product.name }}</p>
+              <p class="text-xs text-brand-brown mt-0.5">{{ product.categoryName }}</p>
+              @if (product.rating > 0) {
+                <p class="text-xs text-gray-500 mt-0.5">التقييم: {{ product.rating | number:'1.1-1' }}</p>
+              }
+            </div>
+          </div>
+
+          <!-- السعر والمخزون والأزرار -->
+          <div class="flex items-center justify-between sm:justify-end gap-4 sm:gap-6">
+
+            <div class="text-start sm:text-end">
+              <p class="text-base font-bold text-brand-black">{{ product.price | number }} جنيه</p>
+
+              @if (product.stockQuantity === 0) {
+                <p class="text-xs text-red-500 mt-0.5">نفذت الكمية</p>
+              } @else if (product.stockQuantity <= 5) {
+                <p class="text-xs text-orange-500 mt-0.5">متبقي {{ product.stockQuantity }} فقط</p>
+              } @else {
+                <p class="text-xs text-green-600 mt-0.5">المخزون: {{ product.stockQuantity }}</p>
+              }
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                (click)="openEdit(product)"
+                class="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-brand-black hover:border-brand-gold hover:text-brand-gold transition-colors"
+                aria-label="تعديل"
+              >
+                <lucide-angular [img]="EditIcon" [size]="16"></lucide-angular>
+              </button>
+              <button
+                type="button"
+                (click)="delete(product)"
+                [disabled]="deletingId() === product.id"
+                class="w-9 h-9 rounded-lg border border-red-200 flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                aria-label="حذف"
+              >
+                <lucide-angular [img]="TrashIcon" [size]="16"></lucide-angular>
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      }
+    </div>
+
+    <!-- الترقيم -->
+    @if (totalPages() > 1) {
+      <div class="flex items-center justify-center gap-2 mt-8">
+        <button
+          type="button"
+          (click)="goToPage(currentPage() - 1)"
+          [disabled]="!hasPreviousPage()"
+          class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          السابق
+        </button>
+        <span class="text-sm text-brand-brown px-4">صفحة {{ currentPage() }} من {{ totalPages() }}</span>
+        <button
+          type="button"
+          (click)="goToPage(currentPage() + 1)"
+          [disabled]="!hasNextPage()"
+          class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          التالي
+        </button>
+      </div>
+    }
+
+  }
+
+</div>
+
+<!-- نافذة الإضافة / التعديل -->
+@if (isModalOpen()) {
+  <div class="fixed inset-0 z-[60] bg-black/60 flex items-end sm:items-center justify-center sm:p-4">
+
+    <div class="bg-white w-full sm:max-w-xl rounded-t-3xl sm:rounded-2xl max-h-[92vh] overflow-y-auto p-6">
+
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="font-serif text-xl text-brand-black">
+          {{ editingProduct() ? 'تعديل المنتج' : 'إضافة منتج جديد' }}
+        </h3>
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+          aria-label="إغلاق"
+        >
+          <lucide-angular [img]="CloseIcon" [size]="20"></lucide-angular>
+        </button>
+      </div>
+
+      <form [formGroup]="productForm" (ngSubmit)="save()" class="space-y-4">
+
+        <!-- الصورة -->
+        <div>
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">صورة المنتج</label>
+          <label class="block border-2 border-dashed border-gray-300 rounded-xl p-4 text-center cursor-pointer hover:border-brand-gold transition-colors">
+            <input type="file" accept="image/*" (change)="onFileSelected($event)" class="hidden" />
+
+            @if (previewUrl()) {
+              <img [src]="previewUrl()" alt="معاينة" class="max-h-44 mx-auto rounded-lg" />
+              <p class="text-xs text-brand-gold mt-2">اضغط لتغيير الصورة</p>
+            } @else {
+              <lucide-angular [img]="ImageIcon" [size]="32" class="mx-auto text-gray-300 mb-2"></lucide-angular>
+              <p class="text-sm text-gray-400">اضغط لاختيار صورة (حتى 5 ميجابايت)</p>
+            }
+          </label>
+        </div>
+
+        <!-- الاسم -->
+        <div>
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">اسم المنتج</label>
+          <input
+            type="text"
+            formControlName="name"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+          />
+          @if (productForm.get('name')?.invalid && productForm.get('name')?.touched) {
+            <p class="text-red-500 text-xs mt-1.5">اسم المنتج مطلوب (حتى 200 حرف)</p>
+          }
+        </div>
+
+        <!-- الوصف -->
+        <div>
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">الوصف</label>
+          <textarea
+            formControlName="description"
+            rows="4"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all resize-none"
+          ></textarea>
+          @if (productForm.get('description')?.invalid && productForm.get('description')?.touched) {
+            <p class="text-red-500 text-xs mt-1.5">وصف المنتج مطلوب (حتى 2000 حرف)</p>
+          }
+        </div>
+
+        <!-- السعر والكمية -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm text-brand-black mb-1.5 font-medium">السعر (جنيه)</label>
+            <input
+              type="number"
+              formControlName="price"
+              min="0"
+              step="0.01"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+            />
+            @if (productForm.get('price')?.invalid && productForm.get('price')?.touched) {
+              <p class="text-red-500 text-xs mt-1.5">السعر لازم يكون أكبر من صفر</p>
+            }
+          </div>
+
+          <div>
+            <label class="block text-sm text-brand-black mb-1.5 font-medium">الكمية المتاحة</label>
+            <input
+              type="number"
+              formControlName="stockQuantity"
+              min="0"
+              step="1"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+            />
+            @if (productForm.get('stockQuantity')?.invalid && productForm.get('stockQuantity')?.touched) {
+              <p class="text-red-500 text-xs mt-1.5">أدخل رقمًا صحيحًا (0 أو أكثر)</p>
+            }
+          </div>
+        </div>
+
+        <!-- القسم -->
+        <div>
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">القسم</label>
+          <select
+            formControlName="categoryId"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+          >
+            <option [ngValue]="null" disabled>اختر القسم</option>
+            @for (main of categories(); track main.id) {
+              <optgroup [label]="main.name">
+                <option [ngValue]="main.id">{{ main.name }} (عام)</option>
+                @for (sub of main.subCategories; track sub.id) {
+                  <option [ngValue]="sub.id">{{ sub.name }}</option>
+                }
+              </optgroup>
+            }
+          </select>
+          @if (productForm.get('categoryId')?.invalid && productForm.get('categoryId')?.touched) {
+            <p class="text-red-500 text-xs mt-1.5">اختيار القسم مطلوب</p>
+          }
+        </div>
+
+        <!-- الأزرار -->
+        <div class="flex gap-3 pt-2">
+          <button
+            type="submit"
+            [disabled]="isSaving()"
+            class="flex-1 bg-brand-black text-white text-sm py-3 rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-50"
+          >
+            {{ isSaving() ? 'جاري الحفظ...' : (editingProduct() ? 'حفظ التعديلات' : 'إضافة المنتج') }}
+          </button>
+          <button
+            type="button"
+            (click)="closeModal()"
+            class="px-6 text-sm text-brand-brown border border-gray-200 rounded-lg hover:bg-brand-cream transition-colors"
+          >
+            إلغاء
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+}

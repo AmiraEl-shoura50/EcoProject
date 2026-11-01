@@ -5,6 +5,7 @@ export interface WishlistItem {
   price: number;
   stockQuantity: number;
   rating: number;
+  originalPrice: number;
 }
 
 export interface Wishlist {

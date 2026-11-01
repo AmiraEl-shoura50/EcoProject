@@ -58,5 +58,12 @@ public class ReviewsController : ControllerBase
         var customers = await _unitOfWork.Customers.FindAsync(c => c.UserId == userId);
         return customers.FirstOrDefault()?.Id;
     }
+    [HttpGet("product/{productId}/summary")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetSummary(int productId)
+    {
+        var summary = await _reviewService.GetSummaryAsync(productId);
+        return Ok(summary);
+    }
 
 }

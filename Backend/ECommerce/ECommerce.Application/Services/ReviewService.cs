@@ -21,6 +21,10 @@ public class ReviewService : IReviewService
 
     public async Task<PaginatedResultDto<ReviewDto>> GetByProductAsync(int productId, int pageNumber, int pageSize)
     {
+        // ✅ حد أقصى للصفحة عشان محدش يطلب الجدول كله
+        pageNumber = Math.Max(1, pageNumber);
+        pageSize = Math.Clamp(pageSize, 1, 50);
+
         var (items, totalCount) = await _unitOfWork.Reviews.GetByProductPagedAsync(productId, pageNumber, pageSize);
 
         return new PaginatedResultDto<ReviewDto>
@@ -32,52 +36,23 @@ public class ReviewService : IReviewService
         };
     }
 
-    public async Task<ReviewDto?> CreateAsync(int customerId, CreateReviewDto dto)
+    public async Task<ReviewSummaryDto> GetSummaryAsync(int productId)
     {
-        // 1️⃣ ✅ Verified Purchase - نتأكد إن الأوردر ده بتاع نفس العميل، فيه المنتج ده، وحالته Delivered
-        var order = await _unitOfWork.Orders.GetWithItemsAsync(dto.OrderId);
-        if (order is null || order.CustomerId != customerId) return null;
+        var distribution = await _unitOfWork.Reviews.GetDistributionAsync(productId);
+        var total = distribution.Values.Sum();
 
-        if (order.Status != OrderStatus.Delivered) return null;
+        var average = total == 0
+            ? 0
+            : Math.Round(distribution.Sum(x => (double)x.Key * x.Value) / total, 1);
 
-        var boughtProduct = order.Items.Any(i => i.ProductId == dto.ProductId);
-        if (!boughtProduct) return null;
-
-        // 2️⃣ ✅ نتأكد إنه ما قيّمش نفس المنتج بنفس الأوردر ده قبل كده
-        var alreadyReviewed = await _unitOfWork.Reviews.HasReviewedAsync(customerId, dto.ProductId, dto.OrderId);
-        if (alreadyReviewed) return null;
-
-        var review = new Review
+        return new ReviewSummaryDto
         {
-            ProductId = dto.ProductId,
-            CustomerId = customerId,
-            OrderId = dto.OrderId,
-            Rating = dto.Rating,
-            Comment = dto.Comment,
-            CreatedAt = DateTime.UtcNow
+            Average = average,
+            TotalCount = total,
+            Distribution = Enumerable.Range(1, 5).Select(star => distribution.GetValueOrDefault(star)).ToArray()
         };
-
-        await _unitOfWork.Reviews.AddAsync(review);
-        await _unitOfWork.SaveChangesAsync();
-
-        // 3️⃣ ✅ نحدث متوسط تقييم المنتج
-        var product = await _unitOfWork.Products.GetByIdAsync(dto.ProductId);
-        if (product is not null)
-        {
-            var average = await _unitOfWork.Reviews.GetAverageRatingAsync(dto.ProductId);
-            product.Rating = (float)average;
-            _unitOfWork.Products.Update(product);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        //var created = await _unitOfWork.Reviews.GetByIdAsync(review.Id);
-        //return _mapper.Map<ReviewDto>(created);
-        var resultDto = _mapper.Map<ReviewDto>(review);
-        var customer = await _unitOfWork.Customers.GetWithUserAsync(customerId);
-        resultDto.CustomerName = customer is not null ? $"{customer.User.FirstName} {customer.User.LastName}" : string.Empty;
-
-        return resultDto;
     }
+
     public async Task<IEnumerable<LatestReviewDto>> GetLatestAsync(int count)
     {
         var reviews = await _unitOfWork.Reviews.GetLatestAsync(count);
@@ -90,5 +65,63 @@ public class ReviewService : IReviewService
             Comment = r.Comment,
             CreatedAt = r.CreatedAt
         });
+    }
+
+    public async Task<ReviewDto?> CreateAsync(int customerId, CreateReviewDto dto)
+    {
+        // ✅ شراء موثّق: الطلب بتاع نفس العميل، متوصّل، وفيه المنتج ده
+        var order = await _unitOfWork.Orders.GetWithItemsAsync(dto.OrderId);
+        if (order is null || order.CustomerId != customerId) return null;
+        if (order.Status != OrderStatus.Delivered) return null;
+        if (!order.Items.Any(i => i.ProductId == dto.ProductId)) return null;
+
+        // ✅ مرة واحدة لكل منتج في كل طلب
+        if (await _unitOfWork.Reviews.HasReviewedAsync(customerId, dto.ProductId, dto.OrderId)) return null;
+
+        var product = await _unitOfWork.Products.GetByIdAsync(dto.ProductId);
+        if (product is null) return null;
+
+        var review = new Review
+        {
+            ProductId = dto.ProductId,
+            CustomerId = customerId,
+            OrderId = dto.OrderId,
+            Rating = dto.Rating,
+            Comment = string.IsNullOrWhiteSpace(dto.Comment) ? null : dto.Comment.Trim(),
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _unitOfWork.Reviews.AddAsync(review);
+
+        try
+        {
+            await _unitOfWork.SaveChangesAsync();
+        }
+        catch (Exception)
+        {
+            // سباق نادر: ضغطتين متزامنتين على نفس التقييم، والفهرس الفريد منع التانية
+            if (await _unitOfWork.Reviews.HasReviewedAsync(customerId, dto.ProductId, dto.OrderId)) return null;
+            throw;
+        }
+
+        // ✅ المتوسط والعدد بيتحسبوا من الداتابيز بعد الحفظ، فبيصحّحوا نفسهم حتى لو حصل تزامن
+        var distribution = await _unitOfWork.Reviews.GetDistributionAsync(dto.ProductId);
+        var count = distribution.Values.Sum();
+
+        product.Rating = count == 0
+            ? 0
+            : (float)Math.Round(distribution.Sum(x => (double)x.Key * x.Value) / count, 1);
+        product.ReviewsCount = count;
+
+        _unitOfWork.Products.Update(product);
+        await _unitOfWork.SaveChangesAsync();
+
+        var resultDto = _mapper.Map<ReviewDto>(review);
+        var customer = await _unitOfWork.Customers.GetWithUserAsync(customerId);
+        resultDto.CustomerName = customer is not null
+            ? $"{customer.User.FirstName} {customer.User.LastName}"
+            : string.Empty;
+
+        return resultDto;
     }
 }

@@ -51,10 +51,15 @@ export class Login {
   this.isLoading = true;
 
   this.authService.login(this.loginForm.value).subscribe({
-    next: () => {
-      this.isLoading = false;
-      this.router.navigateByUrl(this.returnUrl);
-    },
+   next: () => {
+  this.isLoading = false;
+
+  const role = this.authService.userRole();
+  const home = role === 'Seller' ? '/seller' : role === 'Admin' ? '/admin' : '/';
+  const target = this.returnUrl === '/' ? home : this.returnUrl;
+
+  this.router.navigateByUrl(target);
+},
     error: () => {
       this.isLoading = false;
       // الـ Toast اتعرضت أوتوماتيك من الـ Interceptor، هنا بس بنوقف الـ Loading

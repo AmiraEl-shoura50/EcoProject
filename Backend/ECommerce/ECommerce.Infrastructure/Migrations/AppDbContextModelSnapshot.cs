@@ -144,6 +144,9 @@ namespace ECommerce.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CreatedBySellerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -159,6 +162,8 @@ namespace ECommerce.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBySellerId");
 
                     b.HasIndex("ParentCategoryId");
 
@@ -208,6 +213,9 @@ namespace ECommerce.Infrastructure.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("SellerId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -215,6 +223,8 @@ namespace ECommerce.Infrastructure.Migrations
 
                     b.HasIndex("DiscountTargetId")
                         .IsUnique();
+
+                    b.HasIndex("SellerId");
 
                     b.ToTable("Discounts");
                 });
@@ -251,6 +261,9 @@ namespace ECommerce.Infrastructure.Migrations
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Link")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -297,6 +310,9 @@ namespace ECommerce.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("bit");
+
                     b.Property<string>("MethodName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -305,6 +321,10 @@ namespace ECommerce.Infrastructure.Migrations
                     b.Property<string>("ProviderIntegrationId")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TransferUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
@@ -416,6 +436,9 @@ namespace ECommerce.Infrastructure.Migrations
 
                     b.Property<float>("Rating")
                         .HasColumnType("real");
+
+                    b.Property<int>("ReviewsCount")
+                        .HasColumnType("int");
 
                     b.Property<int>("SellerId")
                         .HasColumnType("int");
@@ -714,6 +737,9 @@ namespace ECommerce.Infrastructure.Migrations
                     b.Property<bool>("IsDeletedByCustomer")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsDeletedBySeller")
+                        .HasColumnType("bit");
+
                     b.Property<int>("PaymentMethodId")
                         .HasColumnType("int");
 
@@ -764,6 +790,11 @@ namespace ECommerce.Infrastructure.Migrations
 
             modelBuilder.Entity("ECommerce.Domain.Entities.Category", b =>
                 {
+                    b.HasOne("ECommerce.Domain.Entities.Seller", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedBySellerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("ECommerce.Domain.Entities.Category", "ParentCategory")
                         .WithMany("SubCategories")
                         .HasForeignKey("ParentCategoryId")
@@ -790,6 +821,11 @@ namespace ECommerce.Infrastructure.Migrations
                         .HasForeignKey("ECommerce.Domain.Entities.Discount", "DiscountTargetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("ECommerce.Domain.Entities.Seller", null)
+                        .WithMany()
+                        .HasForeignKey("SellerId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("DiscountTarget");
                 });

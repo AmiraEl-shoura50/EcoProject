@@ -31,12 +31,30 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
             .Include(o => o.PaymentTransactions)
             .FirstOrDefaultAsync(o => o.Id == orderId);
 
+
+
+
+
     public async Task<IEnumerable<Order>> GetBySellerAsync(int sellerId)
-        => await _dbSet
-            .Include(o => o.Items).ThenInclude(i => i.Product)
-            .Include(o => o.PaymentMethod)
-            .Include(o => o.PaymentProofs)
-            .Where(o => o.Items.Any(i => i.Product.SellerId == sellerId))
-            .OrderByDescending(o => o.CreatedDate)
-            .ToListAsync();
+     => await _dbSet
+         .Include(o => o.Items).ThenInclude(i => i.Product)
+         .Include(o => o.PaymentMethod)
+         .Include(o => o.PaymentProofs)
+         .Include(o => o.Customer).ThenInclude(c => c.User)
+         .Where(o => !o.IsDeletedBySeller && o.Items.Any(i => i.Product.SellerId == sellerId))
+         .OrderByDescending(o => o.CreatedDate)
+         .ToListAsync();
+
+
+
+    public async Task<Dictionary<int, int>> CountByPaymentMethodAsync()
+    => await _dbSet
+        .GroupBy(o => o.PaymentMethodId)
+        .Select(g => new { PaymentMethodId = g.Key, Count = g.Count() })
+        .ToDictionaryAsync(x => x.PaymentMethodId, x => x.Count);
 }
+
+
+
+
+

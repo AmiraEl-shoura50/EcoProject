@@ -8,12 +8,20 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      // ✅ لو الرد فيه Message من السيرفر (بيزنس error زي "الإيميل أو الباسورد غلط")، نعرضها Toast
-      // ✅ لو الرد فيه Data (يعني أخطاء Validation لكل حقل)، مش هنعرضها هنا - هي مسؤولية الفورم نفسه
-      if (error.error?.message && !error.error?.data) {
-        toastService.show(error.error.message, 'error');
-      } else if (!error.error?.message) {
-        toastService.show('حصل خطأ غير متوقع، حاول تاني', 'error');
+      const isLogin = req.url.includes('/auth/login');
+      const isRefresh = req.url.includes('/auth/refresh-token');
+
+      // 401 على أي طلب تاني: authInterceptor هيجدد التوكن ويعيد الطلب، فمفيش داعي نعرض رسالة
+      if (error.status === 401 && !isLogin && !isRefresh) {
+        return throwError(() => error);
+      }
+
+      if (isRefresh) {
+        toastService.show('انتهت الجلسة، سجل الدخول مرة أخرى', 'error');
+      } else if (error.status === 0) {
+        toastService.show('تعذر الاتصال بالخادم، تأكد من الاتصال وحاول مرة أخرى', 'error');
+      } else {
+        toastService.show(error.error?.message ?? 'حصل خطأ غير متوقع، حاول مرة أخرى', 'error');
       }
 
       return throwError(() => error);

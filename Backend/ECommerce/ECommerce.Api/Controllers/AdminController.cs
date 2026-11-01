@@ -8,7 +8,7 @@ namespace ECommerce.API.Controllers;
 
 [ApiController]
 [Route("api/admin")]
-[Authorize(Roles = Roles.Admin)] // ✅ Admin بس يقدر يوصل لأي حاجة هنا
+[Authorize(Roles = Roles.Admin)]
 public class AdminController : ControllerBase
 {
     private readonly IAdminService _adminService;
@@ -19,10 +19,14 @@ public class AdminController : ControllerBase
     }
 
     [HttpGet("users")]
-    public async Task<IActionResult> GetAllUsers([FromQuery] string? role = null)
+    public async Task<IActionResult> GetUsers(
+        [FromQuery] string? role = null,
+        [FromQuery] string? search = null,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
     {
-        var users = await _adminService.GetAllUsersAsync(role);
-        return Ok(users);
+        var result = await _adminService.GetUsersAsync(role, search, pageNumber, pageSize);
+        return Ok(result);
     }
 
     [HttpGet("users/{id}")]
@@ -37,7 +41,7 @@ public class AdminController : ControllerBase
     public async Task<IActionResult> SetUserStatus(Guid id, [FromBody] SetUserActiveDto dto)
     {
         var updated = await _adminService.SetUserActiveStatusAsync(id, dto.IsActive);
-        if (!updated) return NotFound();
+        if (!updated) return NotFound("المستخدم غير موجود");
         return NoContent();
     }
 }

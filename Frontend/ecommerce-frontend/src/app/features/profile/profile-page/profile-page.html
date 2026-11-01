@@ -7,7 +7,7 @@
 
       <div class="space-y-4 animate-pulse">
         <div class="bg-white rounded-2xl h-32"></div>
-        <div class="bg-white rounded-2xl h-48"></div>
+        <div class="bg-white rounded-2xl h-64"></div>
       </div>
 
     } @else if (customer()) {
@@ -42,26 +42,146 @@
         </a>
       </div>
 
-      <!-- تعديل العنوان -->
-      <form [formGroup]="form" (ngSubmit)="save()" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <h2 class="font-serif text-lg text-brand-black mb-4">عنوان التوصيل</h2>
+      <!-- البيانات الشخصية -->
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+        <h2 class="font-serif text-lg text-brand-black mb-5">البيانات الشخصية</h2>
 
-        <textarea
-          formControlName="address"
-          rows="3"
-          class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all resize-none"
-        ></textarea>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm text-brand-black mb-1.5 font-medium">الاسم الأول</label>
+            <input
+              type="text"
+              formControlName="firstName"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+            />
+            @if (profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched) {
+              <p class="text-red-500 text-xs mt-1.5">الاسم الأول مطلوب</p>
+            }
+          </div>
 
-        @if (form.get('address')?.invalid && form.get('address')?.touched) {
-          <p class="text-red-500 text-xs mt-1.5">العنوان مطلوب ولا يزيد عن 300 حرف</p>
-        }
+          <div>
+            <label class="block text-sm text-brand-black mb-1.5 font-medium">الاسم الأخير</label>
+            <input
+              type="text"
+              formControlName="lastName"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+            />
+            @if (profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched) {
+              <p class="text-red-500 text-xs mt-1.5">الاسم الأخير مطلوب</p>
+            }
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">البريد الإلكتروني</label>
+          <input
+            type="email"
+            [value]="customer()!.email"
+            disabled
+            class="w-full border border-gray-200 bg-gray-50 text-gray-500 rounded-lg px-4 py-2.5 text-sm cursor-not-allowed"
+          />
+          <p class="text-xs text-gray-400 mt-1.5">لا يمكن تغيير البريد الإلكتروني</p>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">رقم الهاتف</label>
+          <input
+            type="tel"
+            formControlName="phoneNumber"
+            dir="ltr"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+          />
+          @if (profileForm.get('phoneNumber')?.invalid && profileForm.get('phoneNumber')?.touched) {
+            <p class="text-red-500 text-xs mt-1.5">رقم الهاتف غير صحيح</p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">عنوان التوصيل</label>
+          <textarea
+            formControlName="address"
+            rows="3"
+            class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all resize-none"
+          ></textarea>
+          @if (profileForm.get('address')?.invalid && profileForm.get('address')?.touched) {
+            <p class="text-red-500 text-xs mt-1.5">العنوان مطلوب ولا يزيد عن 300 حرف</p>
+          }
+        </div>
 
         <button
           type="submit"
-          [disabled]="isSaving() || form.pristine"
-          class="mt-4 bg-brand-black text-white text-sm px-6 py-3 rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          [disabled]="isSavingProfile() || profileForm.pristine"
+          class="mt-5 bg-brand-black text-white text-sm px-6 py-3 rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {{ isSaving() ? 'جاري الحفظ...' : 'حفظ التعديلات' }}
+          {{ isSavingProfile() ? 'جاري الحفظ...' : 'حفظ التعديلات' }}
+        </button>
+      </form>
+
+      <!-- تغيير كلمة المرور -->
+      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="font-serif text-lg text-brand-black">تغيير كلمة المرور</h2>
+          <button
+            type="button"
+            (click)="togglePasswords()"
+            class="flex items-center gap-1.5 text-xs text-gray-500 hover:text-brand-gold transition-colors"
+          >
+            <lucide-angular [img]="showPasswords() ? EyeOffIcon : EyeIcon" [size]="16"></lucide-angular>
+            {{ showPasswords() ? 'إخفاء' : 'إظهار' }}
+          </button>
+        </div>
+
+        <div class="space-y-4">
+
+          <div>
+            <label class="block text-sm text-brand-black mb-1.5 font-medium">كلمة المرور الحالية</label>
+            <input
+              [type]="showPasswords() ? 'text' : 'password'"
+              formControlName="currentPassword"
+              autocomplete="current-password"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+            />
+            @if (passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched) {
+              <p class="text-red-500 text-xs mt-1.5">كلمة المرور الحالية مطلوبة</p>
+            }
+          </div>
+
+          <div>
+            <label class="block text-sm text-brand-black mb-1.5 font-medium">كلمة المرور الجديدة</label>
+            <input
+              [type]="showPasswords() ? 'text' : 'password'"
+              formControlName="newPassword"
+              autocomplete="new-password"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+            />
+            @if (passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched) {
+              <p class="text-red-500 text-xs mt-1.5">كلمة المرور لازم تكون 6 أحرف على الأقل</p>
+            } @else {
+              <p class="text-xs text-gray-400 mt-1.5">6 أحرف على الأقل، وتشمل حرفًا كبيرًا وصغيرًا ورقمًا ورمزًا</p>
+            }
+          </div>
+
+          <div>
+            <label class="block text-sm text-brand-black mb-1.5 font-medium">تأكيد كلمة المرور الجديدة</label>
+            <input
+              [type]="showPasswords() ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              autocomplete="new-password"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+            />
+            @if (passwordForm.hasError('mismatch') && passwordForm.get('confirmPassword')?.touched) {
+              <p class="text-red-500 text-xs mt-1.5">كلمتا المرور غير متطابقتين</p>
+            }
+          </div>
+
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="isSavingPassword() || passwordForm.invalid"
+          class="mt-5 bg-brand-black text-white text-sm px-6 py-3 rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {{ isSavingPassword() ? 'جاري التغيير...' : 'تغيير كلمة المرور' }}
         </button>
       </form>
 

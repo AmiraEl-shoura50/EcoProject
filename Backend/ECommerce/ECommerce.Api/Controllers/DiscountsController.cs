@@ -29,6 +29,18 @@ public class DiscountsController : ControllerBase
         return Ok(discounts);
     }
 
+    // ✅ جديد: خصومات البائع الحالي
+    [HttpGet("mine")]
+    [Authorize(Roles = Roles.Seller)]
+    public async Task<IActionResult> GetMine()
+    {
+        var sellerId = await GetCurrentSellerIdAsync();
+        if (sellerId is null) return Forbid();
+
+        var discounts = await _discountService.GetMineAsync(sellerId.Value);
+        return Ok(discounts);
+    }
+
     [HttpGet("{id}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetById(int id)
@@ -54,8 +66,6 @@ public class DiscountsController : ControllerBase
         if (sellerId is null) return Forbid();
 
         var created = await _discountService.CreateAsync(dto, sellerId.Value);
-        if (created is null) return BadRequest("بيانات الخصم غير صحيحة أو المنتج/القسم غير موجود");
-
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 

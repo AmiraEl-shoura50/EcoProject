@@ -28,4 +28,19 @@ public class DiscountRepository : GenericRepository<Discount>, IDiscountReposito
                  (d.DiscountTarget.Target == TargetType.Category && d.DiscountTarget.TargetId == categoryId)))
             .ToListAsync();
     }
+    public async Task<IEnumerable<Discount>> GetBySellerAsync(int sellerId)
+    => await _dbSet
+        .Include(d => d.DiscountTarget)
+        .Where(d => d.SellerId == sellerId)
+        .OrderByDescending(d => d.EndDate)
+        .ToListAsync();
+    public async Task<List<Discount>> GetActiveAsync()
+    {
+        var now = DateTime.UtcNow;
+
+        return await _dbSet
+            .Include(d => d.DiscountTarget)
+            .Where(d => d.StartDate <= now && d.EndDate >= now)
+            .ToListAsync();
+    }
 }

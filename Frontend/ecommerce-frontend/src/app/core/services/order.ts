@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
-import { CheckoutResult, CreateOrderRequest, Order, PaymentProof } from '../models/order.model';
+import { CheckoutResult, CreateOrderRequest, Order, PaymentProof, SellerOrder } from '../models/order.model';
 import { CartService } from './cart';
 import { PaginatedResult } from '../models/product.model';
 
@@ -45,4 +45,22 @@ cancel(orderId: number): Observable<unknown> {
 deleteCancelled(orderIds: number[]): Observable<unknown> {
   return this.http.post(`${this.apiUrl}/delete-cancelled`, { orderIds });
 }
+
+getSellerOrders(): Observable<ApiResponse<SellerOrder[]>> {
+  return this.http.get<ApiResponse<SellerOrder[]>>(`${this.apiUrl}/seller/mine`);
+}
+
+reviewPayment(orderId: number, approve: boolean, rejectionReason?: string): Observable<unknown> {
+  return this.http.put(`${this.apiUrl}/${orderId}/review-payment`, { approve, rejectionReason });
+}
+
+updateStatus(orderId: number, newStatus: string): Observable<unknown> {
+  return this.http.put(`${this.apiUrl}/${orderId}/status`, { newStatus });
+}
+deleteCancelledAsSeller(orderIds: number[]): Observable<unknown> {
+  return this.http.post(`${this.apiUrl}/seller/delete-cancelled`, { orderIds });
+}
+getById(orderId: number): Observable<ApiResponse<Order>> {
+    return this.http.get<ApiResponse<Order>>(`${this.apiUrl}/${orderId}`);
+  }
 }

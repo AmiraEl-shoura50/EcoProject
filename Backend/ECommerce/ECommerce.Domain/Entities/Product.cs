@@ -19,7 +19,7 @@ namespace ECommerce.Domain.Entities
         public int StockQuantity { get; set; }
         public string Description { get; set; } = string.Empty;
         public float Rating { get; set; }
-
+        public int ReviewsCount { get; set; }
         public string? ImageUrl { get; set; }
     }
 }

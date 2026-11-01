@@ -9,7 +9,11 @@ export interface Product {
   categoryName: string;
   sellerId: number;
   sellerStoreName: string;
+  reviewsCount: number;
   imageUrl: string | null;
+  discountedPrice: number | null;
+  discountPercent: number | null;
+  discountEndDate: string | null;
 }
 
 export interface ProductQueryParams {
@@ -20,6 +24,7 @@ export interface ProductQueryParams {
   sortBy?: string;
   pageNumber?: number;
   pageSize?: number;
+  
 }
 
 export interface PaginatedResult<T> {
@@ -30,4 +35,8 @@ export interface PaginatedResult<T> {
   totalPages: number;
   hasPreviousPage: boolean;
   hasNextPage: boolean;
+}
+export interface DeleteProductsResult {
+  deletedCount: number;
+  blockedCount: number;
 }

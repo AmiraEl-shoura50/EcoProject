@@ -40,4 +40,15 @@ export class CartPage implements OnInit {
       next: () => this.toastService.show('تم حذف المنتج من السلة', 'success')
     });
   }
+    // إجمالي التوفير من الخصومات
+  savings(): number {
+    const cart = this.cartService.cart();
+    if (!cart) return 0;
+
+    const total = cart.items.reduce(
+      (sum, item) => sum + (item.originalUnitPrice - item.unitPrice) * item.quantity,
+      0
+    );
+    return Math.round(total * 100) / 100;
+  }
 }

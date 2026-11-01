@@ -10,7 +10,11 @@ public interface IProductService
     Task<IEnumerable<ProductDto>> GetByCategoryAsync(int categoryId);
     Task<ProductDto> CreateAsync(CreateProductDto dto, int sellerId); // ✅ sellerId بقى بارامتر منفصل
     Task<bool> UpdateAsync(int id, UpdateProductDto dto, int sellerId); // ✅ كمان هنا عشان نتأكد إنه صاحب المنتج
-    Task<bool> DeleteAsync(int id, int sellerId); // ✅ ونفس الحاجة هنا
+    Task<DeleteProductResult> DeleteAsync(int id, int sellerId);
 
     Task<PaginatedResultDto<ProductDto>> SearchAsync(ProductQueryParams queryParams);
+
+    Task<DeleteProductsResultDto> DeleteManyAsync(List<int> productIds, int sellerId);
+
+    Task<PaginatedResultDto<ProductDto>> GetOffersAsync(ProductQueryParams queryParams);
 }

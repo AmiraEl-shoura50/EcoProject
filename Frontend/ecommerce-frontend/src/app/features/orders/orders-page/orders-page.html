@@ -82,6 +82,19 @@
                   <div class="flex-1 min-w-0">
                     <p class="text-sm text-brand-black line-clamp-1">{{ item.productName }}</p>
                     <p class="text-xs text-brand-brown">الكمية: {{ item.quantity }}</p>
+                                        @if (order.status === 'Delivered') {
+                      @if (item.isReviewed) {
+                        <p class="text-xs text-green-600 mt-1">تم تقييم المنتج ✓</p>
+                      } @else {
+                        <button
+                          type="button"
+                          (click)="openReview(order, item)"
+                          class="mt-1.5 text-xs text-brand-gold border border-brand-gold px-3 py-1 rounded-full hover:bg-brand-gold hover:text-white transition-colors"
+                        >
+                          قيّم المنتج
+                        </button>
+                      }
+                    }
                   </div>
                   <p class="text-sm font-medium text-brand-black">{{ item.subtotal | number }} جنيه</p>
                 </div>
@@ -146,7 +159,17 @@
         </div>
       }
 
-    }
+     }
 
   </div>
 </div>
+
+@if (reviewTarget(); as target) {
+  <app-review-modal
+    [orderId]="target.orderId"
+    [productId]="target.productId"
+    [productName]="target.productName"
+    (closed)="reviewTarget.set(null)"
+    (submitted)="onReviewSubmitted()"
+  ></app-review-modal>
+}

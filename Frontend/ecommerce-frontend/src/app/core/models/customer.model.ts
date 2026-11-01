@@ -6,3 +6,9 @@ export interface Customer {
   email: string;
   phoneNumber: string | null;
 }
+export interface UpdateCustomerRequest {
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  address: string;
+}

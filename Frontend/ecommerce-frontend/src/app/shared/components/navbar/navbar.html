@@ -14,28 +14,40 @@
       </a>
 
       <!-- Categories - Desktop (في النص) -->
-      <div class="hidden  md:flex flex-1 items-center justify-center gap-6 text-sm font-medium">
+      <div class="hidden md:flex flex-1 items-center justify-center gap-6 text-sm font-medium">
+
+        @if (productService.offersCount() > 0) {
+          <a
+            routerLink="/offers"
+            class="flex items-center gap-1.5 text-red-500 font-semibold hover:text-red-600 transition-colors whitespace-nowrap"
+          >
+            <lucide-angular [img]="PercentIcon" [size]="15"></lucide-angular>
+            العروض
+          </a>
+        }
 
         @for (category of visibleCategories(); track category.id) {
           <div
-            class="relative"
+            class="relative h-16 flex items-center"
             (mouseenter)="showSubMenu(category.id)"
             (mouseleave)="hideSubMenu()"
           >
-              <a
+            <a
               [routerLink]="['/category', category.id]"
+              (click)="hideSubMenu()"
               class="text-brand-black hover:text-brand-gold transition-colors cursor-pointer whitespace-nowrap"
             >
               {{ category.name }}
             </a>
 
             @if (hoveredCategoryId === category.id && category.subCategories.length > 0) {
-              <div class="absolute top-full right-0 mt-3 bg-white shadow-xl border border-gray-100 rounded-lg py-4 px-6 min-w-[220px] z-50 animate-fade-in">
+              <div class="absolute top-full right-0 bg-white shadow-xl border border-gray-100 rounded-b-lg py-4 px-6 min-w-[220px] z-50 animate-fade-in">
                 <ul class="space-y-2">
                   @for (sub of category.subCategories; track sub.id) {
                     <li>
-                        <a
+                      <a
                         [routerLink]="['/category', sub.id]"
+                        (click)="hideSubMenu()"
                         class="block text-sm text-brand-brown hover:text-brand-gold transition-colors"
                       >
                         {{ sub.name }}
@@ -51,7 +63,7 @@
         <!-- باقي الأقسام -->
         @if (remainingCategories().length > 0) {
           <div
-            class="relative"
+            class="relative h-16 flex items-center"
             (mouseenter)="isMoreCategoriesOpen = true"
             (mouseleave)="isMoreCategoriesOpen = false"
           >
@@ -63,10 +75,11 @@
             </button>
 
             @if (isMoreCategoriesOpen) {
-              <div class="absolute top-full right-0 mt-3 bg-white shadow-xl border border-gray-100 rounded-lg py-3 min-w-[180px] z-50 animate-fade-in">
+              <div class="absolute top-full right-0 bg-white shadow-xl border border-gray-100 rounded-b-lg py-3 min-w-[180px] z-50 animate-fade-in">
                 @for (category of remainingCategories(); track category.id) {
-                    <a
+                  <a
                     [routerLink]="['/category', category.id]"
+                    (click)="isMoreCategoriesOpen = false"
                     class="block px-4 py-2 text-sm text-brand-black hover:bg-brand-cream transition-colors"
                   >
                     {{ category.name }}
@@ -79,53 +92,134 @@
 
       </div>
 
+      
       <!-- ==================== Left Actions (بحث + أيقونات) ==================== -->
       <div class="flex items-center gap-4 mr-auto md:mr-0">
 
+      
         <!-- Search - Desktop -->
-        <div class="hidden md:block relative w-48 lg:w-64">
-
-          <input
-            type="text"
-            placeholder="ابحث عن منتج..."
-            class="w-full border border-gray-300 rounded-full px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
-          />
-
-          <lucide-angular
-            [img]="SearchIcon"
-            [size]="16"
-            class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-          ></lucide-angular>
-
+        <div class="hidden md:block w-48 lg:w-64">
+          <app-search-box></app-search-box>
         </div>
-
         @if (authService.isLoggedIn()) {
+          <!-- Notifications - Desktop -->
+          <div class="relative hidden md:block">
 
-         <!-- Wishlist - Desktop -->
-<a
-  routerLink="/wishlist"
-  class="hidden md:block relative text-brand-black hover:text-brand-gold transition-colors"
->
-  <lucide-angular [img]="HeartIcon" [size]="22"></lucide-angular>
-  @if (wishlistService.itemsCount() > 0) {
-    <span class="absolute -top-2 -left-2 bg-brand-gold text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-      {{ wishlistService.itemsCount() }}
-    </span>
-  }
-</a>
+            <button
+              type="button"
+              (click)="toggleNotifications()"
+              class="relative flex text-brand-black hover:text-brand-gold transition-colors"
+              aria-label="الإشعارات"
+            >
+              <lucide-angular [img]="BellIcon" [size]="22"></lucide-angular>
+              @if (notificationService.unreadCount() > 0) {
+                <span class="absolute -top-2 -left-2 bg-red-500 text-white text-[10px] font-bold min-w-4 h-4 px-1 rounded-full flex items-center justify-center">
+                  {{ notificationService.unreadCount() > 9 ? '9+' : notificationService.unreadCount() }}
+                </span>
+              }
+            </button>
 
-<!-- Cart - Desktop -->
-<a
-  routerLink="/cart"
-  class="hidden md:block relative text-brand-black hover:text-brand-gold transition-colors"
->
-  <lucide-angular [img]="CartIcon" [size]="22"></lucide-angular>
-  @if (cartService.itemsCount() > 0) {
-    <span class="absolute -top-2 -left-2 bg-brand-gold text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-      {{ cartService.itemsCount() }}
-    </span>
-  }
-</a>
+            @if (isNotificationsOpen) {
+
+              <!-- طبقة شفافة: الضغط في أي مكان بره بيقفل القائمة -->
+              <div class="fixed inset-0 z-40" (click)="closeNotifications()"></div>
+
+              <div class="absolute left-0 mt-3 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden animate-fade-in">
+
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                  <p class="text-sm font-semibold text-brand-black">الإشعارات</p>
+                  @if (notificationService.unreadCount() > 0) {
+                    <button
+                      type="button"
+                      (click)="markAllRead()"
+                      class="flex items-center gap-1 text-xs text-brand-gold hover:underline"
+                    >
+                      <lucide-angular [img]="CheckAllIcon" [size]="14"></lucide-angular>
+                      تحديد الكل كمقروء
+                    </button>
+                  }
+                </div>
+
+                <div class="max-h-96 overflow-y-auto">
+                  @if (notificationService.latest().length === 0) {
+                    <p class="text-sm text-brand-brown text-center py-10">لا توجد إشعارات</p>
+                  } @else {
+                                     @for (n of notificationService.latest(); track n.id) {
+                      <div
+                        class="flex items-start hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0"
+                        [class.bg-brand-cream]="!n.isRead"
+                      >
+                        <button
+                          type="button"
+                          (click)="openNotification(n)"
+                          class="flex-1 min-w-0 text-start flex gap-3 ps-4 py-3"
+                        >
+                          <span
+                            class="mt-1.5 w-2 h-2 rounded-full shrink-0"
+                            [class.bg-brand-gold]="!n.isRead"
+                            [class.bg-transparent]="n.isRead"
+                          ></span>
+                          <span class="flex-1 min-w-0">
+                            <span class="block text-sm text-brand-black" [class.font-semibold]="!n.isRead">{{ n.title }}</span>
+                            <span class="block text-xs text-brand-brown mt-0.5 line-clamp-2">{{ n.message }}</span>
+                            <span class="block text-[11px] text-gray-400 mt-1">{{ n.createdAt | timeAgo }}</span>
+                          </span>
+                        </button>
+
+                        <button
+                          type="button"
+                          (click)="deleteNotification(n)"
+                          class="shrink-0 w-8 h-8 mt-2 me-2 rounded-full flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                          aria-label="حذف الإشعار"
+                        >
+                          <lucide-angular [img]="TrashIcon" [size]="14"></lucide-angular>
+                        </button>
+                      </div>
+                    }
+                  }
+                </div>
+
+                <a
+                  routerLink="/notifications"
+                  (click)="closeNotifications()"
+                  class="block text-center text-sm text-brand-gold py-3 border-t border-gray-100 hover:bg-brand-cream transition-colors"
+                >
+                  عرض كل الإشعارات
+                </a>
+
+              </div>
+            }
+
+          </div>
+          @if (authService.userRole() === 'Customer') {
+
+            <!-- Wishlist - Desktop -->
+            <a
+              routerLink="/wishlist"
+              class="hidden md:block relative text-brand-black hover:text-brand-gold transition-colors"
+            >
+              <lucide-angular [img]="HeartIcon" [size]="22"></lucide-angular>
+              @if (wishlistService.itemsCount() > 0) {
+                <span class="absolute -top-2 -left-2 bg-brand-gold text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {{ wishlistService.itemsCount() }}
+                </span>
+              }
+            </a>
+
+            <!-- Cart - Desktop -->
+            <a
+              routerLink="/cart"
+              class="hidden md:block relative text-brand-black hover:text-brand-gold transition-colors"
+            >
+              <lucide-angular [img]="CartIcon" [size]="22"></lucide-angular>
+              @if (cartService.itemsCount() > 0) {
+                <span class="absolute -top-2 -left-2 bg-brand-gold text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {{ cartService.itemsCount() }}
+                </span>
+              }
+            </a>
+
+          }
 
           <!-- User Dropdown - Desktop -->
           <div class="relative hidden md:block">
@@ -135,44 +229,57 @@
               (click)="toggleMenu()"
               class="flex items-center gap-1 text-brand-black hover:text-brand-gold transition-colors"
             >
-              <lucide-angular
-                [img]="UserIcon"
-                [size]="22"
-              ></lucide-angular>
+              <lucide-angular [img]="UserIcon" [size]="22"></lucide-angular>
             </button>
 
             @if (isMenuOpen) {
+              <div class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 animate-fade-in">
 
-              <div
-                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 animate-fade-in"
-              >
-
-                  <a
-                  routerLink="/profile"
-                  (click)="closeMenu()"
-                  class="block px-4 py-2 text-sm text-brand-black hover:bg-brand-cream transition-colors"
-                >
-                  حسابي
-                </a>
+                @if (authService.userRole() === 'Seller') {
 
                   <a
-                  routerLink="/orders"
-                  (click)="closeMenu()"
-                  class="block px-4 py-2 text-sm text-brand-black hover:bg-brand-cream transition-colors"
-                >
-                  طلباتي
-                </a>
+                    routerLink="/seller"
+                    (click)="closeMenu()"
+                    class="block px-4 py-2 text-sm text-brand-black hover:bg-brand-cream transition-colors"
+                  >
+                    لوحة التحكم
+                  </a>
+                                  } @else if (authService.userRole() === 'Admin') {
+
+                  <a
+                    routerLink="/admin"
+                    (click)="closeMenu()"
+                    class="block px-4 py-2 text-sm text-brand-black hover:bg-brand-cream transition-colors"
+                  >
+                    لوحة الإدارة
+                  </a>
+
+                } @else if (authService.userRole() === 'Customer') {
+
+                  <a
+                    routerLink="/profile"
+                    (click)="closeMenu()"
+                    class="block px-4 py-2 text-sm text-brand-black hover:bg-brand-cream transition-colors"
+                  >
+                    حسابي
+                  </a>
+
+                  <a
+                    routerLink="/orders"
+                    (click)="closeMenu()"
+                    class="block px-4 py-2 text-sm text-brand-black hover:bg-brand-cream transition-colors"
+                  >
+                    طلباتي
+                  </a>
+
+                }
 
                 <button
                   type="button"
                   (click)="logout()"
                   class="w-full text-right flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                 >
-                  <lucide-angular
-                    [img]="LogOutIcon"
-                    [size]="16"
-                  ></lucide-angular>
-
+                  <lucide-angular [img]="LogOutIcon" [size]="16"></lucide-angular>
                   تسجيل الخروج
                 </button>
 
@@ -184,7 +291,7 @@
         } @else {
 
           <!-- Login - Desktop -->
-            <a
+          <a
             routerLink="/login"
             class="hidden md:block text-sm font-medium text-brand-black hover:text-brand-gold transition-colors whitespace-nowrap"
           >
@@ -192,13 +299,28 @@
           </a>
 
           <!-- Register - Desktop -->
-            <a
+          <a
             routerLink="/register"
             class="hidden md:block text-sm font-medium bg-brand-black text-white px-4 py-2 rounded-lg hover:bg-brand-gold transition-colors whitespace-nowrap"
           >
             إنشاء حساب
           </a>
 
+        }
+
+                @if (authService.isLoggedIn()) {
+          <a
+            routerLink="/notifications"
+            class="md:hidden relative flex items-center justify-center w-10 h-10 rounded-lg text-brand-black hover:bg-brand-cream transition-colors"
+            aria-label="الإشعارات"
+          >
+            <lucide-angular [img]="BellIcon" [size]="22"></lucide-angular>
+            @if (notificationService.unreadCount() > 0) {
+              <span class="absolute top-0.5 left-0.5 bg-red-500 text-white text-[10px] font-bold min-w-4 h-4 px-1 rounded-full flex items-center justify-center">
+                {{ notificationService.unreadCount() > 9 ? '9+' : notificationService.unreadCount() }}
+              </span>
+            }
+          </a>
         }
 
         <!-- ==================== Mobile Menu Button ==================== -->
@@ -239,25 +361,8 @@
 
         <!-- Mobile Search -->
         <div class="py-4 px-4">
-
-          <div class="relative">
-
-            <input
-              type="text"
-              placeholder="ابحث عن منتج..."
-              class="w-full border border-gray-300 rounded-full px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
-            />
-
-            <lucide-angular
-              [img]="SearchIcon"
-              [size]="16"
-              class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            ></lucide-angular>
-
-          </div>
-
+          <app-search-box (searched)="closeMobileMenu()"></app-search-box>
         </div>
-
 
         <!-- Mobile Categories -->
         <div class="border-t border-gray-100 py-3 px-4">
@@ -267,7 +372,16 @@
           </p>
 
           <div class="space-y-1">
-
+            @if (productService.offersCount() > 0) {
+              <a
+                routerLink="/offers"
+                (click)="closeMobileMenu()"
+                class="flex items-center gap-2 px-2 py-3 text-sm font-semibold text-red-500 hover:text-red-600 transition-colors"
+              >
+                <lucide-angular [img]="PercentIcon" [size]="16"></lucide-angular>
+                العروض والخصومات
+              </a>
+            }
             @for (category of categories(); track category.id) {
 
               <div>
@@ -338,69 +452,78 @@
 
         </div>
 
-
-        <!-- Mobile Account Links -->
+               <!-- Mobile Account Links -->
         <div class="border-t border-gray-100 py-3 px-4">
 
           @if (authService.isLoggedIn()) {
 
-              <a
-              routerLink="/wishlist"
-              (click)="closeMobileMenu()"
-              class="flex items-center gap-3 px-2 py-3 text-sm text-brand-black hover:text-brand-gold transition-colors"
-            >
-              <lucide-angular
-                [img]="HeartIcon"
-                [size]="20"
-              ></lucide-angular>
-
-              المفضلة
-            </a>
+            @if (authService.userRole() === 'Customer') {
 
               <a
-              routerLink="/cart"
-              (click)="closeMobileMenu()"
-              class="flex items-center gap-3 px-2 py-3 text-sm text-brand-black hover:text-brand-gold transition-colors"
-            >
-              <lucide-angular
-                [img]="CartIcon"
-                [size]="20"
-              ></lucide-angular>
-
-              سلة المشتريات
-            </a>
-               
-              <a
-              routerLink="/profile"
-              (click)="closeMobileMenu()"
-              class="flex items-center gap-3 px-2 py-3 text-sm text-brand-black hover:text-brand-gold transition-colors"
-            >
-              <lucide-angular
-                [img]="UserIcon"
-                [size]="20"
-              ></lucide-angular>
-
-              حسابي
-            </a>
+                routerLink="/wishlist"
+                (click)="closeMobileMenu()"
+                class="flex items-center gap-3 px-2 py-3 text-sm text-brand-black hover:text-brand-gold transition-colors"
+              >
+                <lucide-angular [img]="HeartIcon" [size]="20"></lucide-angular>
+                المفضلة
+              </a>
 
               <a
-              routerLink="/orders"
-              (click)="closeMobileMenu()"
-              class="block px-2 py-3 text-sm text-brand-black hover:text-brand-gold transition-colors"
-            >
-              طلباتي
-            </a>
+                routerLink="/cart"
+                (click)="closeMobileMenu()"
+                class="flex items-center gap-3 px-2 py-3 text-sm text-brand-black hover:text-brand-gold transition-colors"
+              >
+                <lucide-angular [img]="CartIcon" [size]="20"></lucide-angular>
+                سلة المشتريات
+              </a>
+
+              <a
+                routerLink="/profile"
+                (click)="closeMobileMenu()"
+                class="flex items-center gap-3 px-2 py-3 text-sm text-brand-black hover:text-brand-gold transition-colors"
+              >
+                <lucide-angular [img]="UserIcon" [size]="20"></lucide-angular>
+                حسابي
+              </a>
+
+              <a
+                routerLink="/orders"
+                (click)="closeMobileMenu()"
+                class="block px-2 py-3 text-sm text-brand-black hover:text-brand-gold transition-colors"
+              >
+                طلباتي
+              </a>
+
+            } @else if (authService.userRole() === 'Seller') {
+
+              <a
+                routerLink="/seller"
+                (click)="closeMobileMenu()"
+                class="flex items-center gap-3 px-2 py-3 text-sm text-brand-black hover:text-brand-gold transition-colors"
+              >
+                <lucide-angular [img]="UserIcon" [size]="20"></lucide-angular>
+                لوحة التحكم
+              </a>
+
+            } @else if (authService.userRole() === 'Admin') {
+
+              <a
+                routerLink="/admin"
+                (click)="closeMobileMenu()"
+                class="flex items-center gap-3 px-2 py-3 text-sm text-brand-black hover:text-brand-gold transition-colors"
+              >
+                <lucide-angular [img]="UserIcon" [size]="20"></lucide-angular>
+                لوحة الإدارة
+              </a>
+
+            }
 
             <button
               type="button"
               (click)="logout(); closeMobileMenu()"
               class="w-full text-right flex items-center gap-3 px-2 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
             >
-              <lucide-angular
-                [img]="LogOutIcon"
-                [size]="20"
-              ></lucide-angular>
-
+              <lucide-angular [img]="LogOutIcon" [size]="20"></lucide-angular>
               تسجيل الخروج
             </button>
 
@@ -414,7 +537,7 @@
               تسجيل الدخول
             </a>
 
-             <a 
+            <a
               routerLink="/register"
               (click)="closeMobileMenu()"
               class="block text-center text-sm font-medium bg-brand-black text-white px-4 py-3 rounded-lg hover:bg-brand-gold transition-colors"
@@ -425,7 +548,6 @@
           }
 
         </div>
-
       </div>
 
     }

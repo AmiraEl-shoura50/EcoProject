@@ -8,6 +8,8 @@ public class ProductQueryParams
     public decimal? MaxPrice { get; set; }
     public string? SortBy { get; set; } // "price_asc", "price_desc", "rating", "newest"
 
+    public int? SellerId { get; set; }
+
     private int _pageNumber = 1;
     public int PageNumber
     {

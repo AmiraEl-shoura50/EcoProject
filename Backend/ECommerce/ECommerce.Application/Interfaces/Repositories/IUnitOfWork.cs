@@ -21,7 +21,7 @@ public interface IUnitOfWork : IDisposable
 
     IReviewRepository Reviews { get; }
 
-    IGenericRepository<Notification> Notifications { get; }
+    INotificationRepository Notifications { get; }
     IGenericRepository<PaymentProof> PaymentProofs { get; }
     IGenericRepository<PaymentTransaction> PaymentTransactions { get; }
     IGenericRepository<RefreshToken> RefreshTokens { get; }

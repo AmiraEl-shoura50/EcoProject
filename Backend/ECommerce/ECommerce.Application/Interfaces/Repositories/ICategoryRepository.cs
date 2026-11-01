@@ -6,4 +6,6 @@ namespace ECommerce.Application.Interfaces.Repositories;
 public interface ICategoryRepository : IGenericRepository<Category>
 {
     Task<(List<Category> Items, int TotalCount)> SearchAsync(CategoryQueryParams queryParams);
+    Task<List<SellerCategoryDto>> GetBySellerAsync(int sellerId);
+    Task<List<AdminCategoryDto>> GetAdminTreeAsync();
 }

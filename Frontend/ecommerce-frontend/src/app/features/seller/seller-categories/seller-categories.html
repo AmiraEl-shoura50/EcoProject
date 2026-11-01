@@ -1,0 +1,223 @@
+<div>
+
+  <!-- العنوان وزر الإضافة -->
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <div>
+      <h2 class="font-serif text-2xl text-brand-black">الأقسام الفرعية</h2>
+      @if (!isLoading()) {
+        <p class="text-sm text-brand-brown mt-0.5">{{ categories().length }} قسم</p>
+      }
+    </div>
+
+    <button
+      type="button"
+      (click)="openCreate()"
+      [disabled]="categoryService.tree().length === 0"
+      class="flex items-center gap-2 bg-brand-black text-white text-sm px-5 py-2.5 rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      <lucide-angular [img]="PlusIcon" [size]="18"></lucide-angular>
+      إضافة قسم فرعي
+    </button>
+  </div>
+
+  @if (isLoading()) {
+
+    <div class="space-y-4 animate-pulse">
+      @for (i of [1,2,3]; track i) {
+        <div class="bg-white rounded-2xl h-24"></div>
+      }
+    </div>
+
+  } @else if (categories().length === 0) {
+
+    <div class="bg-white rounded-2xl border border-gray-100 text-center py-16 px-4">
+      @if (categoryService.tree().length === 0) {
+        <p class="text-brand-black font-medium mb-2">لا توجد أقسام رئيسية بعد</p>
+        <p class="text-sm text-brand-brown">يجب على مدير الموقع إنشاء الأقسام الرئيسية أولًا لتتمكن من إضافة أقسام فرعية تحتها</p>
+      } @else {
+        <p class="text-brand-brown mb-4">لم تضف أي أقسام فرعية بعد</p>
+        <button
+          type="button"
+          (click)="openCreate()"
+          class="bg-brand-black text-white text-sm px-6 py-3 rounded-lg hover:bg-brand-gold transition-colors"
+        >
+          أضف أول قسم فرعي
+        </button>
+      }
+    </div>
+
+  } @else {
+
+    <div class="space-y-8">
+      @for (group of groups(); track group.parentName) {
+
+        <section>
+          <h3 class="text-sm font-semibold text-brand-brown mb-3">
+            تحت قسم: <span class="text-brand-black">{{ group.parentName }}</span>
+          </h3>
+
+          <div class="space-y-3">
+            @for (category of group.items; track category.id) {
+
+              <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+
+                <div class="flex items-center gap-4 flex-1 min-w-0">
+                  <div class="w-16 h-16 bg-gray-100 rounded-xl overflow-hidden shrink-0">
+                    @if (category.imageUrl) {
+                      <img [src]="category.imageUrl" [alt]="category.name" class="w-full h-full object-cover" />
+                    } @else {
+                      <div class="w-full h-full flex items-center justify-center bg-brand-cream text-brand-gold font-serif text-xl">
+                        {{ category.name.charAt(0) }}
+                      </div>
+                    }
+                  </div>
+
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-brand-black line-clamp-1">{{ category.name }}</p>
+                    <p class="text-xs text-brand-brown mt-0.5 line-clamp-1">{{ category.description }}</p>
+                    <p class="text-xs text-gray-500 mt-0.5">{{ category.productsCount }} منتج</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                  <button
+                    type="button"
+                    (click)="openEdit(category)"
+                    class="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-brand-black hover:border-brand-gold hover:text-brand-gold transition-colors"
+                    aria-label="تعديل"
+                  >
+                    <lucide-angular [img]="EditIcon" [size]="16"></lucide-angular>
+                  </button>
+                  <button
+                    type="button"
+                    (click)="delete(category)"
+                    [disabled]="deletingId() === category.id"
+                    class="w-9 h-9 rounded-lg border border-red-200 flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                    aria-label="حذف"
+                  >
+                    <lucide-angular [img]="TrashIcon" [size]="16"></lucide-angular>
+                  </button>
+                </div>
+
+              </div>
+
+            }
+          </div>
+        </section>
+
+      }
+    </div>
+
+  }
+
+</div>
+
+<!-- نافذة الإضافة / التعديل -->
+@if (isModalOpen()) {
+  <div class="fixed inset-0 z-[60] bg-black/60 flex items-end sm:items-center justify-center sm:p-4">
+
+    <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-2xl max-h-[92vh] overflow-y-auto p-6">
+
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="font-serif text-xl text-brand-black">
+          {{ editingCategory() ? 'تعديل القسم' : 'إضافة قسم فرعي' }}
+        </h3>
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+          aria-label="إغلاق"
+        >
+          <lucide-angular [img]="CloseIcon" [size]="20"></lucide-angular>
+        </button>
+      </div>
+
+      <form [formGroup]="categoryForm" (ngSubmit)="save()" class="space-y-4">
+
+        <!-- القسم الرئيسي -->
+        <div>
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">القسم الرئيسي</label>
+          <select
+            formControlName="parentCategoryId"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+          >
+            <option [ngValue]="null" disabled>اختر القسم الرئيسي</option>
+            @for (main of categoryService.tree(); track main.id) {
+              <option [ngValue]="main.id">{{ main.name }}</option>
+            }
+          </select>
+          @if (editingCategory()) {
+            <p class="text-xs text-gray-400 mt-1.5">لا يمكن تغيير القسم الرئيسي بعد الإنشاء</p>
+          } @else if (categoryForm.get('parentCategoryId')?.invalid && categoryForm.get('parentCategoryId')?.touched) {
+            <p class="text-red-500 text-xs mt-1.5">اختيار القسم الرئيسي مطلوب</p>
+          }
+        </div>
+
+        <!-- الاسم -->
+        <div>
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">اسم القسم</label>
+          <input
+            type="text"
+            formControlName="name"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+          />
+          @if (categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched) {
+            <p class="text-red-500 text-xs mt-1.5">اسم القسم مطلوب (حتى 100 حرف)</p>
+          }
+        </div>
+
+        <!-- الوصف -->
+        <div>
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">الوصف</label>
+          <textarea
+            formControlName="description"
+            rows="3"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all resize-none"
+          ></textarea>
+          @if (categoryForm.get('description')?.invalid && categoryForm.get('description')?.touched) {
+            <p class="text-red-500 text-xs mt-1.5">وصف القسم مطلوب (حتى 500 حرف)</p>
+          }
+        </div>
+
+        <!-- الصورة (اختيارية) -->
+        <div>
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">
+            صورة القسم <span class="text-xs font-normal text-gray-400">(اختيارية)</span>
+          </label>
+          <label class="block border-2 border-dashed border-gray-300 rounded-xl p-4 text-center cursor-pointer hover:border-brand-gold transition-colors">
+            <input type="file" accept="image/*" (change)="onFileSelected($event)" class="hidden" />
+
+            @if (previewUrl()) {
+              <img [src]="previewUrl()" alt="معاينة" class="max-h-36 mx-auto rounded-lg" />
+              <p class="text-xs text-brand-gold mt-2">اضغط لتغيير الصورة</p>
+            } @else {
+              <lucide-angular [img]="ImageIcon" [size]="30" class="mx-auto text-gray-300 mb-2"></lucide-angular>
+              <p class="text-sm text-gray-400">اضغط لاختيار صورة (حتى 5 ميجابايت)</p>
+            }
+          </label>
+        </div>
+
+        <!-- الأزرار -->
+        <div class="flex gap-3 pt-2">
+          <button
+            type="submit"
+            [disabled]="isSaving()"
+            class="flex-1 bg-brand-black text-white text-sm py-3 rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-50"
+          >
+            {{ isSaving() ? 'جاري الحفظ...' : (editingCategory() ? 'حفظ التعديلات' : 'إضافة القسم') }}
+          </button>
+          <button
+            type="button"
+            (click)="closeModal()"
+            class="px-6 text-sm text-brand-brown border border-gray-200 rounded-lg hover:bg-brand-cream transition-colors"
+          >
+            إلغاء
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+}

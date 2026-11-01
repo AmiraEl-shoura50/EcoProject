@@ -1,29 +1,39 @@
 
 using ECommerce.API.Filters;
 using ECommerce.API.Hubs;
+using ECommerce.API.Json;
 using ECommerce.API.Realtime;
 using ECommerce.Application;
 using ECommerce.Application.Interfaces.Services;
 using ECommerce.Infrastructure;
 using ECommerce.Infrastructure.Persistence;
 using FluentValidation.AspNetCore;
+using System.Globalization;
+using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
-
 
 namespace E_commerce
 {
     public class Program
     {
         public static async Task Main(string[] args)
+
         {
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
 
             builder.Services.AddControllers(options =>
             {
-                options.Filters.Add<ApiResponseWrapperFilter>(); // ✅ جديد
-            });
+                options.Filters.Add<ApiResponseWrapperFilter>();
+            }) .AddJsonOptions(options =>
+                 {
+                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                     options.JsonSerializerOptions.Converters.Add(new UtcDateTimeConverter());
+                 });
             builder.Services.AddFluentValidationAutoValidation();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             //builder.Services.AddOpenApi();
@@ -35,7 +45,8 @@ namespace E_commerce
             builder.Services.AddApplication();
             ////
             builder.Services.AddScoped<IRealtimeNotifier, SignalRNotifier>();
-            builder.Services.AddSignalR();
+            builder.Services.AddSignalR()
+                 .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new UtcDateTimeConverter()));
             ////
             builder.Services.AddExceptionHandler<ECommerce.API.Middlewares.GlobalExceptionHandler>();
             builder.Services.AddProblemDetails(); // ✅ Fallback format قياسي لو حصل حاجة غريبة قبل ما الـ Handler يشتغل

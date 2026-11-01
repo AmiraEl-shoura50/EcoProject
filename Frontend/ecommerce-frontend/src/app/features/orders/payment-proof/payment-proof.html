@@ -1,40 +1,114 @@
 <div class="bg-brand-cream min-h-screen py-10">
-  <div class="max-w-md mx-auto px-4">
+  <div class="max-w-lg mx-auto px-4">
 
-    <div class="bg-white rounded-xl p-8">
-      <h1 class="font-serif text-2xl text-brand-black mb-2">رفع إثبات الدفع</h1>
-      <p class="text-sm text-brand-brown mb-6">
-        قم بتحويل المبلغ المطلوب، ثم ارفع صورة من إثبات التحويل هنا
-      </p>
+    @if (isLoading()) {
 
-      <!-- اختيار الصورة -->
-      <label class="block border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-brand-gold transition-colors mb-4">
-        <input type="file" accept="image/*" (change)="onFileSelected($event)" class="hidden" />
+      <div class="bg-white rounded-2xl h-64 animate-pulse"></div>
 
-        @if (previewUrl()) {
-          <img [src]="previewUrl()" alt="معاينة" class="max-h-48 mx-auto rounded-lg" />
+    } @else if (!order()) {
+
+      <div class="bg-white rounded-2xl border border-gray-100 text-center py-14 px-4">
+        <p class="text-brand-black font-medium mb-3">الطلب غير موجود</p>
+        <a routerLink="/orders" class="text-brand-gold font-medium hover:underline">العودة لطلباتي</a>
+      </div>
+
+    } @else if (!canUpload()) {
+
+      <div class="bg-white rounded-2xl border border-gray-100 text-center py-14 px-4">
+        <p class="text-brand-black font-medium mb-2">هذا الطلب لا يحتاج إثبات دفع حاليًا</p>
+        <p class="text-sm text-brand-brown mb-5">ربما تم رفع الإثبات بالفعل، أو أن طريقة الدفع إلكترونية</p>
+        <a routerLink="/orders" class="text-brand-gold font-medium hover:underline">العودة لطلباتي</a>
+      </div>
+
+    } @else {
+
+      <!-- ملخص الطلب -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-5 text-center">
+        <p class="text-xs text-brand-brown">طلب رقم #{{ order()!.id }}</p>
+        <p class="font-serif text-3xl text-brand-gold font-semibold mt-1">
+          {{ order()!.totalAmount | number:'1.0-2' }} جنيه
+        </p>
+        <p class="text-sm text-brand-brown mt-1">المبلغ المطلوب تحويله عبر {{ order()!.paymentMethodName }}</p>
+      </div>
+
+      <!-- الخطوة 1: التحويل -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-5">
+        <h2 class="font-serif text-lg text-brand-black mb-3">١. حوّل المبلغ</h2>
+
+        @if (order()!.paymentTransferUrl) {
+          <a
+            [href]="order()!.paymentTransferUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center justify-center gap-2 bg-brand-black text-white text-sm font-medium py-3.5 rounded-lg hover:bg-brand-gold transition-colors"
+          >
+            <lucide-angular [img]="LinkIcon" [size]="18"></lucide-angular>
+            فتح رابط التحويل ({{ order()!.paymentMethodName }})
+          </a>
+          <p class="text-xs text-gray-400 mt-2 text-center">على الموبايل بيفتح التطبيق مباشرة</p>
         } @else {
-          <p class="text-sm text-gray-400">اضغط لاختيار صورة إثبات التحويل</p>
+          <p class="text-sm text-brand-brown">حوّل المبلغ المطلوب عبر {{ order()!.paymentMethodName }}، ثم ارفع إثبات التحويل بالأسفل.</p>
         }
-      </label>
+      </div>
 
-      <!-- رقم العملية (اختياري) -->
-      <input
-        type="text"
-        [(ngModel)]="transferReference"
-        placeholder="رقم العملية (اختياري)"
-        class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all mb-6"
-      />
+      <!-- الخطوة 2: الإثبات -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <h2 class="font-serif text-lg text-brand-black mb-3">٢. ارفع إثبات التحويل</h2>
 
-      <button
-        type="button"
-        (click)="submit()"
-        [disabled]="isSubmitting()"
-        class="w-full bg-brand-black text-white py-3.5 rounded-lg font-medium hover:bg-brand-gold transition-colors disabled:opacity-50"
-      >
-        {{ isSubmitting() ? 'جاري الرفع...' : 'إرسال إثبات الدفع' }}
-      </button>
-    </div>
+        <!-- تنبيه منع لقطة الشاشة + المشاركة -->
+        <div class="bg-brand-cream rounded-xl p-4 mb-4 text-sm">
+          <p class="font-medium text-brand-black mb-1">تطبيقات التحويل بتمنع لقطة الشاشة</p>
+          <p class="text-brand-brown leading-relaxed">
+            من إيصال التحويل داخل التطبيق اضغط <b>مشاركة</b> ثم اختر <b>Smart Shop</b>، وهيفتح الإيصال هنا جاهزًا للإرسال.
+          </p>
+
+          @if (pwa.isInstalled()) {
+            <p class="text-green-600 text-xs mt-2">الموقع مثبّت على جهازك وجاهز لاستقبال الإيصال ✓</p>
+          } @else if (pwa.canInstall()) {
+            <button
+              type="button"
+              (click)="install()"
+              class="mt-3 w-full bg-white border border-brand-gold text-brand-gold text-sm font-medium py-2.5 rounded-lg hover:bg-brand-gold hover:text-white transition-colors"
+            >
+              ثبّت Smart Shop على جهازك (مرة واحدة)
+            </button>
+            <p class="text-xs text-gray-500 mt-2">التثبيت ضروري ليظهر الموقع في قائمة المشاركة</p>
+          } @else {
+            <p class="text-xs text-gray-500 mt-2">
+              لو الموقع مش ظاهر في قائمة المشاركة (مثلًا على آيفون): احفظ صورة الإيصال من قائمة المشاركة في التطبيق، ثم ارفعها من هنا.
+            </p>
+          }
+        </div>
+
+        <label class="block border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-brand-gold transition-colors mb-4">
+          <input type="file" accept="image/*" (change)="onFileSelected($event)" class="hidden" />
+
+          @if (previewUrl()) {
+            <img [src]="previewUrl()" alt="معاينة" class="max-h-48 mx-auto rounded-lg" />
+            <p class="text-xs text-brand-gold mt-2">اضغط لتغيير الصورة</p>
+          } @else {
+            <p class="text-sm text-gray-400">اضغط لاختيار صورة إثبات التحويل</p>
+          }
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="transferReference"
+          placeholder="رقم العملية (اختياري)"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all mb-5"
+        />
+
+        <button
+          type="button"
+          (click)="submit()"
+          [disabled]="isSubmitting()"
+          class="w-full bg-brand-black text-white py-3.5 rounded-lg font-medium hover:bg-brand-gold transition-colors disabled:opacity-50"
+        >
+          {{ isSubmitting() ? 'جاري الرفع...' : 'إرسال إثبات الدفع' }}
+        </button>
+      </div>
+
+    }
 
   </div>
 </div>

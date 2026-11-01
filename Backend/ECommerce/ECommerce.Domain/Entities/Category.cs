@@ -12,10 +12,12 @@ namespace ECommerce.Domain.Entities
         public string Description { get; set; } = string.Empty;
         public string? ImageUrl { get; set; }
 
-        // ✅ جديد
         public int? ParentCategoryId { get; set; }
         public Category? ParentCategory { get; set; }
         public ICollection<Category> SubCategories { get; set; } = new List<Category>();
+
+        // ✅ جديد: البائع اللي أنشأ القسم (null لأقسام الأدمن)
+        public int? CreatedBySellerId { get; set; }
 
         public ICollection<Product> Products { get; set; } = new List<Product>();
     }

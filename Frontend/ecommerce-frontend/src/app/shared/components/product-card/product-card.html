@@ -2,7 +2,7 @@
   [routerLink]="['/products', product.id]"
   class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 group block"
 >
-  <div class="h-48 w-full overflow-hidden bg-gray-100">
+  <div class="relative h-48 w-full overflow-hidden bg-gray-100">
     @if (product.imageUrl) {
       <img
         [src]="product.imageUrl"
@@ -14,10 +14,32 @@
         لا توجد صورة
       </div>
     }
+
+    @if (product.discountPercent) {
+      <span class="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">
+        -{{ product.discountPercent }}%
+      </span>
+    }
   </div>
+
   <div class="p-4">
     <p class="text-xs text-brand-brown mb-1">{{ product.categoryName }}</p>
-    <h3 class="text-sm font-medium text-brand-black mb-2 line-clamp-1">{{ product.name }}</h3>
-    <p class="font-serif text-lg text-brand-gold font-semibold">{{ product.price | number }} جنيه</p>
+   <h3 class="text-sm font-medium text-brand-black mb-1.5 line-clamp-1">{{ product.name }}</h3>
+
+@if (product.reviewsCount > 0) {
+  <div class="flex items-center gap-1.5 mb-2">
+    <app-stars [value]="product.rating" [size]="13"></app-stars>
+    <span class="text-xs text-gray-500">({{ product.reviewsCount }})</span>
+  </div>
+}
+
+    @if (product.discountedPrice) {
+      <div class="flex items-baseline gap-2 flex-wrap">
+        <p class="font-serif text-lg text-brand-gold font-semibold">{{ product.discountedPrice | number:'1.0-2' }} جنيه</p>
+        <p class="text-xs text-gray-400 line-through">{{ product.price | number:'1.0-2' }}</p>
+      </div>
+    } @else {
+      <p class="font-serif text-lg text-brand-gold font-semibold">{{ product.price | number:'1.0-2' }} جنيه</p>
+    }
   </div>
 </a>

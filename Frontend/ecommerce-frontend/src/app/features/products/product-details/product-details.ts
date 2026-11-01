@@ -8,11 +8,13 @@ import { WishlistService } from '../../../core/services/wishlist';
 import { AuthService } from '../../../core/services/auth';
 import { ToastService } from '../../../core/services/toast';
 import { Product } from '../../../core/models/product.model';
+import { ProductReviews } from '../../../shared/components/product-reviews/product-reviews';
+import { Stars } from '../../../shared/components/stars/stars';
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, ProductReviews, Stars],
   templateUrl: './product-details.html',
   styleUrl: './product-details.css'
 })
@@ -111,5 +113,13 @@ export class ProductDetails implements OnInit {
         next: () => this.toastService.show('تمت الإضافة للمفضلة', 'success')
       });
     }
+  }
+  scrollToReviews(): void {
+  document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' });
+}
+  // البائع والمدير مينفعش يشتروا
+  get cannotBuy(): boolean {
+    const role = this.authService.userRole();
+    return role === 'Seller' || role === 'Admin';
   }
 }

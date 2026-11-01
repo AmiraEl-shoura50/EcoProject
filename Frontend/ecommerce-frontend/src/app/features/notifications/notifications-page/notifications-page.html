@@ -1,0 +1,119 @@
+<div class="bg-brand-cream min-h-screen py-10">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6">
+
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+      <div>
+        <h1 class="font-serif text-3xl text-brand-black">الإشعارات</h1>
+        @if (!isLoading()) {
+          <p class="text-sm text-brand-brown mt-1">{{ totalCount() }} إشعار</p>
+        }
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        @if (notificationService.unreadCount() > 0) {
+          <button
+            type="button"
+            (click)="markAllRead()"
+            class="flex items-center gap-2 text-sm text-brand-gold border border-brand-gold px-4 py-2 rounded-lg hover:bg-brand-gold hover:text-white transition-colors"
+          >
+            <lucide-angular [img]="CheckAllIcon" [size]="16"></lucide-angular>
+            تحديد الكل كمقروء
+          </button>
+        }
+
+        @if (totalCount() > notificationService.unreadCount()) {
+          <button
+            type="button"
+            (click)="clearRead()"
+            class="flex items-center gap-2 text-sm text-red-500 border border-red-200 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors"
+          >
+            <lucide-angular [img]="TrashIcon" [size]="16"></lucide-angular>
+            مسح المقروء
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (isLoading()) {
+
+      <div class="space-y-3 animate-pulse">
+        @for (i of [1,2,3,4]; track i) {
+          <div class="bg-white rounded-2xl h-20"></div>
+        }
+      </div>
+
+    } @else if (items().length === 0) {
+
+      <div class="bg-white rounded-2xl border border-gray-100 text-center py-16 px-4">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-brand-cream flex items-center justify-center text-brand-gold">
+          <lucide-angular [img]="BellIcon" [size]="28"></lucide-angular>
+        </div>
+        <p class="text-brand-black font-medium mb-1">لا توجد إشعارات</p>
+        <p class="text-sm text-brand-brown">هتظهر هنا تحديثات طلباتك والعروض الجديدة</p>
+      </div>
+
+    } @else {
+
+      <div class="space-y-3">
+        @for (n of items(); track n.id) {
+          <div
+            class="flex items-start bg-white rounded-2xl border shadow-sm hover:shadow-md transition-shadow"
+            [class.border-brand-gold]="!n.isRead"
+            [class.border-gray-100]="n.isRead"
+          >
+            <button
+              type="button"
+              (click)="open(n)"
+              class="flex-1 min-w-0 text-start flex gap-4 p-4"
+            >
+              <span
+                class="mt-1.5 w-2.5 h-2.5 rounded-full shrink-0"
+                [class.bg-brand-gold]="!n.isRead"
+                [class.bg-gray-200]="n.isRead"
+              ></span>
+
+              <span class="flex-1 min-w-0">
+                <span class="block text-sm text-brand-black" [class.font-semibold]="!n.isRead">{{ n.title }}</span>
+                <span class="block text-sm text-brand-brown mt-1">{{ n.message }}</span>
+                <span class="block text-xs text-gray-400 mt-2">{{ n.createdAt | timeAgo }}</span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              (click)="remove(n)"
+              class="shrink-0 w-9 h-9 mt-3 me-3 rounded-full flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+              aria-label="حذف الإشعار"
+            >
+              <lucide-angular [img]="TrashIcon" [size]="16"></lucide-angular>
+            </button>
+          </div>
+        }
+      </div>
+
+      @if (totalPages() > 1) {
+        <div class="flex items-center justify-center gap-2 mt-8">
+          <button
+            type="button"
+            (click)="goToPage(currentPage() - 1)"
+            [disabled]="!hasPreviousPage()"
+            class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            السابق
+          </button>
+          <span class="text-sm text-brand-brown px-4">صفحة {{ currentPage() }} من {{ totalPages() }}</span>
+          <button
+            type="button"
+            (click)="goToPage(currentPage() + 1)"
+            [disabled]="!hasNextPage()"
+            class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            التالي
+          </button>
+        </div>
+      }
+
+    }
+
+  </div>
+</div>

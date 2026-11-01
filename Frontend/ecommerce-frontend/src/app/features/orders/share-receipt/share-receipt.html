@@ -1,0 +1,104 @@
+<div class="bg-brand-cream min-h-screen py-10">
+  <div class="max-w-lg mx-auto px-4">
+
+    <h1 class="font-serif text-2xl text-brand-black text-center mb-6">إرسال إيصال الدفع</h1>
+
+    @if (isLoading()) {
+
+      <div class="bg-white rounded-2xl h-64 animate-pulse"></div>
+
+    } @else if (!file()) {
+
+      <div class="bg-white rounded-2xl border border-gray-100 text-center py-14 px-4">
+        <p class="text-brand-black font-medium mb-2">لم يتم استلام أي إيصال</p>
+        <p class="text-sm text-brand-brown mb-5">
+          من تطبيق التحويل اضغط <b>مشاركة</b> على الإيصال ثم اختر <b>Smart Shop</b>
+        </p>
+        <a routerLink="/orders" class="text-brand-gold font-medium hover:underline">العودة لطلباتي</a>
+      </div>
+
+    } @else {
+
+      <!-- الإيصال -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-5 text-center">
+        <img [src]="previewUrl()" alt="إيصال التحويل" class="max-h-72 mx-auto rounded-lg" />
+      </div>
+
+      @if (orders().length === 0) {
+
+        <div class="bg-white rounded-2xl border border-gray-100 text-center py-10 px-4">
+          <p class="text-brand-black font-medium mb-2">لا توجد طلبات في انتظار الدفع</p>
+          <p class="text-sm text-brand-brown mb-5">أتمم طلبًا جديدًا أولًا، ثم أرسل الإيصال</p>
+          <button
+            type="button"
+            (click)="discard()"
+            class="text-sm text-brand-brown border border-gray-200 px-5 py-2 rounded-lg hover:bg-brand-cream transition-colors"
+          >
+            إلغاء
+          </button>
+        </div>
+
+      } @else {
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+
+          <p class="text-sm font-medium text-brand-black mb-3">اختر الطلب المرتبط بهذا الإيصال</p>
+
+          <div class="space-y-3 mb-5">
+            @for (order of orders(); track order.id) {
+              <label
+                class="flex items-center gap-3 border-2 rounded-lg p-4 cursor-pointer transition-all"
+                [class.border-brand-gold]="selectedOrderId() === order.id"
+                [class.border-gray-200]="selectedOrderId() !== order.id"
+              >
+                <input
+                  type="radio"
+                  name="order"
+                  [checked]="selectedOrderId() === order.id"
+                  (change)="selectOrder(order.id)"
+                  class="accent-brand-gold"
+                />
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-brand-black">طلب رقم #{{ order.id }}</p>
+                  <p class="text-xs text-brand-brown">
+                    {{ order.paymentMethodName }} · {{ order.createdDate | date:'dd/MM/yyyy' }}
+                  </p>
+                </div>
+                <p class="text-sm font-semibold text-brand-gold shrink-0">{{ order.totalAmount | number:'1.0-2' }} جنيه</p>
+              </label>
+            }
+          </div>
+
+          <input
+            type="text"
+            [(ngModel)]="transferReference"
+            placeholder="رقم العملية (اختياري)"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all mb-5"
+          />
+
+          <div class="flex gap-3">
+            <button
+              type="button"
+              (click)="submit()"
+              [disabled]="isSubmitting()"
+              class="flex-1 bg-brand-black text-white text-sm py-3 rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-50"
+            >
+              {{ isSubmitting() ? 'جاري الإرسال...' : 'إرسال الإيصال' }}
+            </button>
+            <button
+              type="button"
+              (click)="discard()"
+              class="px-5 text-sm text-brand-brown border border-gray-200 rounded-lg hover:bg-brand-cream transition-colors"
+            >
+              إلغاء
+            </button>
+          </div>
+
+        </div>
+
+      }
+
+    }
+
+  </div>
+</div>

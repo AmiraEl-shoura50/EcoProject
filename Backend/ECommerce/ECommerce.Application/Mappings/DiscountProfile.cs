@@ -12,6 +12,9 @@ public class DiscountProfile : Profile
             .ForMember(dest => dest.DiscountType, opt => opt.MapFrom(src => src.DiscountType.ToString()))
             .ForMember(dest => dest.TargetType, opt => opt.MapFrom(src => src.DiscountTarget.Target.ToString()))
             .ForMember(dest => dest.TargetId, opt => opt.MapFrom(src => src.DiscountTarget.TargetId))
-            .ForMember(dest => dest.TargetName, opt => opt.Ignore()); // ✅ هنملاها يدويًا في الـ Service (محتاجة Query إضافية)
+           
+            .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => DateTime.SpecifyKind(src.StartDate, DateTimeKind.Utc)))
+            .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => DateTime.SpecifyKind(src.EndDate, DateTimeKind.Utc)))
+            .ForMember(dest => dest.TargetName, opt => opt.Ignore()); // بتتملى في الـ Service
     }
 }

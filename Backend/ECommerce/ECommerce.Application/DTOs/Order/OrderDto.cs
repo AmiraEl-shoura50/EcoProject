@@ -10,5 +10,6 @@ public class OrderDto
     public string PaymentMethodName { get; set; } = string.Empty;
     public List<OrderItemDto> Items { get; set; } = new();
     public string PaymentMethodType { get; set; } = string.Empty;
+    public string? PaymentTransferUrl { get; set; }
 
 }

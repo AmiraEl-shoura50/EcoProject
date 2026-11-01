@@ -9,11 +9,11 @@ public interface IOrderService
     Task<PaginatedResultDto<OrderDto>> GetMyOrdersAsync(int customerId, int pageNumber, int pageSize);
     Task<OrderDto?> GetByIdAsync(int orderId, int customerId);
     Task<bool> CancelAsync(int orderId, int customerId);
-    Task<IEnumerable<OrderDto>> GetOrdersForSellerAsync(int sellerId);
+    Task<IEnumerable<SellerOrderDto>> GetOrdersForSellerAsync(int sellerId);
     Task<bool> UpdateStatusAsync(int orderId, int sellerId, string newStatus);
 
     Task<PaymentProofDto?> SubmitPaymentProofAsync(int customerId, int orderId, SubmitPaymentProofDto dto);
     Task<bool> ReviewPaymentProofAsync(int sellerId, int orderId, ReviewPaymentProofDto dto);
-
+    Task<int> DeleteCancelledForSellerAsync(int sellerId, List<int> orderIds);
     Task<int> DeleteCancelledAsync(int customerId, List<int> orderIds);
 }

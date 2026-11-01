@@ -1,0 +1,275 @@
+<div>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <div>
+      <h2 class="font-serif text-2xl text-brand-black">طرق الدفع</h2>
+      @if (!isLoading()) {
+        <p class="text-sm text-brand-brown mt-0.5">{{ methods().length }} طريقة</p>
+      }
+    </div>
+
+    <button
+      type="button"
+      (click)="openCreate()"
+      class="flex items-center gap-2 bg-brand-black text-white text-sm px-5 py-2.5 rounded-lg hover:bg-brand-gold transition-colors"
+    >
+      <lucide-angular [img]="PlusIcon" [size]="18"></lucide-angular>
+      إضافة طريقة دفع
+    </button>
+  </div>
+
+  @if (isLoading()) {
+
+    <div class="space-y-4 animate-pulse">
+      @for (i of [1,2,3]; track i) {
+        <div class="bg-white rounded-2xl h-24"></div>
+      }
+    </div>
+
+  } @else if (methods().length === 0) {
+
+    <div class="bg-white rounded-2xl border border-gray-100 text-center py-16 px-4">
+      <p class="text-brand-black font-medium mb-2">لا توجد طرق دفع</p>
+      <p class="text-sm text-brand-brown mb-5">العملاء لن يتمكنوا من إتمام الطلبات قبل إضافة طريقة دفع واحدة على الأقل</p>
+      <button
+        type="button"
+        (click)="openCreate()"
+        class="bg-brand-black text-white text-sm px-6 py-3 rounded-lg hover:bg-brand-gold transition-colors"
+      >
+        أضف أول طريقة دفع
+      </button>
+    </div>
+
+  } @else {
+
+    <div class="space-y-4">
+      @for (method of methods(); track method.id) {
+
+        <div
+          class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col sm:flex-row sm:items-center gap-4"
+          [class.opacity-70]="method.isHidden"
+        >
+
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-center gap-2 mb-1.5">
+              <p class="text-sm font-semibold text-brand-black">{{ method.methodName }}</p>
+
+              <span
+                class="text-xs font-medium px-2.5 py-0.5 rounded-full"
+                [class.bg-indigo-100]="method.type === 'Gateway'"
+                [class.text-indigo-700]="method.type === 'Gateway'"
+                [class.bg-orange-100]="method.type === 'Manual'"
+                [class.text-orange-700]="method.type === 'Manual'"
+              >
+                {{ method.type === 'Gateway' ? 'بوابة دفع إلكتروني' : 'تحويل يدوي + إثبات' }}
+              </span>
+
+              @if (method.isHidden) {
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-200 text-gray-600">
+                  مخفية عن العملاء
+                </span>
+              }
+            </div>
+
+            <p class="text-xs text-brand-brown">
+              {{ method.ordersCount }} طلب
+              @if (method.providerIntegrationId) {
+                · رقم التكامل: <span dir="ltr" class="inline-block">{{ method.providerIntegrationId }}</span>
+              }
+            </p>
+
+            @if (method.type === 'Manual') {
+              @if (method.transferUrl) {
+                <p class="text-xs text-gray-500 mt-1 truncate" dir="ltr">{{ method.transferUrl }}</p>
+              } @else {
+                <p class="text-xs text-orange-500 mt-1">لم يتم إضافة رابط تحويل</p>
+              }
+            }
+
+            @if (method.ordersCount > 0) {
+              <p class="text-xs text-gray-400 mt-1">لا يمكن حذفها لأنها مرتبطة بطلبات سابقة، ويمكنك إخفاءها بدلًا من ذلك</p>
+            }
+          </div>
+
+          <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+
+            <button
+              type="button"
+              (click)="toggleVisibility(method)"
+              [disabled]="togglingId() === method.id"
+              class="w-9 h-9 rounded-lg border flex items-center justify-center transition-colors disabled:opacity-50"
+              [class.border-gray-200]="!method.isHidden"
+              [class.text-brand-black]="!method.isHidden"
+              [class.border-brand-gold]="method.isHidden"
+              [class.text-brand-gold]="method.isHidden"
+              [attr.aria-label]="method.isHidden ? 'إظهار للعملاء' : 'إخفاء عن العملاء'"
+              [attr.title]="method.isHidden ? 'إظهار للعملاء' : 'إخفاء عن العملاء'"
+            >
+              <lucide-angular [img]="method.isHidden ? EyeOffIcon : EyeIcon" [size]="16"></lucide-angular>
+            </button>
+
+            <button
+              type="button"
+              (click)="openEdit(method)"
+              class="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-brand-black hover:border-brand-gold hover:text-brand-gold transition-colors"
+              aria-label="تعديل"
+            >
+              <lucide-angular [img]="EditIcon" [size]="16"></lucide-angular>
+            </button>
+
+            <button
+              type="button"
+              (click)="delete(method)"
+              [disabled]="method.ordersCount > 0 || deletingId() === method.id"
+              class="w-9 h-9 rounded-lg border border-red-200 flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+              aria-label="حذف"
+            >
+              <lucide-angular [img]="TrashIcon" [size]="16"></lucide-angular>
+            </button>
+
+          </div>
+
+        </div>
+
+      }
+    </div>
+
+  }
+
+</div>
+
+<!-- نافذة الإضافة / التعديل -->
+@if (isModalOpen()) {
+  <div class="fixed inset-0 z-[60] bg-black/60 flex items-end sm:items-center justify-center sm:p-4">
+
+    <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-2xl max-h-[92vh] overflow-y-auto p-6">
+
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="font-serif text-xl text-brand-black">
+          {{ editingMethod() ? 'تعديل طريقة الدفع' : 'إضافة طريقة دفع' }}
+        </h3>
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+          aria-label="إغلاق"
+        >
+          <lucide-angular [img]="CloseIcon" [size]="20"></lucide-angular>
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="save()" class="space-y-5">
+
+        <!-- النوع -->
+        <div>
+          <p class="text-sm text-brand-black mb-2 font-medium">نوع الطريقة</p>
+
+          @if (editingMethod()) {
+            <p class="text-sm text-brand-brown bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5">
+              {{ form.getRawValue().type === 'Gateway' ? 'بوابة دفع إلكتروني' : 'تحويل يدوي + إثبات' }}
+            </p>
+            <p class="text-xs text-gray-400 mt-1.5">لا يمكن تغيير النوع بعد الإنشاء</p>
+          } @else {
+            <div class="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                (click)="setType('Manual')"
+                class="border-2 rounded-lg py-3 px-2 text-sm font-medium transition-all"
+                [class.border-brand-gold]="form.value.type === 'Manual'"
+                [class.border-gray-200]="form.value.type !== 'Manual'"
+              >
+                تحويل يدوي
+                <span class="block text-xs font-normal text-gray-400 mt-0.5">فودافون كاش، إنستاباي...</span>
+              </button>
+              <button
+                type="button"
+                (click)="setType('Gateway')"
+                class="border-2 rounded-lg py-3 px-2 text-sm font-medium transition-all"
+                [class.border-brand-gold]="form.value.type === 'Gateway'"
+                [class.border-gray-200]="form.value.type !== 'Gateway'"
+              >
+                بوابة دفع
+                <span class="block text-xs font-normal text-gray-400 mt-0.5">Paymob</span>
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- الاسم -->
+        <div>
+          <label class="block text-sm text-brand-black mb-1.5 font-medium">اسم طريقة الدفع</label>
+          <input
+            type="text"
+            formControlName="methodName"
+            placeholder="مثال: فودافون كاش"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+          />
+          @if (form.get('methodName')?.invalid && form.get('methodName')?.touched) {
+            <p class="text-red-500 text-xs mt-1.5">الاسم مطلوب (حتى 100 حرف)</p>
+          }
+        </div>
+
+        <!-- رابط التحويل: للتحويل اليدوي فقط -->
+        @if (form.getRawValue().type === 'Manual') {
+          <div>
+            <label class="block text-sm text-brand-black mb-1.5 font-medium">
+              رابط التحويل <span class="text-xs font-normal text-gray-400">(اختياري)</span>
+            </label>
+            <input
+              type="url"
+              formControlName="transferUrl"
+              dir="ltr"
+              placeholder="https://ipn.eg/S/..."
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+            />
+            <p class="text-xs text-gray-400 mt-1.5">
+              الرابط اللي هيفتحه العميل لتحويل المبلغ (رابط فودافون كاش أو إنستاباي الخاص بك)
+            </p>
+            @if (form.get('transferUrl')?.invalid && form.get('transferUrl')?.touched) {
+              <p class="text-red-500 text-xs mt-1.5">أدخل رابطًا صحيحًا يبدأ بـ http أو https</p>
+            }
+          </div>
+        }
+
+        <!-- رقم التكامل: للبوابة فقط -->
+        @if (form.getRawValue().type === 'Gateway') {
+          <div>
+            <label class="block text-sm text-brand-black mb-1.5 font-medium">رقم التكامل (Integration ID)</label>
+            <input
+              type="text"
+              formControlName="providerIntegrationId"
+              inputmode="numeric"
+              dir="ltr"
+              placeholder="1234567"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+            />
+            <p class="text-xs text-gray-400 mt-1.5">تجده في لوحة تحكم Paymob ضمن Payment Integrations</p>
+            @if (form.get('providerIntegrationId')?.invalid && form.get('providerIntegrationId')?.touched) {
+              <p class="text-red-500 text-xs mt-1.5">أدخل أرقامًا إنجليزية فقط</p>
+            }
+          </div>
+        }
+
+        <div class="flex gap-3 pt-2">
+          <button
+            type="submit"
+            [disabled]="isSaving()"
+            class="flex-1 bg-brand-black text-white text-sm py-3 rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-50"
+          >
+            {{ isSaving() ? 'جاري الحفظ...' : (editingMethod() ? 'حفظ التعديلات' : 'إضافة') }}
+          </button>
+          <button
+            type="button"
+            (click)="closeModal()"
+            class="px-6 text-sm text-brand-brown border border-gray-200 rounded-lg hover:bg-brand-cream transition-colors"
+          >
+            إلغاء
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+}

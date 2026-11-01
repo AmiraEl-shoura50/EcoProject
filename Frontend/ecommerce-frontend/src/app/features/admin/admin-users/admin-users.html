@@ -1,0 +1,161 @@
+<div>
+
+  <div class="mb-5">
+    <h2 class="font-serif text-2xl text-brand-black">المستخدمون</h2>
+    @if (!isLoading() || totalCount() > 0) {
+      <p class="text-sm text-brand-brown mt-0.5">{{ totalCount() }} مستخدم</p>
+    }
+  </div>
+
+  <!-- البحث المباشر -->
+  <div class="relative mb-4">
+    <input
+      #searchBox
+      type="text"
+      [value]="searchTerm()"
+      (input)="onSearchInput(searchBox.value)"
+      autocomplete="off"
+      placeholder="ابحث بالاسم أو البريد أو رقم الهاتف..."
+      class="w-full bg-white border border-gray-300 rounded-full px-4 py-2.5 pr-10 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+    />
+    <lucide-angular
+      [img]="SearchIcon"
+      [size]="16"
+      class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+    ></lucide-angular>
+
+    @if (searchTerm()) {
+      <button
+        type="button"
+        (click)="clearSearch()"
+        class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-brand-black hover:bg-gray-100 transition-colors"
+        aria-label="مسح البحث"
+      >
+        <lucide-angular [img]="CloseIcon" [size]="14"></lucide-angular>
+      </button>
+    }
+  </div>
+
+  <!-- فلتر الدور -->
+  <div class="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-3">
+    @for (f of roleFilters; track f.key) {
+      <button
+        type="button"
+        (click)="setRoleFilter(f.key)"
+        class="shrink-0 px-4 py-2 rounded-full text-sm border transition-colors"
+        [class.bg-brand-black]="roleFilter() === f.key"
+        [class.text-white]="roleFilter() === f.key"
+        [class.border-brand-black]="roleFilter() === f.key"
+        [class.bg-white]="roleFilter() !== f.key"
+        [class.text-brand-black]="roleFilter() !== f.key"
+        [class.border-gray-200]="roleFilter() !== f.key"
+      >
+        {{ f.label }}
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+
+    <div class="space-y-3 animate-pulse">
+      @for (i of [1,2,3,4,5]; track i) {
+        <div class="bg-white rounded-2xl h-20"></div>
+      }
+    </div>
+
+  } @else if (users().length === 0) {
+
+    <div class="bg-white rounded-2xl border border-gray-100 text-center py-16 px-4">
+      <p class="text-brand-brown">لا يوجد مستخدمون مطابقون</p>
+    </div>
+
+  } @else {
+
+    <div class="space-y-3">
+      @for (user of users(); track user.id) {
+
+        <div
+          class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row sm:items-center gap-4"
+          [class.opacity-70]="!user.isActive"
+        >
+
+          <div class="flex items-center gap-4 flex-1 min-w-0">
+            <div class="w-12 h-12 rounded-full bg-brand-black text-brand-gold font-serif text-lg flex items-center justify-center shrink-0">
+              {{ initial(user) }}
+            </div>
+
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-brand-black line-clamp-1">{{ user.firstName }} {{ user.lastName }}</p>
+              <p class="text-xs text-brand-brown truncate">{{ user.email }}</p>
+              @if (user.phoneNumber) {
+                <p class="text-xs text-gray-500 mt-0.5">
+                  <span dir="ltr" class="inline-block">{{ user.phoneNumber }}</span>
+                </p>
+              }
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 sm:justify-end">
+
+            @for (role of user.roles; track role) {
+              <span class="text-xs font-medium px-3 py-1 rounded-full" [ngClass]="roleClass(role)">
+                {{ roleLabel(role) }}
+              </span>
+            }
+
+            @if (user.isActive) {
+              <span class="text-xs font-medium px-3 py-1 rounded-full bg-green-100 text-green-700">نشط</span>
+            } @else {
+              <span class="text-xs font-medium px-3 py-1 rounded-full bg-red-100 text-red-600">موقوف</span>
+            }
+
+            <!-- حسابات المدراء مبتتوقفش -->
+            @if (!isAdmin(user)) {
+              <button
+                type="button"
+                (click)="toggleStatus(user)"
+                [disabled]="busyId() === user.id"
+                class="text-xs px-4 py-2 rounded-lg border transition-colors disabled:opacity-50"
+                [class.text-red-500]="user.isActive"
+                [class.border-red-200]="user.isActive"
+                [class.hover:bg-red-50]="user.isActive"
+                [class.text-green-600]="!user.isActive"
+                [class.border-green-200]="!user.isActive"
+                [class.hover:bg-green-50]="!user.isActive"
+              >
+                {{ user.isActive ? 'إيقاف الحساب' : 'تفعيل الحساب' }}
+              </button>
+            }
+
+          </div>
+
+        </div>
+
+      }
+    </div>
+
+    @if (totalPages() > 1) {
+      <div class="flex items-center justify-center gap-2 mt-8">
+        <button
+          type="button"
+          (click)="goToPage(currentPage() - 1)"
+          [disabled]="!hasPreviousPage()"
+          class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          السابق
+        </button>
+        <span class="text-sm text-brand-brown px-4">صفحة {{ currentPage() }} من {{ totalPages() }}</span>
+        <button
+          type="button"
+          (click)="goToPage(currentPage() + 1)"
+          [disabled]="!hasNextPage()"
+          class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          التالي
+        </button>
+      </div>
+    }
+
+  }
+
+</div>

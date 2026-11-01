@@ -15,41 +15,53 @@
     </div>
   </section>
 
-  <!-- ✅ Categories Section -->
-@if (categories().length > 0) {
-  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <h2 class="font-serif text-3xl text-brand-black mb-8 text-center">
-      أقســامنـــا
-    </h2>
+  <!-- Categories Section -->
+  @if (categories().length > 0 || productService.offersCount() > 0) {
+    <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <h2 class="font-serif text-3xl text-brand-black mb-8 text-center">أقسامنا</h2>
 
-    <div class="flex flex-wrap justify-center gap-8">
-      @for (category of categories(); track category.id) {
-        <a
-          [routerLink]="['/category', category.id]"
-          class="group relative rounded-xl overflow-hidden h-56 md:h-72 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm bg-gray-100"
-        >
-          @if (category.imageUrl) {
-            <img
-              [src]="category.imageUrl"
-              [alt]="category.name"
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-          } @else {
-            <div class="w-full h-full bg-brand-black/10"></div>
-          }
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-8">
 
-          <div
-            class="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center"
+        <!-- العروض: بتظهر أولًا ولو فيه عروض سارية بس -->
+        @if (productService.offersCount() > 0) {
+          <a
+            routerLink="/offers"
+            class="group relative rounded-xl overflow-hidden h-56 md:h-72 bg-gradient-to-br from-brand-black via-brand-brown to-brand-gold"
           >
-            <h3 class="text-white font-serif text-xl md:text-2xl">
-              {{ category.name }}
-            </h3>
-          </div>
-        </a>
-      }
-    </div>
-  </section>
-}
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4 group-hover:bg-black/10 transition-colors">
+              <span class="w-14 h-14 rounded-full bg-white/15 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <lucide-angular [img]="PercentIcon" [size]="28"></lucide-angular>
+              </span>
+              <h3 class="font-serif text-xl md:text-2xl">العروض</h3>
+              <p class="text-xs md:text-sm text-white/80 mt-1">خصومات على {{ productService.offersCount() }} منتج</p>
+            </div>
+          </a>
+        }
+
+        @for (category of categories(); track category.id) {
+          <a
+            [routerLink]="['/category', category.id]"
+            class="group relative rounded-xl overflow-hidden h-56 md:h-72 bg-gray-100"
+          >
+            @if (category.imageUrl) {
+              <img
+                [src]="category.imageUrl"
+                [alt]="category.name"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            } @else {
+              <div class="w-full h-full bg-brand-black/10"></div>
+            }
+
+            <div class="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
+              <h3 class="text-white font-serif text-xl md:text-2xl">{{ category.name }}</h3>
+            </div>
+          </a>
+        }
+
+      </div>
+    </section>
+  }
 
   <!-- Products Section -->
   <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

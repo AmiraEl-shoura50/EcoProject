@@ -11,6 +11,12 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
         builder.HasOne(c => c.ParentCategory)
             .WithMany(c => c.SubCategories)
             .HasForeignKey(c => c.ParentCategoryId)
-            .OnDelete(DeleteBehavior.Restrict); // ✅ منمنعش حذف قسم رئيسي وهو ليه أبناء
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // ✅ جديد: علاقة اختيارية مع البائع المنشئ
+        builder.HasOne<Seller>()
+            .WithMany()
+            .HasForeignKey(c => c.CreatedBySellerId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

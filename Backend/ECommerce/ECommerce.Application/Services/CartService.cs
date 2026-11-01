@@ -10,22 +10,41 @@ public class CartService : ICartService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly IPricingService _pricingService;
 
-    public CartService(IUnitOfWork unitOfWork, IMapper mapper)
+    public CartService(IUnitOfWork unitOfWork, IMapper mapper, IPricingService pricingService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _pricingService = pricingService;
     }
 
     public async Task<CartDto> GetByCustomerIdAsync(int customerId)
     {
         var cart = await GetOrCreateCartAsync(customerId);
-        return _mapper.Map<CartDto>(cart);
+        var dto = _mapper.Map<CartDto>(cart);
+
+        if (dto.Items.Count > 0)
+        {
+            var book = await _pricingService.LoadAsync();
+
+            foreach (var item in dto.Items)
+            {
+                var product = cart.Items.First(i => i.ProductId == item.ProductId).Product;
+                var price = book.GetPrice(product);
+
+                item.OriginalUnitPrice = product.Price;
+                item.UnitPrice = price.Final;
+            }
+
+            dto.TotalPrice = dto.Items.Sum(i => i.Subtotal);
+        }
+
+        return dto;
     }
 
     public async Task<bool> AddItemAsync(int customerId, AddToCartDto dto)
     {
-        // ✅ نتأكد إن المنتج موجود ومتاح فعلاً قبل أي حاجة
         var product = await _unitOfWork.Products.GetByIdAsync(dto.ProductId);
         if (product is null) return false;
 
@@ -36,7 +55,6 @@ public class CartService : ICartService
         var existingItem = cart.Items.FirstOrDefault(i => i.ProductId == dto.ProductId);
         if (existingItem is not null)
         {
-            // ✅ لو المنتج موجود بالفعل في الكارت، بنزود الكمية بدل ما نضيف Row جديد
             var newQuantity = existingItem.Quantity + dto.Quantity;
             if (newQuantity > product.StockQuantity) return false;
 
@@ -80,12 +98,11 @@ public class CartService : ICartService
         var item = cart.Items.FirstOrDefault(i => i.ProductId == productId);
         if (item is null) return false;
 
-        cart.Items.Remove(item); // ✅ بما إن دي Composite Key، الحذف من الـ Collection كافي مع EF Core Tracking
+        cart.Items.Remove(item);
         await _unitOfWork.SaveChangesAsync();
         return true;
     }
 
-    // ✅ Helper - كل Customer المفروض يبقى ليه Cart تلقائي، فلو مش موجود بنعمله
     private async Task<Cart> GetOrCreateCartAsync(int customerId)
     {
         var cart = await _unitOfWork.Carts.GetByCustomerIdAsync(customerId);

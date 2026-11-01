@@ -76,9 +76,33 @@ public class ProductsController : ControllerBase
         var sellerId = await GetCurrentSellerIdAsync();
         if (sellerId is null) return Forbid();
 
-        var deleted = await _productService.DeleteAsync(id, sellerId.Value);
-        if (!deleted) return NotFound();
-        return NoContent();
+        var result = await _productService.DeleteAsync(id, sellerId.Value);
+
+        return result switch
+        {
+            DeleteProductResult.NotFound => NotFound(),
+            DeleteProductResult.HasOrders => BadRequest("لا يمكن حذف منتج تم طلبه من قبل. يمكنك جعل الكمية صفرًا لإيقاف بيعه"),
+            _ => NoContent()
+        };
+    }
+
+    [HttpGet("mine")]
+    [Authorize(Roles = Roles.Seller)]
+    public async Task<IActionResult> GetMine([FromQuery] ProductQueryParams queryParams)
+    {
+        var sellerId = await GetCurrentSellerIdAsync();
+        if (sellerId is null) return Forbid();
+
+        queryParams.SellerId = sellerId.Value;
+        var result = await _productService.SearchAsync(queryParams);
+        return Ok(result);
+    }
+    [HttpGet("offers")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetOffers([FromQuery] ProductQueryParams queryParams)
+    {
+        var result = await _productService.GetOffersAsync(queryParams);
+        return Ok(result);
     }
 
     // ✅ Helper method - بتجيب الـ Seller المرتبط بالـ User الحالي من الـ Token
@@ -93,4 +117,5 @@ public class ProductsController : ControllerBase
 
         return seller?.Id;
     }
+
 }

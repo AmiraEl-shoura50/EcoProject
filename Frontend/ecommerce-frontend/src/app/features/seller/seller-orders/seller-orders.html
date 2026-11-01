@@ -1,0 +1,301 @@
+<div>
+
+  <h2 class="font-serif text-2xl text-brand-black mb-5">الطلبات</h2>
+
+  <!-- الفلاتر -->
+  <div class="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-3">
+    @for (f of filters; track f.key) {
+      <button
+        type="button"
+        (click)="setFilter(f.key)"
+        class="shrink-0 px-4 py-2 rounded-full text-sm border transition-colors"
+        [class.bg-brand-black]="filter() === f.key"
+        [class.text-white]="filter() === f.key"
+        [class.border-brand-black]="filter() === f.key"
+        [class.bg-white]="filter() !== f.key"
+        [class.text-brand-black]="filter() !== f.key"
+        [class.border-gray-200]="filter() !== f.key"
+      >
+        {{ f.label }} <span class="opacity-70">({{ countFor(f.key) }})</span>
+      </button>
+    }
+  </div>
+  <!-- شريط حذف الطلبات الملغية: بيظهر بس لو في طلبات ملغية ظاهرة -->
+  @if (visibleCancelled().length > 0) {
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-5 flex flex-wrap items-center justify-between gap-3">
+      <label class="flex items-center gap-2 text-sm text-brand-black cursor-pointer">
+        <input
+          type="checkbox"
+          [checked]="allCancelledSelected()"
+          (change)="toggleSelectAll()"
+          class="accent-brand-gold w-4 h-4"
+        />
+        تحديد كل الطلبات الملغية
+      </label>
+
+      <button
+        type="button"
+        (click)="deleteSelected()"
+        [disabled]="selectedIds().length === 0 || isDeleting()"
+        class="text-sm text-white bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {{ isDeleting() ? 'جاري الحذف...' : 'حذف المحدد (' + selectedIds().length + ')' }}
+      </button>
+    </div>
+  }
+
+  @if (isLoading()) {
+
+    <div class="space-y-4 animate-pulse">
+      @for (i of [1,2,3]; track i) {
+        <div class="bg-white rounded-2xl h-48"></div>
+      }
+    </div>
+
+  } @else if (filteredOrders().length === 0) {
+
+    <div class="bg-white rounded-2xl border border-gray-100 text-center py-16">
+      <p class="text-brand-brown">لا توجد طلبات في هذا القسم</p>
+    </div>
+
+  } @else {
+
+    <div class="space-y-5">
+      @for (order of filteredOrders(); track order.id) {
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+
+          <!-- رأس الطلب -->
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-3">
+              @if (order.status === 'Cancelled') {
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(order.id)"
+                  (change)="toggleSelect(order.id)"
+                  class="accent-brand-gold w-4 h-4 cursor-pointer"
+                  [attr.aria-label]="'تحديد الطلب رقم ' + order.id"
+                />
+              }
+              <div>
+                <p class="text-sm font-semibold text-brand-black">طلب رقم #{{ order.id }}</p>
+                <p class="text-xs text-brand-brown mt-0.5">{{ order.createdDate | date:'dd/MM/yyyy' }}</p>
+              </div>
+            </div>
+            <span class="text-xs font-medium px-3 py-1 rounded-full" [ngClass]="statusClass(order.status)">
+              {{ statusLabel(order.status) }}
+            </span>
+          </div>
+
+          <!-- بيانات العميل -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm bg-brand-cream rounded-xl p-4 mt-4">
+            <div>
+              <p class="text-xs text-brand-brown mb-0.5">العميل</p>
+              <p class="text-brand-black font-medium">{{ order.customerName }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-brand-brown mb-0.5">الهاتف</p>
+              <p class="text-brand-black font-medium" dir="ltr">{{ order.customerPhone || '—' }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-brand-brown mb-0.5">العنوان</p>
+              <p class="text-brand-black">{{ order.customerAddress }}</p>
+            </div>
+          </div>
+
+          <!-- المنتجات -->
+          <div class="space-y-3 border-t border-gray-100 mt-4 pt-4">
+            @for (item of order.items; track item.productId) {
+              <div class="flex items-center gap-3">
+                <div class="w-14 h-14 bg-gray-100 rounded-lg overflow-hidden shrink-0">
+                  @if (item.productImageUrl) {
+                    <img [src]="item.productImageUrl" [alt]="item.productName" class="w-full h-full object-cover" />
+                  }
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm text-brand-black line-clamp-1">{{ item.productName }}</p>
+                  <p class="text-xs text-brand-brown">الكمية: {{ item.quantity }}</p>
+                </div>
+                <p class="text-sm font-medium text-brand-black">{{ item.subtotal | number }} جنيه</p>
+              </div>
+            }
+          </div>
+
+          <!-- الإجمالي والدفع -->
+          <div class="flex flex-wrap items-center justify-between gap-2 border-t border-gray-100 mt-4 pt-4">
+            <p class="text-xs text-brand-brown">طريقة الدفع: {{ order.paymentMethodName }}</p>
+            <p class="text-base font-semibold text-brand-black">
+              الإجمالي: <span class="text-brand-gold">{{ order.totalAmount | number }} جنيه</span>
+            </p>
+          </div>
+
+          <!-- إثبات الدفع -->
+          @if (order.latestPaymentProof; as proof) {
+            <div class="mt-4 border border-gray-100 rounded-xl p-3 flex items-center gap-3">
+              <button
+                type="button"
+                (click)="previewImage.set(proof.imageUrl)"
+                class="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 shrink-0"
+              >
+                <img [src]="proof.imageUrl" alt="إثبات الدفع" class="w-full h-full object-cover" />
+              </button>
+
+              <div class="flex-1 min-w-0 text-sm">
+                <p class="font-medium text-brand-black">
+                  إثبات التحويل
+                  <span class="text-xs font-normal text-brand-brown">· {{ proof.submittedAt | date:'dd/MM/yyyy' }}</span>
+                </p>
+                @if (proof.transferReference) {
+                  <p class="text-xs text-brand-brown mt-0.5">
+                    رقم العملية: <span dir="ltr" class="inline-block">{{ proof.transferReference }}</span>
+                  </p>
+                }
+                @if (proof.isApproved === null) {
+                  <p class="text-xs text-blue-600 mt-0.5">في انتظار مراجعتك</p>
+                } @else if (proof.isApproved) {
+                  <p class="text-xs text-green-600 mt-0.5">تم قبوله</p>
+                } @else {
+                  <p class="text-xs text-red-500 mt-0.5">تم رفضه: {{ proof.rejectionReason }}</p>
+                }
+              </div>
+
+              <button
+                type="button"
+                (click)="previewImage.set(proof.imageUrl)"
+                class="text-xs text-brand-gold hover:underline shrink-0"
+              >
+                عرض الصورة
+              </button>
+            </div>
+          }
+
+          <!-- الإجراءات -->
+          <div class="mt-4">
+
+            @if (needsReview(order)) {
+
+              @if (rejectingId() === order.id) {
+
+                <div class="space-y-3">
+                  <textarea
+                    [(ngModel)]="rejectionReason"
+                    rows="2"
+                    placeholder="اكتب سبب الرفض ليظهر للعميل"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all resize-none"
+                  ></textarea>
+                  <div class="flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      (click)="confirmReject(order)"
+                      [disabled]="busyId() === order.id"
+                      class="bg-red-500 text-white text-sm px-5 py-2 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+                    >
+                      تأكيد الرفض
+                    </button>
+                    <button
+                      type="button"
+                      (click)="cancelReject()"
+                      class="text-sm text-brand-brown border border-gray-200 px-5 py-2 rounded-lg hover:bg-brand-cream transition-colors"
+                    >
+                      تراجع
+                    </button>
+                  </div>
+                </div>
+
+              } @else {
+
+                <div class="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    (click)="approve(order)"
+                    [disabled]="busyId() === order.id"
+                    class="bg-green-600 text-white text-sm px-5 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                  >
+                    قبول الدفع
+                  </button>
+                  <button
+                    type="button"
+                    (click)="startReject(order)"
+                    class="text-sm text-red-500 border border-red-200 px-5 py-2 rounded-lg hover:bg-red-50 transition-colors"
+                  >
+                    رفض الإثبات
+                  </button>
+                </div>
+
+              }
+
+            } @else if (order.status === 'Confirmed') {
+
+              <div class="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  (click)="advance(order, 'Shipped')"
+                  [disabled]="busyId() === order.id"
+                  class="bg-brand-black text-white text-sm px-5 py-2 rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-50"
+                >
+                  تأكيد الشحن
+                </button>
+                <button
+                  type="button"
+                  (click)="cancel(order)"
+                  [disabled]="busyId() === order.id"
+                  class="text-sm text-red-500 border border-red-200 px-5 py-2 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                >
+                  إلغاء الطلب
+                </button>
+              </div>
+
+            } @else if (order.status === 'Shipped') {
+
+              <button
+                type="button"
+                (click)="advance(order, 'Delivered')"
+                [disabled]="busyId() === order.id"
+                class="bg-brand-black text-white text-sm px-5 py-2 rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-50"
+              >
+                تأكيد التوصيل
+              </button>
+
+            } @else if (order.status === 'Pending') {
+
+              <p class="text-xs text-brand-brown">في انتظار قيام العميل بالدفع</p>
+
+            } @else if (order.status === 'AwaitingConfirmation') {
+
+              <p class="text-xs text-brand-brown">في انتظار إتمام الدفع الإلكتروني</p>
+
+            }
+
+          </div>
+
+        </div>
+
+      }
+    </div>
+
+  }
+
+</div>
+
+<!-- عرض صورة الإثبات بحجم كبير -->
+@if (previewImage()) {
+  <div
+    class="fixed inset-0 z-[60] bg-black/75 flex items-center justify-center p-4"
+    (click)="previewImage.set(null)"
+  >
+    <button
+      type="button"
+      class="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-brand-black"
+      aria-label="إغلاق"
+      (click)="previewImage.set(null)"
+    >
+      <lucide-angular [img]="CloseIcon" [size]="20"></lucide-angular>
+    </button>
+    <img
+      [src]="previewImage()"
+      alt="إثبات الدفع"
+      class="max-h-[85vh] max-w-full rounded-xl shadow-2xl"
+      (click)="$event.stopPropagation()"
+    />
+  </div>
+}

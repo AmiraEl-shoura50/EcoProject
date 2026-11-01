@@ -10,5 +10,6 @@ public class PaymentMethodConfiguration : IEntityTypeConfiguration<PaymentMethod
     {
         builder.Property(p => p.MethodName).IsRequired().HasMaxLength(100);
         builder.Property(p => p.ProviderIntegrationId).HasMaxLength(100);
+        builder.Property(p => p.TransferUrl).HasMaxLength(500);
     }
 }

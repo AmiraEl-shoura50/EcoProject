@@ -12,6 +12,7 @@ public class DiscountService : IDiscountService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly INotificationService _notificationService;
+
     public DiscountService(IUnitOfWork unitOfWork, IMapper mapper, INotificationService notificationService)
     {
         _unitOfWork = unitOfWork;
@@ -28,6 +29,15 @@ public class DiscountService : IDiscountService
         return dtos;
     }
 
+    public async Task<IEnumerable<DiscountDto>> GetMineAsync(int sellerId)
+    {
+        var discounts = await _unitOfWork.Discounts.GetBySellerAsync(sellerId);
+        var dtos = _mapper.Map<List<DiscountDto>>(discounts);
+
+        await FillTargetNamesAsync(dtos);
+        return dtos;
+    }
+
     public async Task<DiscountDto?> GetByIdAsync(int id)
     {
         var discount = await _unitOfWork.Discounts.GetByIdWithTargetAsync(id);
@@ -38,43 +48,66 @@ public class DiscountService : IDiscountService
         return dto;
     }
 
-    public async Task<DiscountDto?> CreateAsync(CreateDiscountDto dto, int sellerId)
+    public async Task<DiscountDto> CreateAsync(CreateDiscountDto dto, int sellerId)
     {
-        // ✅ Validation أساسي على التواريخ
-        if (dto.StartDate >= dto.EndDate) return null;
+        // الرسائل هنا بتوصل للمستخدم كما هي (InvalidOperationException بيتحول لـ 400)
+        if (dto.StartDate >= dto.EndDate)
+            throw new InvalidOperationException("تاريخ البداية يجب أن يكون قبل تاريخ النهاية");
 
-        if (!Enum.TryParse<TargetType>(dto.TargetType, true, out var targetType)) return null;
-        if (!Enum.TryParse<DiscountType>(dto.DiscountType, true, out var discountType)) return null;
+        if (dto.EndDate <= DateTime.UtcNow)
+            throw new InvalidOperationException("تاريخ انتهاء الخصم يجب أن يكون في المستقبل");
 
-        // ✅✅ الأهم - نتحقق يدويًا إن الـ TargetId فعلاً موجود، وإنه بتاع الـ Seller ده
+        if (!Enum.TryParse<TargetType>(dto.TargetType, true, out var targetType) || !Enum.IsDefined(targetType))
+            throw new InvalidOperationException("نوع الهدف غير صحيح");
+
+        if (!Enum.TryParse<DiscountType>(dto.DiscountType, true, out var discountType) || !Enum.IsDefined(discountType))
+            throw new InvalidOperationException("نوع الخصم غير صحيح");
+
+        string? productName = null;
+
         if (targetType == TargetType.Product)
         {
             var product = await _unitOfWork.Products.GetByIdAsync(dto.TargetId);
-            if (product is null || product.SellerId != sellerId) return null;
+            if (product is null || product.SellerId != sellerId)
+                throw new InvalidOperationException("المنتج غير موجود أو لا يخصك");
+
+            if (discountType == DiscountType.FixedAmount && dto.DiscountAmount >= product.Price)
+                throw new InvalidOperationException("قيمة الخصم يجب أن تكون أقل من سعر المنتج");
+
+            productName = product.Name;
         }
-        else if (targetType == TargetType.Category)
+        else
         {
             var category = await _unitOfWork.Categories.GetByIdAsync(dto.TargetId);
-            if (category is null) return null;
-            // ملحوظة: الـ Category مش مرتبطة بـ Seller معين في التصميم الحالي، فأي Seller يقدر يحط خصم على قسم
+            if (category is null)
+                throw new InvalidOperationException("القسم غير موجود");
+            // الخصم على قسم بيمس منتجات البائع نفسه داخل القسم ده بس (الربط بـ SellerId)
         }
 
-        var discountTarget = new DiscountTarget
-        {
-            Target = targetType,
-            TargetId = dto.TargetId
-        };
+        // ✅ نمنع خصمين متداخلين زمنيًا على نفس الهدف لنفس البائع
+        var existing = await _unitOfWork.Discounts.GetBySellerAsync(sellerId);
+        var overlaps = existing.Any(d =>
+            d.DiscountTarget.Target == targetType &&
+            d.DiscountTarget.TargetId == dto.TargetId &&
+            dto.StartDate < d.EndDate &&
+            dto.EndDate > d.StartDate);
 
-        await _unitOfWork.DiscountTargets.AddAsync(discountTarget);
-        await _unitOfWork.SaveChangesAsync(); // ✅ لازم نحفظ الأول عشان ناخد الـ Id بتاعه
+        if (overlaps)
+            throw new InvalidOperationException("يوجد خصم آخر على نفس الهدف في هذه الفترة");
 
+        // ✅ حفظ واحد للهدف والخصم معًا: يا الاتنين يتحفظوا يا مفيش حاجة تتحفظ
         var discount = new Discount
         {
-            DiscountTargetId = discountTarget.Id,
+            SellerId = sellerId,
             DiscountType = discountType,
             DiscountAmount = dto.DiscountAmount,
             StartDate = dto.StartDate,
-            EndDate = dto.EndDate
+            EndDate = dto.EndDate,
+            DiscountTarget = new DiscountTarget
+            {
+                Target = targetType,
+                TargetId = dto.TargetId
+            }
         };
 
         await _unitOfWork.Discounts.AddAsync(discount);
@@ -84,7 +117,7 @@ public class DiscountService : IDiscountService
         var resultDto = _mapper.Map<DiscountDto>(created);
         await FillTargetNamesAsync(new List<DiscountDto> { resultDto });
 
-        // ✅ إشعار العملاء اللي حاطين المنتج ده في الـ Wishlist
+        // ✅ إشعار العملاء اللي حاطين المنتج ده في المفضلة
         if (targetType == TargetType.Product)
         {
             var wishlistItems = await _unitOfWork.Wishlists.GetCustomersWhoWishlistedProductAsync(dto.TargetId);
@@ -94,7 +127,7 @@ public class DiscountService : IDiscountService
                 await _notificationService.CreateAndSendAsync(
                     item.Wishlist.Customer.UserId,
                     "عرض جديد! 🎉",
-                    $"في خصم جديد على منتج في قائمة أمنياتك");
+                    $"في خصم جديد على {productName} الموجود في قائمة المفضلة");
             }
         }
 
@@ -104,17 +137,12 @@ public class DiscountService : IDiscountService
     public async Task<bool> DeleteAsync(int id, int sellerId)
     {
         var discount = await _unitOfWork.Discounts.GetByIdWithTargetAsync(id);
-        if (discount is null) return false;
 
-        // ✅ تأكيد الملكية قبل الحذف
-        if (discount.DiscountTarget.Target == TargetType.Product)
-        {
-            var product = await _unitOfWork.Products.GetByIdAsync(discount.DiscountTarget.TargetId);
-            if (product is null || product.SellerId != sellerId) return false;
-        }
+        // ✅ الملكية بالـ SellerId لكل الأنواع (منتج وقسم)
+        if (discount is null || discount.SellerId != sellerId) return false;
 
         _unitOfWork.Discounts.Delete(discount);
-        _unitOfWork.DiscountTargets.Delete(discount.DiscountTarget); // ✅ بنمسح الـ Target كمان عشان منسبش بيانات يتيمة
+        _unitOfWork.DiscountTargets.Delete(discount.DiscountTarget);
         await _unitOfWork.SaveChangesAsync();
 
         return true;
@@ -126,13 +154,16 @@ public class DiscountService : IDiscountService
         if (product is null) return Enumerable.Empty<DiscountDto>();
 
         var discounts = await _unitOfWork.Discounts.GetActiveForProductAsync(productId, product.CategoryId);
-        var dtos = _mapper.Map<List<DiscountDto>>(discounts);
 
+        // ✅ خصومات صاحب المنتج بس
+        var ownDiscounts = discounts.Where(d => d.SellerId == product.SellerId);
+
+        var dtos = _mapper.Map<List<DiscountDto>>(ownDiscounts);
         await FillTargetNamesAsync(dtos);
         return dtos;
     }
 
-    // ✅ Helper - بيملى TargetName لأنها مش FK حقيقي، فمحتاجين Query يدوي لكل نوع
+    // TargetName مش FK حقيقي، فمحتاجين Query يدوي لكل نوع
     private async Task FillTargetNamesAsync(List<DiscountDto> dtos)
     {
         foreach (var dto in dtos)

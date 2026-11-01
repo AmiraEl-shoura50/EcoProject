@@ -1,0 +1,17 @@
+<span class="relative inline-flex" role="img" [attr.aria-label]="'التقييم ' + value() + ' من 5'">
+
+  <!-- النجوم الفاضية -->
+  <span class="flex text-gray-300">
+    @for (n of positions; track n) {
+      <lucide-angular [img]="StarIcon" [size]="size()" class="shrink-0"></lucide-angular>
+    }
+  </span>
+
+  <!-- النجوم المملوءة: مقصوصة بنسبة التقييم -->
+  <span class="absolute inset-y-0 start-0 flex overflow-hidden text-brand-gold" [style.width.%]="percent()">
+    @for (n of positions; track n) {
+      <lucide-angular [img]="StarIcon" [size]="size()" class="icon-filled shrink-0"></lucide-angular>
+    }
+  </span>
+
+</span>

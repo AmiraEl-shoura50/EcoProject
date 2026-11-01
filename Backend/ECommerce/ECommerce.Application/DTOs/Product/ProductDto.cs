@@ -12,8 +12,14 @@ public class ProductDto
     public int CategoryId { get; set; }
     public string CategoryName { get; set; } = string.Empty;
 
+    public int ReviewsCount { get; set; }
     public int SellerId { get; set; }
     public string SellerStoreName { get; set; } = string.Empty;
 
     public string? ImageUrl { get; set; }
+
+    // ✅ جديد: بيتملوا بس لو في خصم ساري
+    public decimal? DiscountedPrice { get; set; }
+    public int? DiscountPercent { get; set; }
+    public DateTime? DiscountEndDate { get; set; }
 }

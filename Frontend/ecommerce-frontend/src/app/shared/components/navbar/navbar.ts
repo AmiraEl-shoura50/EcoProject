@@ -1,16 +1,21 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit,  computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { LucideAngularModule, ShoppingCart, Heart, User, LogOut, Search, Menu, X, ChevronDown } from 'lucide-angular';
+import { RouterLink,Router } from '@angular/router';
+import { LucideAngularModule, ShoppingCart, Heart, User, LogOut,  Menu, X, ChevronDown ,Percent , Bell, CheckCheck, Trash2  } from 'lucide-angular';
+import { SearchBox } from '../search-box/search-box';
 import { AuthService } from '../../../core/services/auth';
 import { CategoryService } from '../../../core/services/category';
-import { Category } from '../../../core/models/category.model';
+
 import { CartService } from '../../../core/services/cart';
 import { WishlistService } from '../../../core/services/wishlist';
+import { ProductService } from '../../../core/services/product';
+import { NotificationService } from '../../../core/services/notification';
+import { AppNotification } from '../../../core/models/notification.model';
+import { TimeAgoPipe } from '../../pipes/time-ago.pipe';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink, LucideAngularModule],
+  imports: [CommonModule, RouterLink, LucideAngularModule, SearchBox, TimeAgoPipe],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
@@ -21,7 +26,11 @@ export class Navbar implements OnInit {
   mobileExpandedCategoryId: number | null = null;
   hoveredCategoryId: number | null = null;
   isMoreCategoriesOpen = false;
-  categories = signal<Category[]>([]);
+  isNotificationsOpen = false;
+
+  get categories() {
+    return this.categoryService.tree;
+  }
 
   private readonly visibleCategoriesCount = 4;
 
@@ -38,24 +47,26 @@ export class Navbar implements OnInit {
   readonly HeartIcon = Heart;
   readonly UserIcon = User;
   readonly LogOutIcon = LogOut;
-  readonly SearchIcon = Search;
   readonly MenuIcon = Menu;
   readonly CloseIcon = X;
   readonly ChevronDownIcon = ChevronDown;
-
+  readonly PercentIcon = Percent;
+  readonly BellIcon = Bell;
+  readonly CheckAllIcon = CheckCheck;
+  readonly TrashIcon = Trash2;
   constructor(
     public authService: AuthService,
     private categoryService: CategoryService,
-     public cartService: CartService,
-  public wishlistService: WishlistService
+    public cartService: CartService,
+    public wishlistService: WishlistService,
+    public productService: ProductService,
+    public notificationService: NotificationService ,
+    private router: Router
+
   ) {}
 
   ngOnInit(): void {
-    this.categoryService.getTree().subscribe({
-      next: (response) => {
-        this.categories.set(response.data);
-      }
-    });
+    this.categoryService.loadTree();
   }
 
   // ---- Desktop user dropdown ----
@@ -107,4 +118,25 @@ export class Navbar implements OnInit {
     this.authService.logout();
     this.closeMenu();
   }
+  toggleNotifications(): void {
+  this.isNotificationsOpen = !this.isNotificationsOpen;
+  if (this.isNotificationsOpen) this.isMenuOpen = false;
+}
+
+closeNotifications(): void {
+  this.isNotificationsOpen = false;
+}
+
+openNotification(notification: AppNotification): void {
+  this.closeNotifications();
+  this.notificationService.markAsRead(notification).subscribe();
+  this.router.navigateByUrl(this.notificationService.targetFor(notification, this.authService.userRole()));
+}
+
+markAllRead(): void {
+  this.notificationService.markAllAsRead().subscribe();
+}
+deleteNotification(notification: AppNotification): void {
+  this.notificationService.delete(notification).subscribe();
+}
 }

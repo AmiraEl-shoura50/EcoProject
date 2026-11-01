@@ -11,5 +11,11 @@ public class DiscountConfiguration : IEntityTypeConfiguration<Discount>
         builder.HasOne(d => d.DiscountTarget)
             .WithOne(dt => dt.Discount)
             .HasForeignKey<Discount>(d => d.DiscountTargetId);
+
+       
+        builder.HasOne<Seller>()
+            .WithMany()
+            .HasForeignKey(d => d.SellerId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

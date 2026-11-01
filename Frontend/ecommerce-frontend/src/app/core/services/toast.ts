@@ -1,9 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 
+export type ToastType = 'success' | 'error' | 'info';
+
 export interface Toast {
   id: number;
   message: string;
-  type: 'success' | 'error';
+  type: ToastType;
 }
 
 @Injectable({
@@ -13,7 +15,7 @@ export class ToastService {
   toasts = signal<Toast[]>([]);
   private nextId = 0;
 
-  show(message: string, type: 'success' | 'error' = 'error'): void {
+  show(message: string, type: ToastType = 'error'): void {
     const id = this.nextId++;
     this.toasts.update(current => [...current, { id, message, type }]);
 

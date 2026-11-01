@@ -154,4 +154,18 @@ public class OrdersController : ControllerBase
 
         return Ok(new { deletedCount = deleted });
     }
+
+    [HttpPost("seller/delete-cancelled")]
+    [Authorize(Roles = Roles.Seller)]
+    public async Task<IActionResult> DeleteCancelledForSeller([FromBody] DeleteOrdersDto dto)
+    {
+        var sellerId = await GetCurrentSellerIdAsync();
+        if (sellerId is null) return Forbid();
+
+        var deleted = await _orderService.DeleteCancelledForSellerAsync(sellerId.Value, dto.OrderIds);
+        if (deleted == 0)
+            return BadRequest("لا توجد طلبات ملغية قابلة للحذف ضمن المحدد");
+
+        return Ok(new { deletedCount = deleted });
+    } 
 }

@@ -36,7 +36,12 @@
 
                 <div class="flex-1 min-w-0">
                   <h3 class="text-sm font-medium text-brand-black mb-1 line-clamp-1">{{ item.productName }}</h3>
-                  <p class="text-sm text-brand-gold font-semibold">{{ item.unitPrice | number }} جنيه</p>
+                  <div class="flex items-baseline gap-2 flex-wrap">
+  <p class="text-sm text-brand-gold font-semibold">{{ item.unitPrice | number:'1.0-2' }} جنيه</p>
+  @if (item.originalUnitPrice > item.unitPrice) {
+    <p class="text-xs text-gray-400 line-through">{{ item.originalUnitPrice | number:'1.0-2' }}</p>
+  }
+</div>
                 </div>
               </div>
 
@@ -89,7 +94,12 @@
             <span>عدد المنتجات</span>
             <span>{{ cartService.itemsCount() }}</span>
           </div>
-
+          @if (savings() > 0) {
+            <div class="flex items-center justify-between text-sm text-green-600 mb-2">
+              <span>إجمالي التوفير</span>
+              <span>{{ savings() | number:'1.0-2' }} جنيه</span>
+            </div>
+          }
           <div class="flex items-center justify-between text-lg font-semibold text-brand-black border-t border-gray-100 pt-4 mt-4">
             <span>الإجمالي</span>
             <span class="text-brand-gold">{{ cartService.cart()!.totalPrice | number }} جنيه</span>

@@ -1,0 +1,373 @@
+<div>
+
+  <!-- العنوان وزر الإضافة -->
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <div>
+      <h2 class="font-serif text-2xl text-brand-black">الخصومات</h2>
+      @if (!isLoading()) {
+        <p class="text-sm text-brand-brown mt-0.5">{{ discounts().length }} خصم</p>
+      }
+    </div>
+
+    <button
+      type="button"
+      (click)="openCreate()"
+      class="flex items-center gap-2 bg-brand-black text-white text-sm px-5 py-2.5 rounded-lg hover:bg-brand-gold transition-colors"
+    >
+      <lucide-angular [img]="PlusIcon" [size]="18"></lucide-angular>
+      إضافة خصم
+    </button>
+  </div>
+
+  <!-- الفلاتر -->
+  <div class="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-3">
+    @for (f of filters; track f.key) {
+      <button
+        type="button"
+        (click)="filter.set(f.key)"
+        class="shrink-0 px-4 py-2 rounded-full text-sm border transition-colors"
+        [class.bg-brand-black]="filter() === f.key"
+        [class.text-white]="filter() === f.key"
+        [class.border-brand-black]="filter() === f.key"
+        [class.bg-white]="filter() !== f.key"
+        [class.text-brand-black]="filter() !== f.key"
+        [class.border-gray-200]="filter() !== f.key"
+      >
+        {{ f.label }} <span class="opacity-70">({{ countFor(f.key) }})</span>
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+
+    <div class="space-y-4 animate-pulse">
+      @for (i of [1,2,3]; track i) {
+        <div class="bg-white rounded-2xl h-28"></div>
+      }
+    </div>
+
+  } @else if (filteredDiscounts().length === 0) {
+
+    <div class="bg-white rounded-2xl border border-gray-100 text-center py-16 px-4">
+      @if (discounts().length === 0) {
+        <p class="text-brand-brown mb-4">لم تضف أي خصومات بعد</p>
+        <button
+          type="button"
+          (click)="openCreate()"
+          class="bg-brand-black text-white text-sm px-6 py-3 rounded-lg hover:bg-brand-gold transition-colors"
+        >
+          أضف أول خصم
+        </button>
+      } @else {
+        <p class="text-brand-brown">لا توجد خصومات في هذا القسم</p>
+      }
+    </div>
+
+  } @else {
+
+    <div class="space-y-4">
+      @for (discount of filteredDiscounts(); track discount.id) {
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+
+          <!-- القيمة -->
+          <div class="w-24 h-24 shrink-0 rounded-2xl bg-brand-cream flex flex-col items-center justify-center text-center">
+            <p class="font-serif text-2xl text-brand-gold font-semibold leading-tight">
+              {{ discount.discountType === 'Percentage'
+                  ? (discount.discountAmount | number:'1.0-2') + '%'
+                  : (discount.discountAmount | number:'1.0-2') }}
+            </p>
+            @if (discount.discountType === 'FixedAmount') {
+              <p class="text-xs text-brand-brown">جنيه</p>
+            } @else {
+              <p class="text-xs text-brand-brown">خصم</p>
+            }
+          </div>
+
+          <!-- التفاصيل -->
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-center gap-2 mb-1">
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                {{ discount.targetType === 'Product' ? 'منتج' : 'قسم' }}
+              </span>
+              <span class="text-xs font-medium px-2.5 py-0.5 rounded-full" [ngClass]="statusClass(discount)">
+                {{ statusLabel(discount) }}
+              </span>
+            </div>
+
+            <p class="text-sm font-semibold text-brand-black line-clamp-1">{{ discount.targetName }}</p>
+
+            <p class="text-xs text-brand-brown mt-1.5">
+              من {{ discount.startDate | date:'dd/MM/yyyy HH:mm' }}
+              إلى {{ discount.endDate | date:'dd/MM/yyyy HH:mm' }}
+            </p>
+          </div>
+
+          <!-- الحذف -->
+          <button
+            type="button"
+            (click)="delete(discount)"
+            [disabled]="deletingId() === discount.id"
+            class="self-end sm:self-auto w-9 h-9 shrink-0 rounded-lg border border-red-200 flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+            aria-label="حذف"
+          >
+            <lucide-angular [img]="TrashIcon" [size]="16"></lucide-angular>
+          </button>
+
+        </div>
+
+      }
+    </div>
+
+  }
+
+</div>
+
+<!-- نافذة إضافة خصم -->
+@if (isModalOpen()) {
+  <div class="fixed inset-0 z-[60] bg-black/60 flex items-end sm:items-center justify-center sm:p-4">
+
+    <div class="bg-white w-full sm:max-w-xl rounded-t-3xl sm:rounded-2xl max-h-[92vh] overflow-y-auto p-6">
+
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="font-serif text-xl text-brand-black">إضافة خصم جديد</h3>
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+          aria-label="إغلاق"
+        >
+          <lucide-angular [img]="CloseIcon" [size]="20"></lucide-angular>
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="save()" class="space-y-6">
+
+        <!-- 1) هدف الخصم -->
+        <div>
+          <p class="text-sm text-brand-black mb-2 font-medium">الخصم على</p>
+
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <button
+              type="button"
+              (click)="setTargetType('Product')"
+              class="border-2 rounded-lg py-2.5 text-sm font-medium transition-all"
+              [class.border-brand-gold]="form.value.targetType === 'Product'"
+              [class.border-gray-200]="form.value.targetType !== 'Product'"
+            >
+              منتج محدد
+            </button>
+            <button
+              type="button"
+              (click)="setTargetType('Category')"
+              class="border-2 rounded-lg py-2.5 text-sm font-medium transition-all"
+              [class.border-brand-gold]="form.value.targetType === 'Category'"
+              [class.border-gray-200]="form.value.targetType !== 'Category'"
+            >
+              قسم كامل
+            </button>
+          </div>
+
+          @if (form.value.targetType === 'Product') {
+
+            @if (selectedProduct(); as product) {
+
+              <div class="flex items-center gap-3 border border-brand-gold rounded-xl p-3 bg-brand-cream">
+                <div class="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden shrink-0">
+                  @if (product.imageUrl) {
+                    <img [src]="product.imageUrl" [alt]="product.name" class="w-full h-full object-cover" />
+                  }
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm text-brand-black line-clamp-1">{{ product.name }}</p>
+                  <p class="text-xs text-brand-brown">السعر الحالي: {{ product.price | number }} جنيه</p>
+                </div>
+                <button
+                  type="button"
+                  (click)="clearProduct()"
+                  class="text-xs text-brand-gold hover:underline shrink-0"
+                >
+                  تغيير
+                </button>
+              </div>
+
+            } @else {
+
+              <div class="relative mb-2">
+                <input
+                  #productSearchBox
+                  type="text"
+                  [value]="productQuery()"
+                  (input)="onProductSearch(productSearchBox.value)"
+                  autocomplete="off"
+                  placeholder="ابحث عن منتج من منتجاتك..."
+                  class="w-full border border-gray-300 rounded-lg px-4 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+                />
+                <lucide-angular
+                  [img]="SearchIcon"
+                  [size]="16"
+                  class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                ></lucide-angular>
+              </div>
+
+              <div class="border border-gray-100 rounded-xl overflow-hidden max-h-56 overflow-y-auto">
+                @if (isSearchingProducts()) {
+                  <p class="p-4 text-sm text-gray-400 text-center">جاري البحث...</p>
+                } @else if (productResults().length === 0) {
+                  <p class="p-4 text-sm text-brand-brown text-center">لا توجد منتجات مطابقة</p>
+                } @else {
+                  @for (product of productResults(); track product.id) {
+                    <button
+                      type="button"
+                      (click)="selectProduct(product)"
+                      class="w-full flex items-center gap-3 p-3 text-start hover:bg-brand-cream transition-colors border-b border-gray-50 last:border-b-0"
+                    >
+                      <div class="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden shrink-0">
+                        @if (product.imageUrl) {
+                          <img [src]="product.imageUrl" [alt]="product.name" class="w-full h-full object-cover" />
+                        }
+                      </div>
+                      <p class="flex-1 min-w-0 text-sm text-brand-black line-clamp-1">{{ product.name }}</p>
+                      <p class="text-xs text-brand-gold font-semibold shrink-0">{{ product.price | number }} جنيه</p>
+                    </button>
+                  }
+                }
+              </div>
+
+              @if (form.get('targetId')?.invalid && form.get('targetId')?.touched) {
+                <p class="text-red-500 text-xs mt-1.5">اختر المنتج أولًا</p>
+              }
+
+            }
+
+          } @else {
+
+            <select
+              formControlName="targetId"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+            >
+              <option [ngValue]="null" disabled>اختر القسم</option>
+              @for (main of categoryService.tree(); track main.id) {
+                <optgroup [label]="main.name">
+                  <option [ngValue]="main.id">{{ main.name }} (عام)</option>
+                  @for (sub of main.subCategories; track sub.id) {
+                    <option [ngValue]="sub.id">{{ sub.name }}</option>
+                  }
+                </optgroup>
+              }
+            </select>
+          <p class="text-xs text-gray-400 mt-1.5">الخصم يسري على منتجاتك أنت فقط داخل هذا القسم وأقسامه الفرعية</p>
+          
+            @if (form.get('targetId')?.invalid && form.get('targetId')?.touched) {
+              <p class="text-red-500 text-xs mt-1.5">اختر القسم أولًا</p>
+            }
+
+          }
+        </div>
+
+        <!-- 2) نوع الخصم وقيمته -->
+        <div>
+          <p class="text-sm text-brand-black mb-2 font-medium">نوع الخصم</p>
+
+          <div class="grid grid-cols-2 gap-3 mb-3">
+            <button
+              type="button"
+              (click)="setDiscountType('Percentage')"
+              class="border-2 rounded-lg py-2.5 text-sm font-medium transition-all"
+              [class.border-brand-gold]="form.value.discountType === 'Percentage'"
+              [class.border-gray-200]="form.value.discountType !== 'Percentage'"
+            >
+              نسبة مئوية %
+            </button>
+            <button
+              type="button"
+              (click)="setDiscountType('FixedAmount')"
+              class="border-2 rounded-lg py-2.5 text-sm font-medium transition-all"
+              [class.border-brand-gold]="form.value.discountType === 'FixedAmount'"
+              [class.border-gray-200]="form.value.discountType !== 'FixedAmount'"
+            >
+              مبلغ ثابت (جنيه)
+            </button>
+          </div>
+
+          <div class="relative">
+            <input
+              type="number"
+              formControlName="discountAmount"
+              min="0"
+              step="0.01"
+              [attr.placeholder]="form.value.discountType === 'Percentage' ? 'مثال: 20' : 'مثال: 50'"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 pl-16 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+            />
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">
+              {{ form.value.discountType === 'Percentage' ? '%' : 'جنيه' }}
+            </span>
+          </div>
+
+          @if (form.get('discountAmount')?.invalid && form.get('discountAmount')?.touched) {
+            <p class="text-red-500 text-xs mt-1.5">أدخل قيمة أكبر من صفر</p>
+          } @else if (form.hasError('percentMax')) {
+            <p class="text-red-500 text-xs mt-1.5">نسبة الخصم يجب أن تكون أقل من 100%</p>
+          } @else if (fixedTooHigh()) {
+            <p class="text-red-500 text-xs mt-1.5">قيمة الخصم يجب أن تكون أقل من سعر المنتج</p>
+          } @else if (previewPrice(); as price) {
+            <p class="text-xs text-green-600 mt-1.5">السعر بعد الخصم: {{ price | number:'1.0-2' }} جنيه</p>
+          }
+        </div>
+
+        <!-- 3) الفترة -->
+        <div>
+          <p class="text-sm text-brand-black mb-2 font-medium">فترة الخصم</p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-brand-brown mb-1">من</label>
+              <input
+                type="datetime-local"
+                formControlName="startDate"
+                dir="ltr"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+              />
+            </div>
+            <div>
+              <label class="block text-xs text-brand-brown mb-1">إلى</label>
+              <input
+                type="datetime-local"
+                formControlName="endDate"
+                dir="ltr"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+              />
+            </div>
+          </div>
+
+          @if (form.hasError('dateOrder')) {
+            <p class="text-red-500 text-xs mt-1.5">تاريخ البداية يجب أن يكون قبل تاريخ النهاية</p>
+          } @else if (form.hasError('endPast')) {
+            <p class="text-red-500 text-xs mt-1.5">تاريخ الانتهاء يجب أن يكون في المستقبل</p>
+          }
+        </div>
+
+        <!-- الأزرار -->
+        <div class="flex gap-3 pt-2">
+          <button
+            type="submit"
+            [disabled]="isSaving()"
+            class="flex-1 bg-brand-black text-white text-sm py-3 rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-50"
+          >
+            {{ isSaving() ? 'جاري الحفظ...' : 'إنشاء الخصم' }}
+          </button>
+          <button
+            type="button"
+            (click)="closeModal()"
+            class="px-6 text-sm text-brand-brown border border-gray-200 rounded-lg hover:bg-brand-cream transition-colors"
+          >
+            إلغاء
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+}

@@ -10,15 +10,23 @@ namespace ECommerce.Application.Services;
 
 public class OrderService : IOrderService
 {
-    
+
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IEmailService _emailService;
     private readonly INotificationService _notificationService;
-     
     private readonly IFileStorageService _fileStorageService;
-    private readonly IPaymentService _paymentService; // ✅ جديد - ضيفيها في الـ Constructor
-    public OrderService(IUnitOfWork unitOfWork, IMapper mapper, IEmailService emailService, INotificationService notificationService, IFileStorageService fileStorageService, IPaymentService paymentService)
+    private readonly IPaymentService _paymentService;
+    private readonly IPricingService _pricingService;
+
+    public OrderService(
+     IUnitOfWork unitOfWork,
+     IMapper mapper,
+     IEmailService emailService,
+     INotificationService notificationService,
+     IFileStorageService fileStorageService,
+     IPaymentService paymentService,
+     IPricingService pricingService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
@@ -26,6 +34,7 @@ public class OrderService : IOrderService
         _notificationService = notificationService;
         _fileStorageService = fileStorageService;
         _paymentService = paymentService;
+        _pricingService = pricingService;
     }
 
 
@@ -37,7 +46,7 @@ public class OrderService : IOrderService
             return Enumerable.Empty<CheckoutResultDto>();
 
         var paymentMethod = await _unitOfWork.PaymentMethods.GetByIdAsync(dto.PaymentMethodId);
-        if (paymentMethod is null)
+        if (paymentMethod is null || paymentMethod.IsHidden)
             return Enumerable.Empty<CheckoutResultDto>();
 
         foreach (var item in cart.Items)
@@ -46,8 +55,11 @@ public class OrderService : IOrderService
                 return Enumerable.Empty<CheckoutResultDto>();
         }
 
+        // ✅ دفتر الأسعار بيتحمّل مرة واحدة لكل الطلب
+        var priceBook = await _pricingService.LoadAsync();
+
         var groupedBySeller = cart.Items.GroupBy(i => i.Product.SellerId);
-        var createdOrders = new List<(Order Order, int SellerId)>(); // ✅ بنخزن الـ Object نفسه، مش الـ Id
+        var createdOrders = new List<(Order Order, int SellerId)>();
 
         foreach (var group in groupedBySeller)
         {
@@ -64,30 +76,33 @@ public class OrderService : IOrderService
 
             foreach (var item in group)
             {
+                // ✅ السعر بعد الخصم لحظة الشراء، وده اللي بيتسجل في الطلب ويتحاسب بيه العميل
+                var unitPrice = priceBook.GetPrice(item.Product).Final;
+
                 order.Items.Add(new OrderItem
                 {
                     ProductId = item.ProductId,
                     Quantity = item.Quantity,
-                    UnitPrice = item.Product.Price
+                    UnitPrice = unitPrice
                 });
 
-                totalAmount += item.Product.Price * item.Quantity;
+                totalAmount += unitPrice * item.Quantity;
                 item.Product.StockQuantity -= item.Quantity;
                 _unitOfWork.Products.Update(item.Product);
             }
 
             order.TotalAmount = totalAmount;
             await _unitOfWork.Orders.AddAsync(order);
-            createdOrders.Add((order, group.Key)); // ✅ بنخزن مرجع الـ order نفسه
+            createdOrders.Add((order, group.Key));
         }
 
         cart.Items.Clear();
-        await _unitOfWork.SaveChangesAsync(); // ✅ دلوقتي كل order.Id في القائمة بقت الأرقام الحقيقية تلقائيًا
+        await _unitOfWork.SaveChangesAsync();
 
         var results = new List<CheckoutResultDto>();
         var allCreatedOrders = new List<Order>();
 
-        foreach (var (order, sellerId) in createdOrders) // ✅ بنستخدم order.Id دلوقتي بعد ما بقى حقيقي
+        foreach (var (order, sellerId) in createdOrders)
         {
             var seller = await _unitOfWork.Sellers.GetByIdAsync(sellerId);
             if (seller is not null)
@@ -97,7 +112,7 @@ public class OrderService : IOrderService
             }
 
             var full = await _unitOfWork.Orders.GetWithItemsAsync(order.Id);
-            if (full is null) continue; // ✅ رجّعناها زي ما كانت بعد ما اتأكدنا إن السبب اتحل
+            if (full is null) continue;
             allCreatedOrders.Add(full);
         }
 
@@ -114,9 +129,13 @@ public class OrderService : IOrderService
                 var customerEmail = order.Customer?.User?.Email;
                 if (!string.IsNullOrEmpty(customerEmail))
                 {
+                    var transferLink = string.IsNullOrEmpty(order.PaymentMethod.TransferUrl)
+                        ? string.Empty
+                        : $"<p><a href=\"{System.Net.WebUtility.HtmlEncode(order.PaymentMethod.TransferUrl)}\">اضغط هنا لإتمام التحويل</a></p>";
+
                     _ = _emailService.SendEmailAsync(customerEmail,
                         $"طلبك #{order.Id} في انتظار تأكيد الدفع",
-                        $"<p>يرجى تحويل {order.TotalAmount} جنيه عبر {order.PaymentMethod.MethodName} ثم رفع إثبات التحويل</p>");
+                        $"<p>يرجى تحويل {order.TotalAmount} جنيه عبر {order.PaymentMethod.MethodName} ثم رفع إثبات التحويل</p>{transferLink}");
                 }
             }
 
@@ -130,15 +149,8 @@ public class OrderService : IOrderService
 
         return results;
     }
-    public async Task<OrderDto?> GetByIdAsync(int orderId, int customerId)
-    {
-        var order = await _unitOfWork.Orders.GetWithItemsAsync(orderId);
-        if (order is null || order.CustomerId != customerId) return null;
+ 
 
-        return _mapper.Map<OrderDto>(order);
-    }
-
-   
     public async Task<PaymentProofDto?> SubmitPaymentProofAsync(int customerId, int orderId, SubmitPaymentProofDto dto)
     {
         var order = await _unitOfWork.Orders.GetWithItemsAsync(orderId);
@@ -223,20 +235,7 @@ public class OrderService : IOrderService
         return true;
     }
 
-    public async Task<PaginatedResultDto<OrderDto>> GetMyOrdersAsync (int customerId, int pageNumber, int pageSize)
-    {
-        var (items, totalCount) = await _unitOfWork.Orders.GetByCustomerPagedAsync(customerId, pageNumber, pageSize);
-
-        return new PaginatedResultDto<OrderDto>
-        {
-            Items = _mapper.Map<List<OrderDto>>(items),
-            PageNumber = pageNumber,
-            PageSize = pageSize,
-            TotalCount = totalCount
-        };
-    }
-
- 
+   
 
     public async Task<bool> CancelAsync(int orderId, int customerId)
     {
@@ -261,10 +260,10 @@ public class OrderService : IOrderService
         return true;
     }
 
-    public async Task<IEnumerable<OrderDto>> GetOrdersForSellerAsync(int sellerId)
+    public async Task<IEnumerable<SellerOrderDto>> GetOrdersForSellerAsync(int sellerId)
     {
         var orders = await _unitOfWork.Orders.GetBySellerAsync(sellerId);
-        return _mapper.Map<IEnumerable<OrderDto>>(orders);
+        return _mapper.Map<IEnumerable<SellerOrderDto>>(orders);
     }
 
     public async Task<bool> UpdateStatusAsync(int orderId, int sellerId, string newStatus)
@@ -285,8 +284,18 @@ public class OrderService : IOrderService
 
         if (!validTransitions.TryGetValue(order.Status, out var allowedNext) || !allowedNext.Contains(status))
             return false;
+        // ✅ لو البائع ألغى الطلب، نرجّع الكميات للمخزون (زي إلغاء العميل بالظبط)
+        if (status == OrderStatus.Cancelled)
+        {
+            foreach (var item in order.Items)
+            {
+                item.Product.StockQuantity += item.Quantity;
+                _unitOfWork.Products.Update(item.Product);
+            }
+        }
 
         order.Status = status;
+
         if (status == OrderStatus.Delivered)
         {
             order.CompletedDate = DateTime.UtcNow;
@@ -299,6 +308,24 @@ public class OrderService : IOrderService
             order.Customer.UserId, "تحديث حالة الطلب", $"طلبك #{order.Id} أصبح: {status}");
 
         return true;
+    }
+    public async Task<int> DeleteCancelledForSellerAsync(int sellerId, List<int> orderIds)
+    {
+        // ✅ الفلترة جوه الـ Query: طلبات هذا البائع فقط، وملغية فقط
+        var orders = (await _unitOfWork.Orders.FindAsync(o =>
+            orderIds.Contains(o.Id) &&
+            o.Status == OrderStatus.Cancelled &&
+            !o.IsDeletedBySeller &&
+            o.Items.Any(i => i.Product.SellerId == sellerId))).ToList();
+
+        foreach (var order in orders)
+        {
+            order.IsDeletedBySeller = true;
+            _unitOfWork.Orders.Update(order);
+        }
+
+        await _unitOfWork.SaveChangesAsync();
+        return orders.Count;
     }
     public async Task<int> DeleteCancelledAsync(int customerId, List<int> orderIds)
     {
@@ -318,4 +345,52 @@ public class OrderService : IOrderService
         await _unitOfWork.SaveChangesAsync();
         return orders.Count;
     }
+
+
+    public async Task<OrderDto?> GetByIdAsync(int orderId, int customerId)
+    {
+        var order = await _unitOfWork.Orders.GetWithItemsAsync(orderId);
+        if (order is null || order.CustomerId != customerId) return null;
+
+        var dto = _mapper.Map<OrderDto>(order);
+        await MarkReviewedItemsAsync(customerId, new[] { dto });
+
+        return dto;
+    }
+
+    public async Task<PaginatedResultDto<OrderDto>> GetMyOrdersAsync(int customerId, int pageNumber, int pageSize)
+    {
+        var (items, totalCount) = await _unitOfWork.Orders.GetByCustomerPagedAsync(customerId, pageNumber, pageSize);
+
+        var dtos = _mapper.Map<List<OrderDto>>(items);
+        await MarkReviewedItemsAsync(customerId, dtos);
+
+        return new PaginatedResultDto<OrderDto>
+        {
+            Items = dtos,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
+    }
+
+    // بتعلّم عناصر الطلبات المتوصّلة اللي العميل قيّمها قبل كده (استعلام واحد لكل الصفحة)
+    private async Task MarkReviewedItemsAsync(int customerId, IEnumerable<OrderDto> orders)
+    {
+        var delivered = orders.Where(o => o.Status == OrderStatus.Delivered.ToString()).ToList();
+        if (delivered.Count == 0) return;
+
+        var reviewed = await _unitOfWork.Reviews.GetReviewedItemsAsync(
+            customerId, delivered.Select(o => o.Id).ToList());
+
+        var keys = reviewed.ToHashSet();
+
+        foreach (var order in delivered)
+            foreach (var item in order.Items)
+                item.IsReviewed = keys.Contains((order.Id, item.ProductId));
+    }
+
 }
+
+
+

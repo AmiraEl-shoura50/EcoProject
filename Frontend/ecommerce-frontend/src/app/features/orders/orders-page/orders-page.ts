@@ -3,12 +3,14 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { OrderService } from '../../../core/services/order';
 import { ToastService } from '../../../core/services/toast';
-import { Order } from '../../../core/models/order.model';
+import { ReviewModal } from '../../../shared/components/review-modal/review-modal';
+import { Order, OrderItem } from '../../../core/models/order.model';
+
 
 @Component({
   selector: 'app-orders-page',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ReviewModal],
   templateUrl: './orders-page.html',
   styleUrl: './orders-page.css'
 })
@@ -20,6 +22,7 @@ export class OrdersPage implements OnInit {
   // ✅ جديد - التحديد والحذف
   selectedIds = signal<number[]>([]);
   isDeleting = signal<boolean>(false);
+  reviewTarget = signal<{ orderId: number; productId: number; productName: string } | null>(null);
 
   cancelledOrders = computed(() =>
     this.orders().filter(o => o.status === 'Cancelled')
@@ -164,4 +167,28 @@ export class OrdersPage implements OnInit {
       error: () => this.isLoading.set(false)
     });
   }
+  openReview(order: Order, item: OrderItem): void {
+  this.reviewTarget.set({ orderId: order.id, productId: item.productId, productName: item.productName });
+}
+
+onReviewSubmitted(): void {
+  const target = this.reviewTarget();
+  if (!target) return;
+
+  // نعلّم المنتج كمُقيَّم محليًا من غير إعادة تحميل الصفحة
+  this.orders.update(list =>
+    list.map(order =>
+      order.id !== target.orderId
+        ? order
+        : {
+            ...order,
+            items: order.items.map(item =>
+              item.productId === target.productId ? { ...item, isReviewed: true } : item
+            )
+          }
+    )
+  );
+
+  this.reviewTarget.set(null);
+}
 }

@@ -7,4 +7,7 @@ public interface IDiscountRepository : IGenericRepository<Discount>
     Task<IEnumerable<Discount>> GetAllWithTargetAsync();
     Task<Discount?> GetByIdWithTargetAsync(int id);
     Task<IEnumerable<Discount>> GetActiveForProductAsync(int productId, int categoryId);
+    Task<IEnumerable<Discount>> GetBySellerAsync(int sellerId);
+
+    Task<List<Discount>> GetActiveAsync();
 }

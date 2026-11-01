@@ -1,3 +1,6 @@
+
+
+
 // شكل البيانات اللي بنبعتها لما نعمل تسجيل حساب جديد
 export interface RegisterRequest {
   firstName: string;
@@ -31,5 +34,9 @@ export interface ForgotPasswordRequest {
 export interface ResetPasswordRequest {
   email: string;
   token: string;
+  newPassword: string;
+}
+export interface ChangePasswordRequest {
+  currentPassword: string;
   newPassword: string;
 }

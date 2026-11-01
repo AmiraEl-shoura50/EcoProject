@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { LucideAngularModule, Star } from 'lucide-angular';
+import { LucideAngularModule, Star ,Percent } from 'lucide-angular';
 import { ProductService } from '../../../core/services/product';
 import { CategoryService } from '../../../core/services/category';
 import { ReviewService } from '../../../core/services/review';
@@ -32,7 +32,7 @@ export class Home implements OnInit {
   stars = [1, 2, 3, 4, 5];
 
   readonly StarIcon = Star;
-
+  readonly PercentIcon = Percent;
   // ✅ آراء ثابتة (تسويقية)
   staticTestimonials: StaticTestimonial[] = [
     {
@@ -54,7 +54,7 @@ export class Home implements OnInit {
   ];
 
   constructor(
-    private productService: ProductService,
+    public productService: ProductService,
     private categoryService: CategoryService,
     private reviewService: ReviewService
   ) {}

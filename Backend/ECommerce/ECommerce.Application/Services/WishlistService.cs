@@ -10,17 +10,35 @@ public class WishlistService : IWishlistService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly IPricingService _pricingService;
 
-    public WishlistService(IUnitOfWork unitOfWork, IMapper mapper)
+    public WishlistService(IUnitOfWork unitOfWork, IMapper mapper, IPricingService pricingService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _pricingService = pricingService;
     }
 
     public async Task<WishlistDto> GetByCustomerIdAsync(int customerId)
     {
         var wishlist = await GetOrCreateWishlistAsync(customerId);
-        return _mapper.Map<WishlistDto>(wishlist);
+        var dto = _mapper.Map<WishlistDto>(wishlist);
+
+        if (dto.Items.Count > 0)
+        {
+            var book = await _pricingService.LoadAsync();
+
+            foreach (var item in dto.Items)
+            {
+                var product = wishlist.Items.First(i => i.ProductId == item.ProductId).Product;
+                var price = book.GetPrice(product);
+
+                item.OriginalPrice = product.Price;
+                item.Price = price.Final;
+            }
+        }
+
+        return dto;
     }
 
     public async Task<bool> AddItemAsync(int customerId, AddToWishlistDto dto)
@@ -31,7 +49,7 @@ public class WishlistService : IWishlistService
         var wishlist = await GetOrCreateWishlistAsync(customerId);
 
         var alreadyExists = wishlist.Items.Any(i => i.ProductId == dto.ProductId);
-        if (alreadyExists) return true; // ✅ موجود بالفعل، مفيش داعي نضيفه تاني ولا نرجع Error
+        if (alreadyExists) return true;
 
         wishlist.Items.Add(new WishlistItem
         {

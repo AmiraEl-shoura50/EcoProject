@@ -30,11 +30,7 @@ public class ReviewRepository : GenericRepository<Review>, IReviewRepository
     public async Task<bool> HasReviewedAsync(int customerId, int productId, int orderId)
         => await _dbSet.AnyAsync(r => r.CustomerId == customerId && r.ProductId == productId && r.OrderId == orderId);
 
-    public async Task<double> GetAverageRatingAsync(int productId)
-    {
-        var ratings = await _dbSet.Where(r => r.ProductId == productId).Select(r => r.Rating).ToListAsync();
-        return ratings.Any() ? ratings.Average() : 0;
-    }
+   
     public async Task<List<Review>> GetLatestAsync(int count)
     {
         return await _dbSet
@@ -45,5 +41,27 @@ public class ReviewRepository : GenericRepository<Review>, IReviewRepository
             .OrderByDescending(r => r.CreatedAt)
             .Take(count)
             .ToListAsync();
+    }
+    public async Task<double> GetAverageRatingAsync(int productId)
+    => await _dbSet
+        .Where(r => r.ProductId == productId)
+        .AverageAsync(r => (double?)r.Rating) ?? 0;
+
+    public async Task<Dictionary<int, int>> GetDistributionAsync(int productId)
+        => await _dbSet
+            .Where(r => r.ProductId == productId)
+            .GroupBy(r => r.Rating)
+            .Select(g => new { Rating = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.Rating, x => x.Count);
+
+    public async Task<List<(int OrderId, int ProductId)>> GetReviewedItemsAsync(
+        int customerId, IReadOnlyCollection<int> orderIds)
+    {
+        var rows = await _dbSet
+            .Where(r => r.CustomerId == customerId && orderIds.Contains(r.OrderId))
+            .Select(r => new { r.OrderId, r.ProductId })
+            .ToListAsync();
+
+        return rows.Select(r => (r.OrderId, r.ProductId)).ToList();
     }
 }

@@ -9,6 +9,8 @@ export interface OrderItem {
   quantity: number;
   unitPrice: number;
   subtotal: number;
+  isReviewed: boolean;
+  
 }
 
 
@@ -21,6 +23,7 @@ export interface Order {
   paymentMethodName: string;
   paymentMethodType: 'Manual' | 'Gateway';
   items: OrderItem[];
+  paymentTransferUrl: string | null;
 }
 
 export interface CheckoutResult {
@@ -36,4 +39,17 @@ export interface PaymentProof {
   reviewedAt: string | null;
   isApproved: boolean | null;
   rejectionReason: string | null;
+}
+export interface SellerOrder {
+  id: number;
+  status: string;
+  createdDate: string;
+  totalAmount: number;
+  paymentMethodName: string;
+  paymentMethodType: 'Manual' | 'Gateway';
+  customerName: string;
+  customerPhone: string | null;
+  customerAddress: string;
+  items: OrderItem[];
+  latestPaymentProof: PaymentProof | null;
 }
