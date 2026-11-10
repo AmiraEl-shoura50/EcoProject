@@ -9,7 +9,7 @@ public class ProductQueryParams
     public string? SortBy { get; set; } // "price_asc", "price_desc", "rating", "newest"
 
     public int? SellerId { get; set; }
-
+    public string? StockFilter { get; set; } // "attention" | "low" | "out"
     private int _pageNumber = 1;
     public int PageNumber
     {

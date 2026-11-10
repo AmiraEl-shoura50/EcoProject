@@ -27,13 +27,14 @@ public class NotificationService : INotificationService
         _logger = logger;
     }
 
-    public async Task CreateAndSendAsync(Guid userId, string title, string message)
+    public async Task CreateAndSendAsync(Guid userId, string title, string message, string? link = null)
     {
         var notification = new Notification
         {
             UserId = userId,
             Title = title,
             Message = message,
+            Link = link,
             IsRead = false,
             CreatedAt = DateTime.UtcNow
         };

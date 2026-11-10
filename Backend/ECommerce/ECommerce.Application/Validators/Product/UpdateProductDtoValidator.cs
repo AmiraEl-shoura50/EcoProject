@@ -1,4 +1,5 @@
 ﻿using ECommerce.Application.DTOs.Product;
+using ECommerce.Application.Validators.Common;
 using FluentValidation;
 
 namespace ECommerce.Application.Validators.Product;
@@ -23,5 +24,7 @@ public class UpdateProductDtoValidator : AbstractValidator<UpdateProductDto>
 
         RuleFor(p => p.CategoryId)
             .GreaterThan(0);
+        RuleFor(p => p.Image).MustBeValidImage();   // في validators المنتجات
+        RuleFor(c => c.Image).MustBeValidImage();   // في validators الأقسام
     }
 }

@@ -1,0 +1,221 @@
+<div>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <div>
+      <h2 class="font-serif text-2xl text-brand-black">رسائل التواصل</h2>
+      @if (!isLoading()) {
+        <p class="text-sm text-brand-brown mt-0.5">{{ totalCount() }} رسالة</p>
+      }
+    </div>
+
+    @if (messageService.unreadCount() > 0) {
+      <button
+        type="button"
+        (click)="markAllRead()"
+        [disabled]="isMarkingAll()"
+        class="flex items-center gap-2 text-sm text-brand-gold border border-brand-gold px-4 py-2 rounded-lg hover:bg-brand-gold hover:text-white transition-colors disabled:opacity-50"
+      >
+        <lucide-angular [img]="CheckAllIcon" [size]="16"></lucide-angular>
+        تحديد الكل كمقروء
+      </button>
+    }
+  </div>
+
+  <!-- الفلتر والبحث -->
+  <div class="flex flex-col sm:flex-row gap-3 mb-5">
+
+    <div class="flex gap-1 bg-white border border-gray-200 rounded-lg p-1 shrink-0">
+      <button
+        type="button"
+        (click)="setFilter('all')"
+        class="px-4 py-1.5 rounded-md text-sm transition-colors"
+        [class.bg-brand-black]="filter() === 'all'"
+        [class.text-white]="filter() === 'all'"
+        [class.text-brand-brown]="filter() !== 'all'"
+      >
+        الكل
+      </button>
+      <button
+        type="button"
+        (click)="setFilter('unread')"
+        class="flex items-center gap-2 px-4 py-1.5 rounded-md text-sm transition-colors"
+        [class.bg-brand-black]="filter() === 'unread'"
+        [class.text-white]="filter() === 'unread'"
+        [class.text-brand-brown]="filter() !== 'unread'"
+      >
+        غير مقروءة
+        @if (messageService.unreadCount() > 0) {
+          <span class="bg-red-500 text-white text-[10px] font-bold min-w-4 h-4 px-1 rounded-full flex items-center justify-center">
+            {{ messageService.unreadCount() }}
+          </span>
+        }
+      </button>
+    </div>
+
+    <div class="relative flex-1">
+      <input
+        #searchBox
+        type="text"
+        [value]="searchTerm()"
+        (input)="onSearchInput(searchBox.value)"
+        autocomplete="off"
+        placeholder="ابحث بالاسم أو البريد أو الموضوع أو نص الرسالة..."
+        class="w-full bg-white border border-gray-300 rounded-full px-4 py-2.5 pr-15 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+      />
+      <lucide-angular
+        [img]="SearchIcon"
+        [size]="16"
+        class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+      ></lucide-angular>
+
+      @if (searchTerm()) {
+        <button
+          type="button"
+          (click)="clearSearch()"
+          class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-brand-black hover:bg-gray-100 transition-colors"
+          aria-label="مسح البحث"
+        >
+          <lucide-angular [img]="CloseIcon" [size]="14"></lucide-angular>
+        </button>
+      }
+    </div>
+
+  </div>
+
+  @if (isLoading()) {
+
+    <div class="space-y-3 animate-pulse">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="bg-white rounded-2xl h-20"></div>
+      }
+    </div>
+
+  } @else if (items().length === 0) {
+
+    <div class="bg-white rounded-2xl border border-gray-100 text-center py-16 px-4">
+      @if (searchTerm()) {
+        <p class="text-brand-brown">لا توجد رسائل مطابقة للبحث</p>
+      } @else if (filter() === 'unread') {
+        <p class="text-brand-black font-medium mb-1">لا توجد رسائل غير مقروءة</p>
+        <p class="text-sm text-brand-brown">كل رسائلك اتقرأت 👌</p>
+      } @else {
+        <p class="text-brand-black font-medium mb-1">لا توجد رسائل بعد</p>
+        <p class="text-sm text-brand-brown">الرسائل اللي بتتبعت من صفحة "تواصل معنا" هتظهر هنا</p>
+      }
+    </div>
+
+  } @else {
+
+    <div class="space-y-3">
+      @for (message of items(); track message.id) {
+
+        <article
+          class="bg-white rounded-2xl border shadow-sm transition-shadow hover:shadow-md"
+          [class.border-brand-gold]="!message.isRead"
+          [class.border-gray-100]="message.isRead"
+        >
+
+          <button
+            type="button"
+            (click)="toggle(message)"
+            class="w-full text-start flex items-start gap-3 p-4"
+          >
+            <span
+              class="mt-2 w-2.5 h-2.5 rounded-full shrink-0"
+              [class.bg-brand-gold]="!message.isRead"
+              [class.bg-gray-200]="message.isRead"
+            ></span>
+
+            <span class="flex-1 min-w-0">
+              <span class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+                <span class="text-sm text-brand-black" [class.font-semibold]="!message.isRead">{{ message.name }}</span>
+                <span class="text-xs text-gray-400" [attr.title]="message.createdAt | date:'dd/MM/yyyy HH:mm'">
+                  {{ message.createdAt | timeAgo }}
+                </span>
+              </span>
+
+              <span class="block text-sm text-brand-black mt-0.5 line-clamp-1" [class.font-semibold]="!message.isRead">
+                {{ message.subject }}
+              </span>
+
+              @if (expandedId() !== message.id) {
+                <span class="block text-xs text-brand-brown mt-0.5 line-clamp-1">{{ message.message }}</span>
+              }
+            </span>
+          </button>
+
+          @if (expandedId() === message.id) {
+            <div class="px-4 pb-4 pt-4 border-t border-gray-100">
+
+              <p class="text-xs text-brand-brown mb-3">
+                من: <span dir="ltr" class="inline-block text-brand-black">{{ message.email }}</span>
+                · {{ message.createdAt | date:'dd/MM/yyyy HH:mm' }}
+              </p>
+
+              <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line break-words mb-4">{{ message.message }}</p>
+
+              <div class="flex flex-wrap items-center gap-2">
+
+                <a
+                  [href]="replyHref(message)"
+                  class="inline-flex items-center gap-2 bg-brand-black text-white text-sm px-4 py-2 rounded-lg hover:bg-brand-gold transition-colors"
+                >
+                  <lucide-angular [img]="ReplyIcon" [size]="16"></lucide-angular>
+                  رد بالإيميل
+                </a>
+
+                <button
+                  type="button"
+                  (click)="toggleRead(message)"
+                  [disabled]="busyId() === message.id"
+                  class="inline-flex items-center gap-2 text-sm text-brand-brown border border-gray-300 px-4 py-2 rounded-lg hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-50"
+                >
+                  <lucide-angular [img]="message.isRead ? UnreadIcon : ReadIcon" [size]="16"></lucide-angular>
+                  {{ message.isRead ? 'تحديد كغير مقروءة' : 'تحديد كمقروءة' }}
+                </button>
+
+                <button
+                  type="button"
+                  (click)="remove(message)"
+                  [disabled]="busyId() === message.id"
+                  class="inline-flex items-center gap-2 text-sm text-red-500 border border-red-200 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                >
+                  <lucide-angular [img]="TrashIcon" [size]="16"></lucide-angular>
+                  حذف
+                </button>
+
+              </div>
+
+            </div>
+          }
+
+        </article>
+
+      }
+    </div>
+
+    @if (totalPages() > 1) {
+      <div class="flex items-center justify-center gap-2 mt-8">
+        <button
+          type="button"
+          (click)="goToPage(currentPage() - 1)"
+          [disabled]="!hasPreviousPage()"
+          class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          السابق
+        </button>
+        <span class="text-sm text-brand-brown px-4">صفحة {{ currentPage() }} من {{ totalPages() }}</span>
+        <button
+          type="button"
+          (click)="goToPage(currentPage() + 1)"
+          [disabled]="!hasNextPage()"
+          class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          التالي
+        </button>
+      </div>
+    }
+
+  }
+
+</div>

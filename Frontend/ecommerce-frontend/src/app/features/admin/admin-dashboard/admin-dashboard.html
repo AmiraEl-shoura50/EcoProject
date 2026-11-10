@@ -1,0 +1,163 @@
+<div>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <h2 class="font-serif text-2xl text-brand-black">نظرة عامة</h2>
+
+    <button
+      type="button"
+      (click)="load()"
+      [disabled]="isLoading()"
+      class="text-sm text-brand-brown border border-gray-300 bg-white px-4 py-2 rounded-lg hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-50"
+    >
+      {{ isLoading() ? 'جاري التحديث...' : 'تحديث' }}
+    </button>
+  </div>
+
+  @if (data(); as d) {
+
+    <!-- الأعداد -->
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      @for (card of cards(); track card.label) {
+
+        @if (card.link) {
+          <a
+            [routerLink]="card.link"
+            [queryParams]="card.query"
+            class="block bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5 hover:shadow-md hover:border-brand-gold transition-all"
+          >
+            <p class="text-sm text-brand-brown">{{ card.label }}</p>
+            <p class="font-serif text-3xl text-brand-black mt-1">{{ card.value | number }}</p>
+            <p class="text-xs text-gray-400 mt-1">{{ card.hint }}</p>
+          </a>
+        } @else {
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5">
+            <p class="text-sm text-brand-brown">{{ card.label }}</p>
+            <p class="font-serif text-3xl text-brand-black mt-1">{{ card.value | number }}</p>
+            <p class="text-xs text-gray-400 mt-1">{{ card.hint }}</p>
+          </div>
+        }
+
+      }
+    </div>
+
+    <!-- المبيعات -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <p class="text-xs text-brand-brown mb-1">إجمالي مبيعات الموقع</p>
+        <p class="font-serif text-2xl text-brand-black">
+          {{ d.totalSales | number:'1.0-2' }} <span class="font-sans text-sm text-brand-brown">جنيه</span>
+        </p>
+        <p class="text-xs text-gray-400 mt-1">من {{ d.totalOrders }} طلب (الطلبات المدفوعة فقط تُحسب)</p>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <p class="text-xs text-brand-brown mb-1">مبيعات آخر 30 يوم</p>
+        <p class="font-serif text-2xl text-brand-gold">
+          {{ d.salesLast30Days | number:'1.0-2' }} <span class="font-sans text-sm text-brand-brown">جنيه</span>
+        </p>
+      </div>
+
+    </div>
+
+    <!-- المخطط -->
+    <div class="mb-6">
+      <app-sales-chart [data]="d.dailySales" title="مبيعات الموقع اليومية"></app-sales-chart>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- الطلبات حسب الحالة -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <h3 class="font-serif text-lg text-brand-black mb-4">الطلبات حسب الحالة</h3>
+
+        @if (d.totalOrders === 0) {
+          <p class="text-sm text-brand-brown text-center py-8">لا توجد طلبات بعد</p>
+        } @else {
+          <ul class="space-y-3">
+            @for (row of statusRows(); track row.key) {
+              <li>
+                <div class="flex items-center justify-between text-sm mb-1">
+                  <span class="text-brand-black">{{ row.label }}</span>
+                  <span class="text-brand-brown">{{ row.count }}</span>
+                </div>
+                <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full" [ngClass]="row.barClass" [style.width.%]="row.percent"></div>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- أفضل البائعين -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <h3 class="font-serif text-lg text-brand-black mb-4">أفضل البائعين (آخر 30 يومًا)</h3>
+
+        @if (d.topSellers.length === 0) {
+          <p class="text-sm text-brand-brown text-center py-8">لا توجد مبيعات في هذه الفترة</p>
+        } @else {
+          <ul class="space-y-3">
+            @for (seller of d.topSellers; track seller.sellerId; let i = $index) {
+              <li class="flex items-center gap-3">
+                <span class="w-6 text-center text-sm font-bold text-brand-gold">{{ i + 1 }}</span>
+
+                <div class="w-11 h-11 rounded-full bg-brand-cream overflow-hidden shrink-0 flex items-center justify-center">
+                  @if (seller.imageUrl) {
+                    <img [src]="seller.imageUrl" [alt]="seller.storeName" class="w-full h-full object-cover" />
+                  } @else {
+                    <span class="font-serif text-lg text-brand-gold">{{ seller.storeName.charAt(0) }}</span>
+                  }
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <a
+                    [routerLink]="['/store', seller.sellerId]"
+                    class="block text-sm text-brand-black line-clamp-1 hover:text-brand-gold transition-colors"
+                  >
+                    {{ seller.storeName }}
+                  </a>
+                  <p class="text-xs text-brand-brown">{{ seller.ordersCount }} طلب</p>
+                </div>
+
+                <p class="text-sm font-semibold text-brand-black shrink-0">{{ seller.revenue | number:'1.0-2' }} جنيه</p>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+    </div>
+
+  } @else if (failed()) {
+
+    <div class="bg-white rounded-2xl border border-gray-100 text-center py-14 px-4">
+      <p class="text-brand-brown mb-4">تعذر تحميل البيانات</p>
+      <button
+        type="button"
+        (click)="load()"
+        class="bg-brand-black text-white text-sm px-6 py-2.5 rounded-lg hover:bg-brand-gold transition-colors"
+      >
+        إعادة المحاولة
+      </button>
+    </div>
+
+  } @else {
+
+    <div class="space-y-4 animate-pulse">
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        @for (i of [1,2,3,4,5,6]; track i) {
+          <div class="bg-white rounded-2xl h-24"></div>
+        }
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        @for (i of [1,2]; track i) {
+          <div class="bg-white rounded-2xl h-24"></div>
+        }
+      </div>
+      <div class="bg-white rounded-2xl h-64"></div>
+    </div>
+
+  }
+
+</div>

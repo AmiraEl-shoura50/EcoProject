@@ -46,6 +46,14 @@ public class AuthService : IAuthService
         {
             return new AuthResponseDto { Success = false, Message = "اسم المتجر مطلوب لحساب البائع" };
         }
+        if (dto.Role == "Seller")
+        {
+            var storeName = dto.StoreName!.Trim();
+            var exists = (await _unitOfWork.Sellers.FindAsync(s => s.StoreName.ToLower() == storeName.ToLower())).Any();
+
+            if (exists)
+                return new AuthResponseDto { Success = false, Message = "اسم المتجر مستخدم بالفعل، اختر اسمًا آخر" };
+        }
 
         var existingUser = await _userManager.FindByEmailAsync(dto.Email);
         if (existingUser is not null)
@@ -91,7 +99,7 @@ public class AuthService : IAuthService
             var seller = new Seller
             {
                 UserId = user.Id,
-                StoreName = dto.StoreName!,
+                StoreName = dto.StoreName.Trim()!,
                 Rating = 0
             };
             await _unitOfWork.Sellers.AddAsync(seller);

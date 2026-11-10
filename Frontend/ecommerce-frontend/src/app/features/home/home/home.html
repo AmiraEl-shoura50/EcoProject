@@ -1,19 +1,154 @@
 <div class="bg-brand-cream min-h-screen">
 
-  <!-- Hero Section -->
-  <section class="bg-brand-black text-white py-20 px-4">
-    <div class="max-w-4xl mx-auto text-center">
 
-      <h1 class="font-serif text-5xl mb-4">
-        اكتشف <span class="text-brand-gold">Smart Shop</span>
+
+<!-- SMART SHOP HERO -->
+<section class="smart-hero" dir="rtl">
+
+  <!-- Background -->
+  <div class="hero-background">
+    <div class="hero-glow hero-glow-one"></div>
+    <div class="hero-glow hero-glow-two"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-wave"></div>
+  </div>
+
+  <div class="hero-container">
+
+    <!-- Text Content -->
+    <div class="hero-content">
+
+      <div class="hero-badge">
+        <span class="badge-icon">✧</span>
+        <span>تجربة تسوق مختلفة</span>
+      </div>
+
+      <h1 class="hero-title">
+        اكتشف
+        <span>Smart Shop</span>
       </h1>
 
-      <p class="text-gray-300 text-lg">
-        تسوق أفضل المنتجات من بائعين موثوقين في مكان واحد
+      <p class="hero-description">
+        تسوق أفضل المنتجات من بائعين موثوقين
+        في مكان واحد
       </p>
 
+      <div class="hero-actions">
+
+        <a routerLink="/products" class="hero-cta">
+          اكتشف المنتجات
+          <span>←</span>
+        </a>
+
+        <div class="hero-trust">
+          <span class="trust-icon">♢</span>
+          <span>تسوق بثقة وراحة</span>
+        </div>
+
+      </div>
+
+      <!-- Small Highlights -->
+      <div class="hero-highlights">
+
+        <div class="highlight-item">
+          <span class="highlight-number">01</span>
+          <span>مكان واحد</span>
+        </div>
+
+        <div class="highlight-divider"></div>
+
+        <div class="highlight-item">
+          <span class="highlight-number">∞</span>
+          <span>اختيارات أكثر</span>
+        </div>
+
+        <div class="highlight-divider"></div>
+
+        <div class="highlight-item">
+          <span class="highlight-number">✧</span>
+          <span>تجربة مميزة</span>
+        </div>
+
+      </div>
+
     </div>
-  </section>
+
+    <!-- Product Slider -->
+    <div class="hero-visual">
+
+      <div class="hero-visual-glow"></div>
+
+      <!-- Decorative Orbit -->
+      <div class="hero-orbit"></div>
+      <div class="hero-orbit-small"></div>
+
+      <!-- Product Stage -->
+      <div class="hero-slider-stage">
+
+        @for (slide of heroSlides; track slide.image; let i = $index) {
+          <div
+            class="hero-slide"
+            [class.active]="i === activeIndex"
+            [class.prev]="i === previousIndex"
+            [class.next]="i === nextIndex"
+            [attr.aria-hidden]="i !== activeIndex"
+          >
+            <img
+              [src]="slide.image"
+              [alt]="slide.alt"
+              draggable="false"
+            />
+          </div>
+        }
+
+        <!-- Pedestal -->
+        <div class="hero-pedestal">
+          <div class="pedestal-top"></div>
+          <div class="pedestal-base"></div>
+        </div>
+
+      </div>
+
+      <!-- Slider Controls -->
+      <button
+        type="button"
+        class="hero-arrow hero-arrow-prev"
+        (click)="previousSlide()"
+        aria-label="المنتج السابق"
+      >
+        <span>›</span>
+      </button>
+
+      <button
+        type="button"
+        class="hero-arrow hero-arrow-next"
+        (click)="nextSlide()"
+        aria-label="المنتج التالي"
+      >
+        <span>‹</span>
+      </button>
+
+      <!-- Pagination -->
+      <div class="hero-pagination">
+        @for (slide of heroSlides; track slide.image; let i = $index) {
+          <button
+            type="button"
+            class="pagination-dot"
+            [class.active]="i === activeIndex"
+            (click)="goToSlide(i)"
+            [attr.aria-label]="'الانتقال إلى المنتج ' + (i + 1)"
+            [attr.aria-current]="i === activeIndex ? 'true' : null"
+          ></button>
+        }
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
 
   <!-- Categories Section -->
   @if (categories().length > 0 || productService.offersCount() > 0) {

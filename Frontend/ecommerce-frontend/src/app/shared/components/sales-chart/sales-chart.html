@@ -1,0 +1,59 @@
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+
+  <div class="flex flex-wrap items-start justify-between gap-3 mb-5">
+    <div>
+      <h3 class="font-serif text-lg text-brand-black">{{ title() }}</h3>
+      <p class="text-sm text-brand-brown mt-0.5">
+        إجمالي آخر {{ range() }} يوم:
+        <span class="font-semibold text-brand-gold">{{ total() | number:'1.0-2' }} جنيه</span>
+      </p>
+    </div>
+
+    <div class="flex gap-1 bg-brand-cream rounded-lg p-1">
+      @for (r of ranges; track r) {
+        <button
+          type="button"
+          (click)="range.set(r)"
+          class="px-3 py-1.5 rounded-md text-xs transition-colors"
+          [class.bg-white]="range() === r"
+          [class.shadow-sm]="range() === r"
+          [class.text-brand-black]="range() === r"
+          [class.text-brand-brown]="range() !== r"
+          [class.font-semibold]="range() === r"
+        >
+          {{ r }} يوم
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (!hasSales()) {
+
+    <p class="text-center text-sm text-brand-brown py-14">لا توجد مبيعات في هذه الفترة</p>
+
+  } @else {
+
+    <!-- الأعمدة -->
+    <div class="flex items-end gap-1 sm:gap-1.5 h-44">
+      @for (bar of bars(); track bar.date) {
+        <div class="flex-1 min-w-0 h-full flex items-end" [attr.title]="bar.tooltip">
+          <div
+            class="w-full rounded-t-md min-h-[3px] transition-all"
+            [style.height.%]="bar.height"
+            [class.bg-brand-gold]="bar.amount > 0"
+            [class.bg-gray-200]="bar.amount === 0"
+          ></div>
+        </div>
+      }
+    </div>
+
+    <!-- التواريخ -->
+    <div class="flex gap-1 sm:gap-1.5 mt-2 border-t border-gray-100 pt-2">
+      @for (bar of bars(); track bar.date) {
+        <div class="flex-1 min-w-0 text-center text-[10px] text-gray-400">{{ bar.label }}</div>
+      }
+    </div>
+
+  }
+
+</div>

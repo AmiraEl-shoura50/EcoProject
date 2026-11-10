@@ -28,7 +28,7 @@
       (input)="onSearchInput(searchBox.value)"
       autocomplete="off"
       placeholder="ابحث في منتجاتك..."
-      class="w-full bg-white border border-gray-300 rounded-full px-4 py-2.5 pr-10 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+      class="w-full bg-white border border-gray-300 rounded-full px-4 py-2.5 pr-15 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
     />
     <lucide-angular
       [img]="SearchIcon"
@@ -47,7 +47,27 @@
       </button>
     }
   </div>
-
+  <!-- فلتر المخزون -->
+  <div class="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-2">
+    @for (tab of stockTabs(); track tab.key) {
+      <button
+        type="button"
+        (click)="setStockFilter(tab.key)"
+        class="shrink-0 px-4 py-2 rounded-full text-sm border transition-colors"
+        [class.bg-brand-black]="stockFilter() === tab.key"
+        [class.text-white]="stockFilter() === tab.key"
+        [class.border-brand-black]="stockFilter() === tab.key"
+        [class.bg-white]="stockFilter() !== tab.key"
+        [class.text-brand-black]="stockFilter() !== tab.key"
+        [class.border-gray-200]="stockFilter() !== tab.key"
+      >
+        {{ tab.label }}
+        @if (tab.count !== null) {
+          <span class="opacity-70">({{ tab.count }})</span>
+        }
+      </button>
+    }
+  </div>
   <!-- شريط التحديد والحذف -->
   @if (!isLoading() && products().length > 0) {
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -80,12 +100,12 @@
       }
     </div>
 
-  } @else if (products().length === 0) {
+   } @else if (products().length === 0) {
 
     <div class="bg-white rounded-2xl border border-gray-100 text-center py-16 px-4">
       @if (searchTerm()) {
         <p class="text-brand-brown">لا توجد منتجات مطابقة للبحث</p>
-      } @else {
+      } @else if (stockFilter() === 'all') {
         <p class="text-brand-brown mb-4">لم تضف أي منتجات بعد</p>
         <button
           type="button"
@@ -94,11 +114,21 @@
         >
           أضف أول منتج
         </button>
+      } @else {
+        <p class="text-brand-black font-medium mb-3">
+          {{ stockFilter() === 'out'
+              ? 'لا توجد منتجات نفذت كميتها'
+              : stockFilter() === 'low'
+                ? 'لا توجد منتجات قاربت على النفاد'
+                : 'مخزونك بخير، لا توجد منتجات تحتاج انتباه' }}
+        </p>
+        <button type="button" (click)="setStockFilter('all')" class="text-sm text-brand-gold hover:underline">
+          عرض كل المنتجات
+        </button>
       }
     </div>
 
   } @else {
-
     <div class="space-y-4">
       @for (product of products(); track product.id) {
 

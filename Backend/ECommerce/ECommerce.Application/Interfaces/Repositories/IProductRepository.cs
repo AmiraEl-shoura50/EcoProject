@@ -14,4 +14,8 @@ public interface IProductRepository : IGenericRepository<Product>
 
     Task<List<ProductPricingInfo>> GetPricingInfoAsync(IReadOnlyCollection<int> sellerIds);
     Task<List<Product>> GetByIdsWithDetailsAsync(IReadOnlyCollection<int> ids);
+
+    Task<int> CountBySellerAsync(int sellerId);
+    Task<(int OutOfStock, int LowStock)> GetStockSummaryForSellerAsync(int sellerId, int lowThreshold);
+    Task<List<Product>> GetLowStockForSellerAsync(int sellerId, int lowThreshold, int take);
 }

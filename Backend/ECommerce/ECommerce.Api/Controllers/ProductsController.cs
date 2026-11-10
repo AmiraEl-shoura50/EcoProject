@@ -25,6 +25,7 @@ public class ProductsController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> GetAll([FromQuery] ProductQueryParams queryParams)
     {
+        queryParams.StockFilter = null;
         var result = await _productService.SearchAsync(queryParams);
         return Ok(result);
     }
@@ -117,5 +118,14 @@ public class ProductsController : ControllerBase
 
         return seller?.Id;
     }
+    [HttpGet("mine/stock-summary")]
+    [Authorize(Roles = Roles.Seller)]
+    public async Task<IActionResult> GetMyStockSummary()
+    {
+        var sellerId = await GetCurrentSellerIdAsync();
+        if (sellerId is null) return Forbid();
 
+        var summary = await _productService.GetStockSummaryAsync(sellerId.Value);
+        return Ok(summary);
+    }
 }

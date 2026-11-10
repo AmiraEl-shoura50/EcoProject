@@ -24,6 +24,8 @@ export interface ProductQueryParams {
   sortBy?: string;
   pageNumber?: number;
   pageSize?: number;
+  sellerId?: number;
+  stockFilter?: string;
   
 }
 
@@ -39,4 +41,9 @@ export interface PaginatedResult<T> {
 export interface DeleteProductsResult {
   deletedCount: number;
   blockedCount: number;
+}
+
+export interface StockSummary {
+  outOfStock: number;
+  lowStock: number;
 }

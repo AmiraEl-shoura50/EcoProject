@@ -4,7 +4,7 @@ using ECommerce.Application.Pricing;
 using ECommerce.Domain.Entities;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-
+using ECommerce.Application.Constants;
 namespace ECommerce.Infrastructure.Repositories;
 
 public class ProductRepository : GenericRepository<Product>, IProductRepository
@@ -59,6 +59,19 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
         {
             query = query.Where(p => p.SellerId == queryParams.SellerId.Value);
         }
+        // ✅ فلتر المخزون (للبائع): نفذت / قاربت على النفاد / الاتنين
+        if (!string.IsNullOrWhiteSpace(queryParams.StockFilter))
+        {
+            var threshold = StockRules.LowStockThreshold;
+
+            query = queryParams.StockFilter.ToLowerInvariant() switch
+            {
+                "out" => query.Where(p => p.StockQuantity <= 0),
+                "low" => query.Where(p => p.StockQuantity > 0 && p.StockQuantity <= threshold),
+                "attention" => query.Where(p => p.StockQuantity <= threshold),
+                _ => query
+            };
+        }
 
         // ✅ الترتيب
         query = queryParams.SortBy switch
@@ -67,6 +80,7 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
             "price_desc" => query.OrderByDescending(p => p.Price),
             "rating" => query.OrderByDescending(p => p.Rating),
             "newest" => query.OrderByDescending(p => p.Id), // بما إننا مفيش CreatedDate في Product، بنستخدم Id كتقريب
+            "stock_asc" => query.OrderBy(p => p.StockQuantity).ThenBy(p => p.Id),
             _ => query.OrderBy(p => p.Id)
         };
 
@@ -91,4 +105,26 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
             .Include(p => p.Seller)
             .Where(p => ids.Contains(p.Id))
             .ToListAsync();
+    public async Task<int> CountBySellerAsync(int sellerId)
+    => await _dbSet.CountAsync(p => p.SellerId == sellerId);
+
+    public async Task<(int OutOfStock, int LowStock)> GetStockSummaryForSellerAsync(int sellerId, int lowThreshold)
+    {
+        var outOfStock = await _dbSet.CountAsync(p => p.SellerId == sellerId && p.StockQuantity <= 0);
+        var lowStock = await _dbSet.CountAsync(p =>
+            p.SellerId == sellerId && p.StockQuantity > 0 && p.StockQuantity <= lowThreshold);
+
+        return (outOfStock, lowStock);
+    }
+
+    public async Task<List<Product>> GetLowStockForSellerAsync(int sellerId, int lowThreshold, int take)
+        => await _dbSet
+            .AsNoTracking()
+            .Where(p => p.SellerId == sellerId && p.StockQuantity <= lowThreshold)
+            .OrderBy(p => p.StockQuantity).ThenBy(p => p.Name)
+            .Take(take)
+            .ToListAsync();
+
 }
+
+

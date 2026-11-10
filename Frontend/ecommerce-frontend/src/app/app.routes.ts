@@ -35,7 +35,27 @@ export const routes: Routes = [
 },
 {
   path: 'faq',
+  title: 'الأسئلة الشائعة | Smart Shop',
   loadComponent: () => import('./features/faq/faq/faq').then(m => m.Faq)
+},{
+  path: 'about',
+  title: 'من نحن | Smart Shop',
+  loadComponent: () => import('./features/info/about/about').then(m => m.About)
+},
+{
+  path: 'contact',
+  title: 'تواصل معنا | Smart Shop',
+  loadComponent: () => import('./features/info/contact/contact').then(m => m.Contact)
+},
+{
+  path: 'shipping-policy',
+  title: 'الشحن والتوصيل | Smart Shop',
+  loadComponent: () => import('./features/info/shipping-policy/shipping-policy').then(m => m.ShippingPolicy)
+},
+{
+  path: 'return-policy',
+  title: 'سياسة الإرجاع والإلغاء | Smart Shop',
+  loadComponent: () => import('./features/info/return-policy/return-policy').then(m => m.ReturnPolicy)
 }
 ,
 {
@@ -73,7 +93,12 @@ export const routes: Routes = [
   loadComponent: () => import('./features/seller/seller-layout/seller-layout').then(m => m.SellerLayout),
   canActivate: [roleGuard('Seller')],
   children: [
-    { path: '', redirectTo: 'orders', pathMatch: 'full' },
+    {
+    path: '',
+    pathMatch: 'full',
+    title: 'نظرة عامة | Smart Shop',
+    loadComponent: () => import('./features/seller/seller-dashboard/seller-dashboard').then(m => m.SellerDashboardPage)
+    },
     {
       path: 'orders',
       loadComponent: () => import('./features/seller/seller-orders/seller-orders').then(m => m.SellerOrders)
@@ -89,6 +114,11 @@ export const routes: Routes = [
     {
       path: 'discounts',
       loadComponent: () => import('./features/seller/seller-discounts/seller-discounts').then(m => m.SellerDiscounts)
+    },
+    {
+      path: 'store',
+      title: 'متجري | Smart Shop',
+      loadComponent: () => import('./features/seller/seller-store/seller-store').then(m => m.SellerStore)
     }
   ]
 },
@@ -105,7 +135,12 @@ export const routes: Routes = [
   loadComponent: () => import('./features/admin/admin-layout/admin-layout').then(m => m.AdminLayout),
   canActivate: [roleGuard('Admin')],
   children: [
-    { path: '', redirectTo: 'users', pathMatch: 'full' },
+    {
+      path: '',
+      pathMatch: 'full',
+      title: 'نظرة عامة | Smart Shop',
+      loadComponent: () => import('./features/admin/admin-dashboard/admin-dashboard').then(m => m.AdminDashboardPage)
+    },
     {
       path: 'users',
       loadComponent: () => import('./features/admin/admin-users/admin-users').then(m => m.AdminUsers)
@@ -117,7 +152,12 @@ export const routes: Routes = [
     {
       path: 'payment-methods',
       loadComponent: () => import('./features/admin/admin-payment-methods/admin-payment-methods').then(m => m.AdminPaymentMethods)
-    }
+    },
+    {
+  path: 'messages',
+  title: 'الرسائل | Smart Shop',
+  loadComponent: () => import('./features/admin/admin-messages/admin-messages').then(m => m.AdminMessages)
+}
   ]
 },
 {
@@ -129,5 +169,15 @@ export const routes: Routes = [
   path: 'notifications',
   loadComponent: () => import('./features/notifications/notifications-page/notifications-page').then(m => m.NotificationsPage),
   canActivate: [authGuard]
+},
+{
+  path: 'store/:id',
+  title: 'المتجر | Smart Shop',
+  loadComponent: () => import('./features/store/store-page/store-page').then(m => m.StorePage)
+},
+{
+  path: '**',
+  title: 'الصفحة غير موجودة | Smart Shop',
+  loadComponent: () => import('./features/not-found/not-found/not-found').then(m => m.NotFound)
 }
 ];

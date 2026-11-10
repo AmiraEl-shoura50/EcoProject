@@ -6,4 +6,5 @@ public class UpdateSellerDto
 {
     public string StoreName { get; set; } = string.Empty;
     public IFormFile? Image { get; set; }
+    public bool RemoveImage { get; set; }
 }

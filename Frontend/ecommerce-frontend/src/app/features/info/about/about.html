@@ -1,0 +1,61 @@
+<app-info-page
+  title="من نحن"
+  subtitle="متجر واحد، بائعون كثيرون، وتجربة تسوق بسيطة"
+  [showContactCta]="false"
+>
+
+  <div class="info-prose bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8">
+
+    <section>
+      <h2>حكايتنا</h2>
+      <p>
+        Smart Shop منصة تسوق إلكتروني تجمع بائعين من مجالات مختلفة في مكان واحد، لتجد ما تحتاجه
+        بأسعار واضحة ومن غير ما تتنقل بين مواقع كتيرة.
+      </p>
+    </section>
+
+    <section>
+      <h2>إزاي بنشتغل</h2>
+      <p>الموقع بيربطك مباشرة بالبائع، وكل بائع مسؤول عن منتجاته وتجهيز طلباته وشحنها.</p>
+      <ul>
+        <li>تتصفح الأقسام والعروض وتضيف منتجاتك للسلة.</li>
+        <li>تتم الدفع بالتحويل (فودافون كاش أو إنستاباي) أو بالبطاقة عبر الدفع الإلكتروني.</li>
+        <li>البائع يؤكد الدفع ويشحن طلبك، وبتتابع كل خطوة من صفحة طلباتك وإشعاراتك.</li>
+        <li>بعد الاستلام تقدر تقيّم المنتج وتساعد غيرك في الاختيار.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>تقييمات موثّقة</h2>
+      <p>التقييم متاح فقط للعملاء اللي استلموا المنتج فعلًا، عشان تقدر تثق في آراء اللي اشتروا قبلك.</p>
+    </section>
+
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-center">
+      <p class="font-serif text-lg text-brand-black mb-1">عايز تتسوق؟</p>
+      <p class="text-sm text-brand-brown mb-4">اكتشف المنتجات والعروض الحالية</p>
+      <a
+        routerLink="/"
+        class="inline-block bg-brand-black text-white text-sm px-6 py-2.5 rounded-lg hover:bg-brand-gold transition-colors"
+      >
+        تسوق الآن
+      </a>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-center">
+      <p class="font-serif text-lg text-brand-black mb-1">عندك منتجات للبيع؟</p>
+      <p class="text-sm text-brand-brown mb-4">افتح متجرك وابدأ البيع لعملائنا</p>
+      <a
+        routerLink="/register"
+        class="inline-block border border-brand-gold text-brand-gold text-sm px-6 py-2.5 rounded-lg hover:bg-brand-gold hover:text-white transition-colors"
+      >
+        ابدأ البيع معنا
+      </a>
+    </div>
+
+  </div>
+
+</app-info-page>

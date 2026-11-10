@@ -6,11 +6,11 @@ import { LucideAngularModule, Search, X } from 'lucide-angular';
 import { AdminService } from '../../../core/services/admin';
 import { ToastService } from '../../../core/services/toast';
 import { AdminUser } from '../../../core/models/admin.model';
-
+import { RouterLink, ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, RouterLink],
   templateUrl: './admin-users.html',
   styleUrl: './admin-users.css'
 })
@@ -57,12 +57,17 @@ export class AdminUsers implements OnInit {
 
   constructor(
     private adminService: AdminService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    this.loadUsers();
+   const role = this.route.snapshot.queryParamMap.get('role');
+  if (role && this.roleFilters.some(f => f.key === role)) {
+    this.roleFilter.set(role);
+  }
 
+  this.loadUsers();
     // بحث مباشر بعد 300ms من آخر حرف
     this.search$
       .pipe(

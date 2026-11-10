@@ -64,4 +64,15 @@ public class ReviewRepository : GenericRepository<Review>, IReviewRepository
 
         return rows.Select(r => (r.OrderId, r.ProductId)).ToList();
     }
+    // متوسط وعدد كل تقييمات منتجات البائع (حساب كامل في الداتابيز)
+    public async Task<(double Average, int Count)> GetSellerStatsAsync(int sellerId)
+    {
+        var stats = await _dbSet
+            .Where(r => r.Product.SellerId == sellerId)
+            .GroupBy(_ => 1)
+            .Select(g => new { Average = g.Average(r => (double)r.Rating), Count = g.Count() })
+            .FirstOrDefaultAsync();
+
+        return stats is null ? (0, 0) : (Math.Round(stats.Average, 1), stats.Count);
+    }
 }

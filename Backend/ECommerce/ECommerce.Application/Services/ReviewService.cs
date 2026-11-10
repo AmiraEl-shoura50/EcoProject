@@ -5,6 +5,7 @@ using ECommerce.Application.Interfaces.Repositories;
 using ECommerce.Application.Interfaces.Services;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Application.Services;
 
@@ -12,16 +13,23 @@ public class ReviewService : IReviewService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly INotificationService _notificationService;
+    private readonly ILogger<ReviewService> _logger;
 
-    public ReviewService(IUnitOfWork unitOfWork, IMapper mapper)
+    public ReviewService(
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        INotificationService notificationService,
+        ILogger<ReviewService> logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _notificationService = notificationService;
+        _logger = logger;
     }
 
     public async Task<PaginatedResultDto<ReviewDto>> GetByProductAsync(int productId, int pageNumber, int pageSize)
     {
-        // ✅ حد أقصى للصفحة عشان محدش يطلب الجدول كله
         pageNumber = Math.Max(1, pageNumber);
         pageSize = Math.Clamp(pageSize, 1, 50);
 
@@ -69,13 +77,13 @@ public class ReviewService : IReviewService
 
     public async Task<ReviewDto?> CreateAsync(int customerId, CreateReviewDto dto)
     {
-        // ✅ شراء موثّق: الطلب بتاع نفس العميل، متوصّل، وفيه المنتج ده
+        // شراء موثّق: الطلب بتاع نفس العميل، متوصّل، وفيه المنتج ده
         var order = await _unitOfWork.Orders.GetWithItemsAsync(dto.OrderId);
         if (order is null || order.CustomerId != customerId) return null;
         if (order.Status != OrderStatus.Delivered) return null;
         if (!order.Items.Any(i => i.ProductId == dto.ProductId)) return null;
 
-        // ✅ مرة واحدة لكل منتج في كل طلب
+        // مرة واحدة لكل منتج في كل طلب
         if (await _unitOfWork.Reviews.HasReviewedAsync(customerId, dto.ProductId, dto.OrderId)) return null;
 
         var product = await _unitOfWork.Products.GetByIdAsync(dto.ProductId);
@@ -104,7 +112,7 @@ public class ReviewService : IReviewService
             throw;
         }
 
-        // ✅ المتوسط والعدد بيتحسبوا من الداتابيز بعد الحفظ، فبيصحّحوا نفسهم حتى لو حصل تزامن
+        // المتوسط والعدد بيتحسبوا من الداتابيز بعد الحفظ
         var distribution = await _unitOfWork.Reviews.GetDistributionAsync(dto.ProductId);
         var count = distribution.Values.Sum();
 
@@ -116,12 +124,57 @@ public class ReviewService : IReviewService
         _unitOfWork.Products.Update(product);
         await _unitOfWork.SaveChangesAsync();
 
-        var resultDto = _mapper.Map<ReviewDto>(review);
         var customer = await _unitOfWork.Customers.GetWithUserAsync(customerId);
+
+        var resultDto = _mapper.Map<ReviewDto>(review);
         resultDto.CustomerName = customer is not null
             ? $"{customer.User.FirstName} {customer.User.LastName}"
             : string.Empty;
 
+        await NotifySellerAsync(product, customer, review);
+
         return resultDto;
+    }
+
+    // إشعار البائع بتقييم جديد. بأقصى جهد: التقييم اتحفظ خلاص، وفشل الإشعار ميكسرش العملية
+    private async Task NotifySellerAsync(Product product, Customer? customer, Review review)
+    {
+        try
+        {
+            var seller = await _unitOfWork.Sellers.GetByIdAsync(product.SellerId);
+            if (seller is null) return;
+
+            var name = ShortName(customer?.User.FirstName, customer?.User.LastName);
+
+            var message = $"حصل «{product.Name}» على تقييم {review.Rating} من 5 من {name}";
+            if (!string.IsNullOrWhiteSpace(review.Comment))
+                message += $": «{Truncate(review.Comment, 60)}»";
+
+            await _notificationService.CreateAndSendAsync(
+                seller.UserId,
+                "تقييم جديد ⭐",
+                message,
+                $"/products/{product.Id}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "تعذر إرسال إشعار التقييم للبائع {SellerId}", product.SellerId);
+        }
+    }
+
+    // أول اسم + أول حرف من الاسم التاني (نفس طريقة العرض في الموقع)
+    private static string ShortName(string? first, string? last)
+    {
+        var firstName = first?.Trim() ?? string.Empty;
+        var lastInitial = string.IsNullOrWhiteSpace(last) ? string.Empty : $" {last.Trim()[0]}.";
+        var name = $"{firstName}{lastInitial}".Trim();
+
+        return name.Length == 0 ? "عميل" : name;
+    }
+
+    private static string Truncate(string text, int max)
+    {
+        var clean = text.Trim().ReplaceLineEndings(" ");
+        return clean.Length <= max ? clean : clean[..max].TrimEnd() + "…";
     }
 }

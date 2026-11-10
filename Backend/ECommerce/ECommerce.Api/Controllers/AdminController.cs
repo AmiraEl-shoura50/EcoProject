@@ -12,10 +12,19 @@ namespace ECommerce.API.Controllers;
 public class AdminController : ControllerBase
 {
     private readonly IAdminService _adminService;
+    private readonly IDashboardService _dashboardService;
 
-    public AdminController(IAdminService adminService)
+    public AdminController(IAdminService adminService, IDashboardService dashboardService)
     {
         _adminService = adminService;
+        _dashboardService = dashboardService;
+    }
+
+    [HttpGet("dashboard")]
+    public async Task<IActionResult> GetDashboard([FromQuery] int tzOffset = 0)
+    {
+        var dashboard = await _dashboardService.GetAdminAsync(Math.Clamp(tzOffset, -840, 840));
+        return Ok(dashboard);
     }
 
     [HttpGet("users")]

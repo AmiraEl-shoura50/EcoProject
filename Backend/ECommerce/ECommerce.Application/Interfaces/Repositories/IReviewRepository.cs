@@ -12,5 +12,6 @@ public interface IReviewRepository : IGenericRepository<Review>
 
     Task<Dictionary<int, int>> GetDistributionAsync(int productId); // نجوم → عدد
     Task<List<(int OrderId, int ProductId)>> GetReviewedItemsAsync(int customerId, IReadOnlyCollection<int> orderIds);
+    Task<(double Average, int Count)> GetSellerStatsAsync(int sellerId);
 
 }

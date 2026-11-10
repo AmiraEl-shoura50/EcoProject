@@ -9,13 +9,20 @@
         <ul class="flex lg:flex-col gap-2 overflow-x-auto no-scrollbar lg:overflow-visible bg-white rounded-2xl border border-gray-100 shadow-sm p-2">
           @for (link of links; track link.path) {
             <li class="shrink-0 lg:shrink">
-              <a
+                            <a
                 [routerLink]="link.path"
                 routerLinkActive="bg-brand-black text-white"
+                [routerLinkActiveOptions]="{ exact: link.exact }"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-brand-black hover:text-brand-gold transition-colors whitespace-nowrap"
               >
                 <lucide-angular [img]="link.icon" [size]="18"></lucide-angular>
                 {{ link.label }}
+
+                @if (link.badge && messageService.unreadCount() > 0) {
+                  <span class="ms-auto bg-red-500 text-white text-[10px] font-bold min-w-5 h-5 px-1.5 rounded-full flex items-center justify-center">
+                    {{ messageService.unreadCount() > 99 ? '99+' : messageService.unreadCount() }}
+                  </span>
+                }
               </a>
             </li>
           }

@@ -30,6 +30,7 @@ namespace ECommerce.Infrastructure.Persistence
         public DbSet<PaymentProof> PaymentProofs { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<ContactMessage> ContactMessages { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {

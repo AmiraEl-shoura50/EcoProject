@@ -95,7 +95,18 @@ namespace E_commerce
                     });
 
                 });
+                // ✅ سياسة نموذج التواصل: 3 رسائل كل 10 دقائق لكل IP
+                options.AddPolicy("ContactPolicy", httpContext =>
+                {
+                    var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
+                    return RateLimitPartition.GetFixedWindowLimiter(ipAddress, _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 3,
+                        Window = TimeSpan.FromMinutes(10),
+                        QueueLimit = 0
+                    });
+                });
                 // ✅ سياسة صارمة خاصة بالـ Auth (Login/Register)
                 options.AddPolicy("AuthPolicy", httpContext =>
                 {

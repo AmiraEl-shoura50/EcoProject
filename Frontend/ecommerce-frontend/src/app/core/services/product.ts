@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
-import { DeleteProductsResult, PaginatedResult, Product, ProductQueryParams } from '../models/product.model';
+import { DeleteProductsResult, PaginatedResult, Product, ProductQueryParams, StockSummary } from '../models/product.model';
 
 @Injectable({
   providedIn: 'root'
@@ -73,5 +73,8 @@ export class ProductService {
     });
 
     return httpParams;
+  }
+    getStockSummary(): Observable<ApiResponse<StockSummary>> {
+    return this.http.get<ApiResponse<StockSummary>>(`${this.apiUrl}/mine/stock-summary`);
   }
 }

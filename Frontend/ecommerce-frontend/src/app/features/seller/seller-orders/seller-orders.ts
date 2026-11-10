@@ -6,11 +6,12 @@ import { LucideAngularModule, X } from 'lucide-angular';
 import { OrderService } from '../../../core/services/order';
 import { ToastService } from '../../../core/services/toast';
 import { SellerOrder } from '../../../core/models/order.model';
+import { RouterLink, ActivatedRoute } from '@angular/router'; 
 
 @Component({
   selector: 'app-seller-orders',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, RouterLink],
   templateUrl: './seller-orders.html',
   styleUrl: './seller-orders.css'
 })
@@ -72,13 +73,22 @@ export class SellerOrders implements OnInit {
 
   constructor(
     private orderService: OrderService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    this.loadOrders();
-  }
+  this.loadOrders();
 
+  // لو جاي من بطاقة في النظرة العامة (?filter=review) نفتح على الفلتر ده
+  this.route.queryParamMap.subscribe(params => {
+    const key = params.get('filter');
+
+    if (key && this.filters.some(f => f.key === key)) {
+      this.filter.set(key);
+    }
+  });
+}
   statusLabel(status: string): string {
     return this.statusLabels[status] ?? status;
   }

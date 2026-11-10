@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ECommerce.Application.Constants;
 using ECommerce.Application.DTOs.Common;
 using ECommerce.Application.DTOs.Product;
 using ECommerce.Application.Interfaces.Repositories;
@@ -251,5 +252,12 @@ public class ProductService : IProductService
             PageSize = queryParams.PageSize,
             TotalCount = ordered.Count
         };
+    }
+    public async Task<StockSummaryDto> GetStockSummaryAsync(int sellerId)
+    {
+        var (outOfStock, lowStock) = await _unitOfWork.Products
+            .GetStockSummaryForSellerAsync(sellerId, StockRules.LowStockThreshold);
+
+        return new StockSummaryDto { OutOfStock = outOfStock, LowStock = lowStock };
     }
 }

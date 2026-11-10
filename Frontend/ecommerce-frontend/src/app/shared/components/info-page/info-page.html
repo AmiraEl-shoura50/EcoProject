@@ -1,0 +1,44 @@
+<div class="bg-brand-cream min-h-screen">
+
+  <section class="bg-brand-black text-white py-12 px-4">
+    <div class="max-w-3xl mx-auto text-center">
+
+      <nav class="flex items-center justify-center gap-1.5 text-xs text-white/60 mb-4" aria-label="المسار">
+        <a routerLink="/" class="hover:text-brand-gold transition-colors">الرئيسية</a>
+        <lucide-angular [img]="ChevronIcon" [size]="12"></lucide-angular>
+        <span class="text-white/90">{{ title() }}</span>
+      </nav>
+
+      <h1 class="font-serif text-3xl sm:text-4xl mb-2">{{ title() }}</h1>
+
+      @if (subtitle()) {
+        <p class="text-gray-300 text-sm sm:text-base">{{ subtitle() }}</p>
+      }
+
+    </div>
+  </section>
+
+  <section
+    class="mx-auto px-4 sm:px-6 py-10"
+    [class.max-w-3xl]="!wide()"
+    [class.max-w-5xl]="wide()"
+  >
+
+    <ng-content></ng-content>
+
+    @if (showContactCta()) {
+      <div class="mt-8 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-center">
+        <p class="text-brand-black font-medium mb-1">محتاج مساعدة إضافية؟</p>
+        <p class="text-sm text-brand-brown mb-4">فريقنا جاهز للرد على استفسارك</p>
+        <a
+          routerLink="/contact"
+          class="inline-block bg-brand-black text-white text-sm px-6 py-2.5 rounded-lg hover:bg-brand-gold transition-colors"
+        >
+          تواصل معنا
+        </a>
+      </div>
+    }
+
+  </section>
+
+</div>

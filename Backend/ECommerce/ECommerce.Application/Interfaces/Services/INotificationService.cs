@@ -5,7 +5,7 @@ namespace ECommerce.Application.Interfaces.Services;
 
 public interface INotificationService
 {
-    Task CreateAndSendAsync(Guid userId, string title, string message);
+    Task CreateAndSendAsync(Guid userId, string title, string message, string? link = null);
     Task<PaginatedResultDto<NotificationDto>> GetMyNotificationsAsync(Guid userId, int pageNumber, int pageSize);
     Task<int> GetUnreadCountAsync(Guid userId);
     Task<bool> MarkAsReadAsync(int notificationId, Guid userId);

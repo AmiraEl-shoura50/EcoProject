@@ -1,6 +1,121 @@
 [
   {
     "ContainingType": "ECommerce.API.Controllers.AdminController",
+    "Method": "GetDashboard",
+    "RelativePath": "api/admin/dashboard",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tzOffset",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AdminMessagesController",
+    "Method": "GetAll",
+    "RelativePath": "api/admin/messages",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "filter",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "search",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AdminMessagesController",
+    "Method": "Delete",
+    "RelativePath": "api/admin/messages/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AdminMessagesController",
+    "Method": "MarkRead",
+    "RelativePath": "api/admin/messages/{id}/read",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AdminMessagesController",
+    "Method": "MarkUnread",
+    "RelativePath": "api/admin/messages/{id}/unread",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AdminMessagesController",
+    "Method": "MarkAllRead",
+    "RelativePath": "api/admin/messages/read-all",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AdminMessagesController",
+    "Method": "GetUnreadCount",
+    "RelativePath": "api/admin/messages/unread-count",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AdminController",
     "Method": "GetUsers",
     "RelativePath": "api/admin/users",
     "HttpMethod": "GET",
@@ -390,6 +505,22 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.ContactController",
+    "Method": "Send",
+    "RelativePath": "api/contact",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "ECommerce.Application.DTOs.Contact.ContactMessageDto",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {
@@ -918,6 +1049,11 @@
         "IsRequired": false
       },
       {
+        "Name": "StockFilter",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
         "Name": "PageNumber",
         "Type": "System.Int32",
         "IsRequired": false
@@ -1104,6 +1240,11 @@
         "IsRequired": false
       },
       {
+        "Name": "StockFilter",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
         "Name": "PageNumber",
         "Type": "System.Int32",
         "IsRequired": false
@@ -1114,6 +1255,16 @@
         "IsRequired": false
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.ProductsController",
+    "Method": "GetMyStockSummary",
+    "RelativePath": "api/Products/mine/stock-summary",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {
@@ -1152,6 +1303,11 @@
       {
         "Name": "SellerId",
         "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "StockFilter",
+        "Type": "System.String",
         "IsRequired": false
       },
       {
@@ -1259,6 +1415,16 @@
   },
   {
     "ContainingType": "ECommerce.API.Controllers.SellersController",
+    "Method": "GetMine",
+    "RelativePath": "api/Sellers/me",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.SellersController",
     "Method": "UpdateMyStore",
     "RelativePath": "api/Sellers/me",
     "HttpMethod": "PUT",
@@ -1273,6 +1439,27 @@
       {
         "Name": "Image",
         "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      },
+      {
+        "Name": "RemoveImage",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.SellersController",
+    "Method": "GetMyDashboard",
+    "RelativePath": "api/Sellers/me/dashboard",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tzOffset",
+        "Type": "System.Int32",
         "IsRequired": false
       }
     ],

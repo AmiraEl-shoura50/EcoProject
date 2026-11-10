@@ -52,3 +52,39 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+/* تنسيق نصوص الصفحات التعريفية (من نحن، السياسات...) */
+.info-prose section + section {
+  margin-top: 1.75rem;
+}
+
+.info-prose h2 {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  color: var(--color-brand-black);
+  margin-bottom: 0.5rem;
+}
+
+.info-prose p,
+.info-prose li {
+  font-size: 0.875rem;
+  line-height: 1.9;
+  color: #4b5563;
+}
+
+.info-prose ul,
+.info-prose ol {
+  margin-top: 0.5rem;
+  padding-inline-start: 1.25rem;
+}
+
+.info-prose ul { list-style: disc; }
+.info-prose ol { list-style: decimal; }
+
+.info-prose a {
+  color: var(--color-brand-gold);
+  font-weight: 500;
+}
+
+.info-prose a:hover {
+  text-decoration: underline;
+}

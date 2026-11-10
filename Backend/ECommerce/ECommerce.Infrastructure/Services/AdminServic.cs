@@ -116,4 +116,9 @@ public class AdminService : IAdminService
 
         return true;
     }
+    public async Task<List<Guid>> GetAdminIdsAsync()
+    {
+        var admins = await _userManager.GetUsersInRoleAsync(Roles.Admin);
+        return admins.Where(a => a.IsActive).Select(a => a.Id).ToList();
+    }
 }

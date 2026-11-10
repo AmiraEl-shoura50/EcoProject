@@ -96,6 +96,8 @@ public static class DependencyInjection
         services.AddHttpClient<IPaymentGatewayService, PaymobGatewayService>();
         // background service for order cleanup
         services.AddHostedService<OrderCleanupBackgroundService>();
+
+        services.Configure<ContactSettings>(configuration.GetSection("Contact"));
         return services;
     }
 }

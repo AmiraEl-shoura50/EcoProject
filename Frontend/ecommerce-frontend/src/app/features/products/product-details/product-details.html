@@ -48,8 +48,14 @@
             </button>
           }
 
-          <p class="text-sm text-brand-brown mb-4">
-            بائع: <span class="text-brand-black font-medium">{{ product()!.sellerStoreName }}</span>
+                   <p class="text-sm text-brand-brown mb-4">
+            بائع:
+            <a
+              [routerLink]="['/store', product()!.sellerId]"
+              class="text-brand-black font-medium hover:text-brand-gold hover:underline transition-colors"
+            >
+              {{ product()!.sellerStoreName }}
+            </a>
           </p>
 
          @if (product()!.discountedPrice) {

@@ -17,4 +17,5 @@ public interface IProductService
     Task<DeleteProductsResultDto> DeleteManyAsync(List<int> productIds, int sellerId);
 
     Task<PaginatedResultDto<ProductDto>> GetOffersAsync(ProductQueryParams queryParams);
+    Task<StockSummaryDto> GetStockSummaryAsync(int sellerId);
 }

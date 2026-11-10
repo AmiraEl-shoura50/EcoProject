@@ -5,6 +5,29 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/admin/dashboard": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "tzOffset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/admin/users": {
       "get": {
         "tags": [
@@ -109,6 +132,145 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/messages": {
+      "get": {
+        "tags": [
+          "AdminMessages"
+        ],
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/messages/unread-count": {
+      "get": {
+        "tags": [
+          "AdminMessages"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/messages/{id}/read": {
+      "put": {
+        "tags": [
+          "AdminMessages"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/messages/{id}/unread": {
+      "put": {
+        "tags": [
+          "AdminMessages"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/messages/read-all": {
+      "put": {
+        "tags": [
+          "AdminMessages"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/messages/{id}": {
+      "delete": {
+        "tags": [
+          "AdminMessages"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -651,6 +813,37 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/contact": {
+      "post": {
+        "tags": [
+          "Contact"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactMessageDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactMessageDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactMessageDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -1494,6 +1687,13 @@
             }
           },
           {
+            "name": "StockFilter",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "PageNumber",
             "in": "query",
             "schema": {
@@ -1774,6 +1974,13 @@
             }
           },
           {
+            "name": "StockFilter",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "PageNumber",
             "in": "query",
             "schema": {
@@ -1850,6 +2057,13 @@
             }
           },
           {
+            "name": "StockFilter",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "PageNumber",
             "in": "query",
             "schema": {
@@ -1865,6 +2079,18 @@
               "format": "int32"
             }
           }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Products/mine/stock-summary": {
+      "get": {
+        "tags": [
+          "Products"
         ],
         "responses": {
           "200": {
@@ -2015,6 +2241,16 @@
       }
     },
     "/api/Sellers/me": {
+      "get": {
+        "tags": [
+          "Sellers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
       "put": {
         "tags": [
           "Sellers"
@@ -2031,6 +2267,9 @@
                   "Image": {
                     "type": "string",
                     "format": "binary"
+                  },
+                  "RemoveImage": {
+                    "type": "boolean"
                   }
                 }
               },
@@ -2040,11 +2279,37 @@
                 },
                 "Image": {
                   "style": "form"
+                },
+                "RemoveImage": {
+                  "style": "form"
                 }
               }
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Sellers/me/dashboard": {
+      "get": {
+        "tags": [
+          "Sellers"
+        ],
+        "parameters": [
+          {
+            "name": "tzOffset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -2153,6 +2418,28 @@
             "nullable": true
           },
           "newPassword": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContactMessageDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "subject": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
             "type": "string",
             "nullable": true
           }
@@ -2451,6 +2738,9 @@
       "name": "Admin"
     },
     {
+      "name": "AdminMessages"
+    },
+    {
       "name": "Auth"
     },
     {
@@ -2458,6 +2748,9 @@
     },
     {
       "name": "Categories"
+    },
+    {
+      "name": "Contact"
     },
     {
       "name": "Customers"

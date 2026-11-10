@@ -1,5 +1,6 @@
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, Subscription, debounceTime, distinctUntilChanged, map } from 'rxjs';
@@ -7,8 +8,18 @@ import { LucideAngularModule, Plus, Pencil, Trash2, X, Search, ImagePlus } from 
 import { ProductService } from '../../../core/services/product';
 import { CategoryService } from '../../../core/services/category';
 import { ToastService } from '../../../core/services/toast';
-import { Product } from '../../../core/models/product.model';
+import { Product, StockSummary } from '../../../core/models/product.model';
 import { Category } from '../../../core/models/category.model';
+
+type StockFilter = 'all' | 'attention' | 'low' | 'out';
+
+interface StockTab {
+  key: StockFilter;
+  label: string;
+  count: number | null;
+}
+
+const STOCK_FILTERS: StockFilter[] = ['all', 'attention', 'low', 'out'];
 
 @Component({
   selector: 'app-seller-products',
@@ -33,6 +44,21 @@ export class SellerProducts implements OnInit {
   // ---- البحث المباشر ----
   searchTerm = signal<string>('');
   private search$ = new Subject<string>();
+
+  // ---- فلتر المخزون ----
+  stockFilter = signal<StockFilter>('all');
+  stockSummary = signal<StockSummary | null>(null);
+
+  stockTabs = computed<StockTab[]>(() => {
+    const summary = this.stockSummary();
+
+    return [
+      { key: 'all', label: 'كل المنتجات', count: null },
+      { key: 'attention', label: 'يحتاج انتباه', count: summary ? summary.lowStock + summary.outOfStock : null },
+      { key: 'low', label: 'قاربت على النفاد', count: summary ? summary.lowStock : null },
+      { key: 'out', label: 'نفذت', count: summary ? summary.outOfStock : null }
+    ];
+  });
 
   // ---- التحديد والحذف ----
   selectedIds = signal<number[]>([]);
@@ -65,6 +91,7 @@ export class SellerProducts implements OnInit {
 
   constructor(
     private fb: FormBuilder,
+    private route: ActivatedRoute,
     private productService: ProductService,
     private categoryService: CategoryService,
     private toastService: ToastService
@@ -79,7 +106,14 @@ export class SellerProducts implements OnInit {
   }
 
   ngOnInit(): void {
+    // لو جاي من بطاقة المخزون في النظرة العامة (?stock=attention) نفتح على الفلتر ده
+    const stock = this.route.snapshot.queryParamMap.get('stock');
+    if (stock && (STOCK_FILTERS as string[]).includes(stock)) {
+      this.stockFilter.set(stock as StockFilter);
+    }
+
     this.loadProducts();
+    this.loadStockSummary();
 
     this.categoryService.getTree().subscribe({
       next: (response) => this.categories.set(response.data)
@@ -109,6 +143,16 @@ export class SellerProducts implements OnInit {
   clearSearch(): void {
     this.searchTerm.set('');
     this.search$.next('');
+  }
+
+  // ---- فلتر المخزون ----
+  setStockFilter(filter: StockFilter): void {
+    if (this.stockFilter() === filter) return;
+
+    this.stockFilter.set(filter);
+    this.currentPage.set(1);
+    this.selectedIds.set([]);
+    this.loadProducts();
   }
 
   // ---- التحديد ----
@@ -146,6 +190,7 @@ export class SellerProducts implements OnInit {
         this.toastService.show(message, 'success');
 
         this.loadProducts();
+        this.loadStockSummary();
       },
       error: () => this.isDeletingMany.set(false)
     });
@@ -160,15 +205,25 @@ export class SellerProducts implements OnInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  private loadStockSummary(): void {
+    this.productService.getStockSummary().subscribe({
+      next: (response) => this.stockSummary.set(response.data)
+    });
+  }
+
   private loadProducts(): void {
     this.productsRequest?.unsubscribe(); // نلغي أي بحث قديم لسه شغال
     this.isLoading.set(true);
+
+    const filter = this.stockFilter();
 
     this.productsRequest = this.productService.getMine({
       searchTerm: this.searchTerm().trim(),
       pageNumber: this.currentPage(),
       pageSize: this.pageSize,
-      sortBy: 'newest'
+      // مع فلتر المخزون: الأقل مخزونًا الأول
+      sortBy: filter === 'all' ? 'newest' : 'stock_asc',
+      stockFilter: filter === 'all' ? undefined : filter
     }).subscribe({
       next: (response) => {
         const result = response.data;
@@ -273,6 +328,7 @@ export class SellerProducts implements OnInit {
 
         if (!editing) this.currentPage.set(1); // الجديد بيظهر في الأول
         this.loadProducts();
+        this.loadStockSummary(); // الكمية ممكن تكون اتغيّرت
       },
       error: () => this.isSaving.set(false)
     });
@@ -290,6 +346,7 @@ export class SellerProducts implements OnInit {
         this.selectedIds.update(ids => ids.filter(id => id !== product.id));
         this.toastService.show('تم حذف المنتج بنجاح', 'success');
         this.loadProducts();
+        this.loadStockSummary();
       },
       error: () => this.deletingId.set(null)
     });

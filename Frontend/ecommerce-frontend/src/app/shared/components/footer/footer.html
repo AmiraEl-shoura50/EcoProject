@@ -1,4 +1,4 @@
-<footer class="bg-brand-black text-white ">
+<footer class="bg-brand-black text-white mt-20">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
@@ -11,17 +11,26 @@
         <p class="text-sm text-gray-400 leading-relaxed mb-5">
           وجهتك الأولى للتسوق الأونلاين، منتجات متنوعة من بائعين موثوقين في مكان واحد.
         </p>
-        <div class="flex items-center gap-4">
-          <a href="#" class="text-gray-400 hover:text-brand-gold transition-colors">
-            <lucide-angular [img]="FacebookIcon" [size]="18"></lucide-angular>
-          </a>
-          <a href="#" class="text-gray-400 hover:text-brand-gold transition-colors">
-            <lucide-angular [img]="InstagramIcon" [size]="18"></lucide-angular>
-          </a>
-          <a href="#" class="text-gray-400 hover:text-brand-gold transition-colors">
-            <lucide-angular [img]="TwitterIcon" [size]="18"></lucide-angular>
-          </a>
-        </div>
+
+        @if (site.social.facebook || site.social.instagram || site.social.twitter) {
+          <div class="flex items-center gap-4">
+            @if (site.social.facebook) {
+              <a [href]="site.social.facebook" target="_blank" rel="noopener noreferrer" aria-label="فيسبوك" class="text-gray-400 hover:text-brand-gold transition-colors">
+                <lucide-angular [img]="FacebookIcon" [size]="18"></lucide-angular>
+              </a>
+            }
+            @if (site.social.instagram) {
+              <a [href]="site.social.instagram" target="_blank" rel="noopener noreferrer" aria-label="إنستجرام" class="text-gray-400 hover:text-brand-gold transition-colors">
+                <lucide-angular [img]="InstagramIcon" [size]="18"></lucide-angular>
+              </a>
+            }
+            @if (site.social.twitter) {
+              <a [href]="site.social.twitter" target="_blank" rel="noopener noreferrer" aria-label="إكس (تويتر)" class="text-gray-400 hover:text-brand-gold transition-colors">
+                <lucide-angular [img]="TwitterIcon" [size]="18"></lucide-angular>
+              </a>
+            }
+          </div>
+        }
       </div>
 
       <!-- روابط سريعة -->
@@ -36,11 +45,11 @@
 
       <!-- خدمة العملاء -->
       <div>
-        <h4 class="text-sm font-semibold mb-4 text-gray-200">روابط هامة</h4>
+        <h4 class="text-sm font-semibold mb-4 text-gray-200">خدمة العملاء</h4>
         <ul class="space-y-3 text-sm text-gray-400">
           <li><a routerLink="/faq" class="hover:text-brand-gold transition-colors">الأسئلة الشائعة</a></li>
           <li><a routerLink="/shipping-policy" class="hover:text-brand-gold transition-colors">الشحن والتوصيل</a></li>
-          <li><a routerLink="/return-policy" class="hover:text-brand-gold transition-colors">سياسة الإرجاع</a></li>
+          <li><a routerLink="/return-policy" class="hover:text-brand-gold transition-colors">الإرجاع والإلغاء</a></li>
         </ul>
       </div>
 
@@ -48,17 +57,17 @@
       <div>
         <h4 class="text-sm font-semibold mb-4 text-gray-200">تواصل معنا</h4>
         <ul class="space-y-3 text-sm text-gray-400">
-          <!-- <li class="flex items-center gap-2">
-            <lucide-angular [img]="PhoneIcon" [size]="16"></lucide-angular>
-            <span dir="ltr">+20 100 000 0000</span>
-          </li> -->
           <li class="flex items-center gap-2">
-            <lucide-angular [img]="MailIcon" [size]="16"></lucide-angular>
-            <span>support&#64;smartshop.com</span>
+            <lucide-angular [img]="PhoneIcon" [size]="16" class="shrink-0"></lucide-angular>
+            <a [href]="phoneHref" dir="ltr" class="hover:text-brand-gold transition-colors">{{ site.contact.phone }}</a>
           </li>
           <li class="flex items-center gap-2">
-            <lucide-angular [img]="MapPinIcon" [size]="16"></lucide-angular>
-            <span>الغربية، مصر</span>
+            <lucide-angular [img]="MailIcon" [size]="16" class="shrink-0"></lucide-angular>
+            <a [href]="'mailto:' + site.contact.email" class="hover:text-brand-gold transition-colors break-all">{{ site.contact.email }}</a>
+          </li>
+          <li class="flex items-center gap-2">
+            <lucide-angular [img]="MapPinIcon" [size]="16" class="shrink-0"></lucide-angular>
+            <span>{{ site.contact.address }}</span>
           </li>
         </ul>
       </div>

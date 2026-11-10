@@ -1,0 +1,148 @@
+<div>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <h2 class="font-serif text-2xl text-brand-black">متجري</h2>
+
+    @if (profile(); as p) {
+      <a
+        [routerLink]="['/store', p.id]"
+        target="_blank"
+        class="flex items-center gap-2 text-sm text-brand-gold border border-brand-gold px-4 py-2 rounded-lg hover:bg-brand-gold hover:text-white transition-colors"
+      >
+        <lucide-angular [img]="LinkIcon" [size]="16"></lucide-angular>
+        عرض متجرك للعملاء
+      </a>
+    }
+  </div>
+
+  @if (isLoading()) {
+
+    <div class="space-y-4 animate-pulse">
+      <div class="bg-white rounded-2xl h-28"></div>
+      <div class="bg-white rounded-2xl h-72"></div>
+    </div>
+
+  } @else if (profile()) {
+
+    <!-- الإحصائيات -->
+    <div class="grid grid-cols-3 gap-3 mb-6">
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-center">
+        <p class="text-xs text-brand-brown mb-1">التقييم</p>
+        @if (profile()!.reviewsCount > 0) {
+          <p class="font-serif text-2xl text-brand-black">{{ profile()!.rating | number:'1.1-1' }}</p>
+          <div class="flex justify-center mt-1">
+            <app-stars [value]="profile()!.rating" [size]="13"></app-stars>
+          </div>
+        } @else {
+          <p class="text-sm text-gray-400 mt-2">لا يوجد بعد</p>
+        }
+      </div>
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-center">
+        <p class="text-xs text-brand-brown mb-1">عدد التقييمات</p>
+        <p class="font-serif text-2xl text-brand-black">{{ profile()!.reviewsCount }}</p>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-center">
+        <p class="text-xs text-brand-brown mb-1">عدد المنتجات</p>
+        <p class="font-serif text-2xl text-brand-black">{{ profile()!.productsCount }}</p>
+      </div>
+
+    </div>
+
+    <!-- بيانات المتجر -->
+    <form [formGroup]="form" (ngSubmit)="save()" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
+
+      <h3 class="font-serif text-lg text-brand-black">بيانات المتجر</h3>
+
+      <!-- الصورة -->
+      <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+
+        <div class="w-24 h-24 shrink-0 rounded-full overflow-hidden bg-brand-cream border border-gray-200 flex items-center justify-center">
+          @if (shownImage(); as image) {
+            <img [src]="image" alt="صورة المتجر" class="w-full h-full object-cover" />
+          } @else {
+            <span class="font-serif text-4xl text-brand-gold">{{ profile()!.storeName.charAt(0) }}</span>
+          }
+        </div>
+
+        <div>
+          <p class="text-sm font-medium text-brand-black mb-2">صورة المتجر</p>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="cursor-pointer inline-flex items-center gap-2 text-sm text-brand-black border border-gray-300 px-4 py-2 rounded-lg hover:border-brand-gold hover:text-brand-gold transition-colors">
+              <lucide-angular [img]="ImageIcon" [size]="16"></lucide-angular>
+              {{ shownImage() ? 'تغيير الصورة' : 'اختيار صورة' }}
+              <input type="file" accept="image/*" (change)="onFileSelected($event)" class="hidden" />
+            </label>
+
+            @if (shownImage()) {
+              <button
+                type="button"
+                (click)="removeLogo()"
+                class="inline-flex items-center gap-2 text-sm text-red-500 border border-red-200 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors"
+              >
+                <lucide-angular [img]="TrashIcon" [size]="16"></lucide-angular>
+                حذف الصورة
+              </button>
+            }
+
+            @if (removeImage()) {
+              <button type="button" (click)="undoRemove()" class="text-sm text-brand-gold hover:underline">
+                تراجع عن الحذف
+              </button>
+            }
+          </div>
+
+          <p class="text-xs text-gray-400 mt-2">صورة مربعة أفضل، حتى 5 ميجابايت</p>
+        </div>
+
+      </div>
+
+      <!-- الاسم -->
+      <div>
+        <label class="block text-sm text-brand-black mb-1.5 font-medium">اسم المتجر</label>
+        <input
+          type="text"
+          formControlName="storeName"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+        />
+        @if (form.get('storeName')?.invalid && form.get('storeName')?.touched) {
+          <p class="text-red-500 text-xs mt-1.5">اسم المتجر مطلوب (حتى 150 حرف)</p>
+        }
+        <p class="text-xs text-gray-400 mt-1.5">بيظهر للعملاء في صفحة كل منتج وفي صفحة متجرك</p>
+      </div>
+
+      <!-- بيانات الحساب: للقراءة فقط -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-brand-cream rounded-xl p-4">
+        <div>
+          <p class="text-xs text-brand-brown mb-0.5">صاحب الحساب</p>
+          <p class="text-sm font-medium text-brand-black">{{ profile()!.firstName }} {{ profile()!.lastName }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-brand-brown mb-0.5">البريد الإلكتروني</p>
+          <p class="text-sm font-medium text-brand-black break-all">{{ profile()!.email }}</p>
+        </div>
+        <p class="sm:col-span-2 text-xs text-gray-400">بيانات الحساب دي مش بتظهر للعملاء</p>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="isSaving() || !hasChanges()"
+        class="bg-brand-black text-white text-sm px-6 py-3 rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {{ isSaving() ? 'جاري الحفظ...' : 'حفظ التعديلات' }}
+      </button>
+
+    </form>
+
+  } @else {
+
+    <div class="bg-white rounded-2xl border border-gray-100 text-center py-14 px-4">
+      <p class="text-brand-brown">تعذر تحميل بيانات المتجر</p>
+    </div>
+
+  }
+
+</div>

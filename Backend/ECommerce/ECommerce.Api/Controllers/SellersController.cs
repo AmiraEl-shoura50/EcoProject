@@ -13,21 +13,52 @@ namespace ECommerce.API.Controllers;
 public class SellersController : ControllerBase
 {
     private readonly ISellerService _sellerService;
+    private readonly IDashboardService _dashboardService;
     private readonly IUnitOfWork _unitOfWork;
 
-    public SellersController(ISellerService sellerService, IUnitOfWork unitOfWork)
+    public SellersController(
+        ISellerService sellerService,
+        IDashboardService dashboardService,
+        IUnitOfWork unitOfWork)
     {
         _sellerService = sellerService;
+        _dashboardService = dashboardService;
         _unitOfWork = unitOfWork;
     }
 
-    [HttpGet("{id}")]
+    // عام: بيانات المتجر من غير أي معلومات شخصية
+    [HttpGet("{id:int}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetById(int id)
     {
         var seller = await _sellerService.GetByIdAsync(id);
         if (seller is null) return NotFound();
         return Ok(seller);
+    }
+
+    // خاص: بيانات متجري أنا
+    [HttpGet("me")]
+    [Authorize(Roles = Roles.Seller)]
+    public async Task<IActionResult> GetMine()
+    {
+        var sellerId = await GetCurrentSellerIdAsync();
+        if (sellerId is null) return Forbid();
+
+        var seller = await _sellerService.GetMineAsync(sellerId.Value);
+        if (seller is null) return NotFound();
+        return Ok(seller);
+    }
+
+    // نظرة عامة على متجري: tzOffset هو فرق توقيت المتصفح بالدقايق (JavaScript getTimezoneOffset)
+    [HttpGet("me/dashboard")]
+    [Authorize(Roles = Roles.Seller)]
+    public async Task<IActionResult> GetMyDashboard([FromQuery] int tzOffset = 0)
+    {
+        var sellerId = await GetCurrentSellerIdAsync();
+        if (sellerId is null) return Forbid();
+
+        var dashboard = await _dashboardService.GetSellerAsync(sellerId.Value, Math.Clamp(tzOffset, -840, 840));
+        return Ok(dashboard);
     }
 
     [HttpPut("me")]
