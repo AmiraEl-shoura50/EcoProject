@@ -1,11 +1,10 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { DashboardService } from '../../../core/services/dashboard';
 import { SellerDashboardData } from '../../../core/models/dashboard.model';
 import { SalesChart } from '../../../shared/components/sales-chart/sales-chart';
 import { Stars } from '../../../shared/components/stars/stars';
-
+import { RouterLink, Params } from '@angular/router';
 type Tone = 'blue' | 'green' | 'indigo' | 'orange';
 
 interface AttentionCard {
@@ -15,7 +14,7 @@ interface AttentionCard {
   tone: Tone;
   urgent: boolean;
   link: string;
-  query: Record<string, string> | null;
+  query: Params | null;
 }
 
 @Component({

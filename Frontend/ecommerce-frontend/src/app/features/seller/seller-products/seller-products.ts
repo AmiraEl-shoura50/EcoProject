@@ -18,7 +18,7 @@ interface StockTab {
   label: string;
   count: number | null;
 }
-
+const MAX_STOCK = 1_000_000; // نفس حد الباك
 const STOCK_FILTERS: StockFilter[] = ['all', 'attention', 'low', 'out'];
 
 @Component({
@@ -49,9 +49,17 @@ export class SellerProducts implements OnInit {
   stockFilter = signal<StockFilter>('all');
   stockSummary = signal<StockSummary | null>(null);
 
+  // ---- التعديل السريع للكمية ----
+  stockEditId = signal<number | null>(null);
+  stockMode = signal<'add' | 'set'>('add');
+  stockValue = signal<number | null>(null);
+  isSavingStock = signal<boolean>(false);
+
   stockTabs = computed<StockTab[]>(() => {
     const summary = this.stockSummary();
 
+
+    
     return [
       { key: 'all', label: 'كل المنتجات', count: null },
       { key: 'attention', label: 'يحتاج انتباه', count: summary ? summary.lowStock + summary.outOfStock : null },
@@ -349,6 +357,64 @@ export class SellerProducts implements OnInit {
         this.loadStockSummary();
       },
       error: () => this.deletingId.set(null)
+    });
+  }
+
+    openStockEdit(product: Product): void {
+    this.stockEditId.set(product.id);
+    this.stockMode.set('add');
+    this.stockValue.set(null);
+  }
+
+  closeStockEdit(): void {
+    this.stockEditId.set(null);
+  }
+
+  onStockInput(raw: string): void {
+    const text = raw.trim();
+    this.stockValue.set(text === '' ? null : Number(text));
+  }
+
+  // الكمية بعد التحديث (معاينة قبل الحفظ)
+  previewStock(product: Product): number | null {
+    const value = this.stockValue();
+    if (value === null || !Number.isFinite(value)) return null;
+
+    return this.stockMode() === 'add' ? product.stockQuantity + value : value;
+  }
+
+  canSaveStock(): boolean {
+    const value = this.stockValue();
+    if (value === null || !Number.isInteger(value)) return false;
+
+    return this.stockMode() === 'add'
+      ? value >= 1 && value <= MAX_STOCK
+      : value >= 0 && value <= MAX_STOCK;
+  }
+
+  saveStock(product: Product): void {
+    const value = this.stockValue();
+    if (!this.canSaveStock() || value === null) return;
+
+    this.isSavingStock.set(true);
+
+    this.productService.updateStock(product.id, this.stockMode(), value).subscribe({
+      next: (response) => {
+        const newQuantity = response.data.stockQuantity;
+
+        this.isSavingStock.set(false);
+        this.stockEditId.set(null);
+        this.toastService.show(`تم تحديث الكمية: ${newQuantity} قطعة`, 'success');
+
+        this.products.update(list =>
+          list.map(p => (p.id === product.id ? { ...p, stockQuantity: newQuantity } : p))
+        );
+        this.loadStockSummary();
+
+        // مع فلتر المخزون: المنتج ممكن يخرج من القائمة بعد التحديث
+        if (this.stockFilter() !== 'all') this.loadProducts();
+      },
+      error: () => this.isSavingStock.set(false) // رسالة الخطأ بتظهر من الـ Interceptor
     });
   }
 }

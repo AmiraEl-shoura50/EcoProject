@@ -1187,6 +1187,43 @@
   },
   {
     "ContainingType": "ECommerce.API.Controllers.ProductsController",
+    "Method": "UpdateStock",
+    "RelativePath": "api/Products/{id}/stock",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "ECommerce.Application.DTOs.Product.UpdateStockDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.ProductsController",
+    "Method": "GetBestSellers",
+    "RelativePath": "api/Products/best-sellers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "take",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.ProductsController",
     "Method": "GetByCategory",
     "RelativePath": "api/Products/category/{categoryId}",
     "HttpMethod": "GET",

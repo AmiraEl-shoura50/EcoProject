@@ -48,7 +48,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
-   [Authorize(Roles = Roles.Seller)]
+    [Authorize(Roles = Roles.Seller)]
     public async Task<IActionResult> Create([FromForm] CreateProductDto dto)
     {
         var sellerId = await GetCurrentSellerIdAsync();
@@ -127,5 +127,26 @@ public class ProductsController : ControllerBase
 
         var summary = await _productService.GetStockSummaryAsync(sellerId.Value);
         return Ok(summary);
+    }
+
+    [HttpPut("{id:int}/stock")]
+    [Authorize(Roles = Roles.Seller)]
+    public async Task<IActionResult> UpdateStock(int id, [FromBody] UpdateStockDto dto)
+    {
+        var sellerId = await GetCurrentSellerIdAsync();
+        if (sellerId is null) return Forbid();
+
+        var stock = await _productService.UpdateStockAsync(id, sellerId.Value, dto);
+        if (stock is null) return NotFound();
+
+        return Ok(new { stockQuantity = stock.Value });
+    }
+
+    [HttpGet("best-sellers")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetBestSellers([FromQuery] int take = 8)
+    {
+        var products = await _productService.GetBestSellersAsync(take);
+        return Ok(products);
     }
 }

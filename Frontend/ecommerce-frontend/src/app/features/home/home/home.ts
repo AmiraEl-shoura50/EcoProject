@@ -28,6 +28,7 @@ export class Home implements OnInit , OnDestroy {
   categories = signal<Category[]>([]);
   latestReviews = signal<LatestReview[]>([]);
   isLoading = signal<boolean>(true);
+  bestSellers = signal<Product[]>([]);
   skeletonItems = [1, 2, 3, 4, 5, 6, 7, 8];
   stars = [1, 2, 3, 4, 5];
   heroSlides = [
@@ -86,7 +87,7 @@ export class Home implements OnInit , OnDestroy {
     this.loadProducts();
     this.loadCategories();
     this.loadReviews();
-     this.startAutoplay();
+    this.loadBestSellers();this.startAutoplay();
   }
 ngOnDestroy(): void {
     this.stopAutoplay();
@@ -145,6 +146,11 @@ ngOnDestroy(): void {
       error: () => {
         this.isLoading.set(false);
       }
+    });
+  }
+    private loadBestSellers(): void {
+    this.productService.getBestSellers(8).subscribe({
+      next: (response) => this.bestSellers.set(response.data)
     });
   }
 }

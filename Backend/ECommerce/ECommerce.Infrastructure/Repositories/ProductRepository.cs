@@ -1,10 +1,11 @@
-﻿using ECommerce.Application.DTOs.Product;
+﻿using ECommerce.Application.Constants;
+using ECommerce.Application.DTOs.Product;
 using ECommerce.Application.Interfaces.Repositories;
 using ECommerce.Application.Pricing;
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Enums;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using ECommerce.Application.Constants;
 namespace ECommerce.Infrastructure.Repositories;
 
 public class ProductRepository : GenericRepository<Product>, IProductRepository
@@ -125,6 +126,58 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
             .Take(take)
             .ToListAsync();
 
+    // null لو المنتج مش موجود أو مش بتاع البائع ده
+    public async Task<int?> GetStockForSellerAsync(int productId, int sellerId)
+        => await _dbSet
+            .AsNoTracking()
+            .Where(p => p.Id == productId && p.SellerId == sellerId)
+            .Select(p => (int?)p.StockQuantity)
+            .FirstOrDefaultAsync();
+
+    // الإضافة بتتم جوه الداتابيز (Stock = Stock + X)، فمفيش طلب عميل بيتضيّع لو حصل في نفس اللحظة
+    public async Task<int> AddStockAsync(int productId, int sellerId, int delta)
+        => await _dbSet
+            .Where(p => p.Id == productId && p.SellerId == sellerId)
+            .ExecuteUpdateAsync(s => s.SetProperty(p => p.StockQuantity, p => p.StockQuantity + delta));
+
+    public async Task<int> SetStockAsync(int productId, int sellerId, int quantity)
+        => await _dbSet
+            .Where(p => p.Id == productId && p.SellerId == sellerId)
+            .ExecuteUpdateAsync(s => s.SetProperty(p => p.StockQuantity, quantity));
+
+    public async Task<List<Product>> GetBestSellersAsync(int take, DateTime sinceUtc)
+    {
+        // الترتيب والتجميع كله في الداتابيز: مجموع القطع المباعة لكل منتج
+        var top = await _context.OrderItems
+            .Where(i => i.Order.CreatedDate >= sinceUtc
+                        && (i.Order.Status == OrderStatus.Confirmed
+                            || i.Order.Status == OrderStatus.Shipped
+                            || i.Order.Status == OrderStatus.Delivered)
+                        && i.Product.StockQuantity > 0)
+            .GroupBy(i => i.ProductId)
+            .Select(g => new { ProductId = g.Key, Sold = g.Sum(i => i.Quantity) })
+            .OrderByDescending(x => x.Sold)
+            .ThenBy(x => x.ProductId)
+            .Take(take)
+            .ToListAsync();
+
+        var ids = top.Select(x => x.ProductId).ToList();
+
+        var products = await _dbSet
+            .AsNoTracking()
+            .Include(p => p.Category)
+            .Include(p => p.Seller)
+            .Where(p => ids.Contains(p.Id))
+            .ToListAsync();
+
+        // نرجّعهم بترتيب الأكثر مبيعًا
+        return ids
+            .Select(id => products.FirstOrDefault(p => p.Id == id))
+            .OfType<Product>()
+            .ToList();
+    }
 }
+
+
 
 

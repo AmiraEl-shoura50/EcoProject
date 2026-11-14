@@ -18,4 +18,10 @@ public interface IProductRepository : IGenericRepository<Product>
     Task<int> CountBySellerAsync(int sellerId);
     Task<(int OutOfStock, int LowStock)> GetStockSummaryForSellerAsync(int sellerId, int lowThreshold);
     Task<List<Product>> GetLowStockForSellerAsync(int sellerId, int lowThreshold, int take);
+    Task<int?> GetStockForSellerAsync(int productId, int sellerId);
+    Task<int> AddStockAsync(int productId, int sellerId, int delta);
+    Task<int> SetStockAsync(int productId, int sellerId, int quantity);
+
+    Task<List<Product>> GetBestSellersAsync(int take, DateTime sinceUtc);
+
 }

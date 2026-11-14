@@ -18,4 +18,7 @@ public interface IProductService
 
     Task<PaginatedResultDto<ProductDto>> GetOffersAsync(ProductQueryParams queryParams);
     Task<StockSummaryDto> GetStockSummaryAsync(int sellerId);
+    Task<int?> UpdateStockAsync(int productId, int sellerId, UpdateStockDto dto);
+
+    Task<IEnumerable<ProductDto>> GetBestSellersAsync(int take);
 }

@@ -323,6 +323,21 @@
           </a>
         }
 
+        <!-- ايقونة السلة في الهيدر  -->
+        @if (authService.userRole() === 'Customer') {
+          <a
+            routerLink="/cart"
+            class="md:hidden relative flex items-center justify-center w-10 h-10 rounded-lg text-brand-black hover:bg-brand-cream transition-colors"
+            aria-label="سلة المشتريات"
+          >
+            <lucide-angular [img]="CartIcon" [size]="22"></lucide-angular>
+            @if (cartService.itemsCount() > 0) {
+              <span class="absolute top-0.5 left-0.5 bg-brand-gold text-white text-[10px] font-bold min-w-4 h-4 px-1 rounded-full flex items-center justify-center">
+                {{ cartService.itemsCount() > 99 ? '99+' : cartService.itemsCount() }}
+              </span>
+            }
+          </a>
+        }
         <!-- ==================== Mobile Menu Button ==================== -->
         <button
           type="button"

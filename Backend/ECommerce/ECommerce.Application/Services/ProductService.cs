@@ -16,6 +16,7 @@ public class ProductService : IProductService
     private readonly IFileStorageService _fileStorageService;
     private readonly IPricingService _pricingService;
 
+    private const int BestSellersDays = 90;
     public ProductService(
         IUnitOfWork unitOfWork,
         IMapper mapper,
@@ -171,7 +172,7 @@ public class ProductService : IProductService
     }
 
     // بيحسب الخصم لكل المنتجات في استعلامين بس (الخصومات السارية والأقسام)
-   
+
     private async Task ApplyDiscountsAsync(IEnumerable<ProductDto> dtos)
     {
         var list = dtos.ToList();
@@ -259,5 +260,40 @@ public class ProductService : IProductService
             .GetStockSummaryForSellerAsync(sellerId, StockRules.LowStockThreshold);
 
         return new StockSummaryDto { OutOfStock = outOfStock, LowStock = lowStock };
+    }
+
+    // بترجّع الكمية الجديدة، أو null لو المنتج مش موجود أو مش بتاع البائع
+    public async Task<int?> UpdateStockAsync(int productId, int sellerId, UpdateStockDto dto)
+    {
+        var current = await _unitOfWork.Products.GetStockForSellerAsync(productId, sellerId);
+        if (current is null) return null;
+
+        if (dto.Mode == "add")
+        {
+            if ((long)current.Value + dto.Quantity > StockRules.MaxStock)
+                throw new InvalidOperationException("الكمية بعد الإضافة تتجاوز الحد الأقصى (1,000,000)");
+
+            await _unitOfWork.Products.AddStockAsync(productId, sellerId, dto.Quantity);
+        }
+        else
+        {
+            await _unitOfWork.Products.SetStockAsync(productId, sellerId, dto.Quantity);
+        }
+
+        // نقرا الكمية الفعلية من الداتابيز (مش من الحساب) عشان تشمل أي طلبات حصلت في نفس الوقت
+        return await _unitOfWork.Products.GetStockForSellerAsync(productId, sellerId);
+    }
+
+ 
+
+    public async Task<IEnumerable<ProductDto>> GetBestSellersAsync(int take)
+    {
+        take = Math.Clamp(take, 1, 20);
+
+        var products = await _unitOfWork.Products.GetBestSellersAsync(take, DateTime.UtcNow.AddDays(-BestSellersDays));
+        var dtos = _mapper.Map<List<ProductDto>>(products);
+        await ApplyDiscountsAsync(dtos);
+
+        return dtos;
     }
 }

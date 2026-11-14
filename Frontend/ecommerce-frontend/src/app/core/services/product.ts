@@ -77,4 +77,12 @@ export class ProductService {
     getStockSummary(): Observable<ApiResponse<StockSummary>> {
     return this.http.get<ApiResponse<StockSummary>>(`${this.apiUrl}/mine/stock-summary`);
   }
+    updateStock(id: number, mode: 'add' | 'set', quantity: number): Observable<ApiResponse<{ stockQuantity: number }>> {
+    return this.http.put<ApiResponse<{ stockQuantity: number }>>(`${this.apiUrl}/${id}/stock`, { mode, quantity });
+  }
+    getBestSellers(take: number = 8): Observable<ApiResponse<Product[]>> {
+    return this.http.get<ApiResponse<Product[]>>(`${this.apiUrl}/best-sellers`, {
+      params: { take }
+    });
+  }
 }
