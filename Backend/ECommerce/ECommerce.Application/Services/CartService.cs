@@ -22,6 +22,7 @@ public class CartService : ICartService
     public async Task<CartDto> GetByCustomerIdAsync(int customerId)
     {
         var cart = await GetOrCreateCartAsync(customerId);
+        var removedCount = await RemoveUnavailableItemsAsync(cart);
         var dto = _mapper.Map<CartDto>(cart);
 
         if (dto.Items.Count > 0)
@@ -39,7 +40,7 @@ public class CartService : ICartService
 
             dto.TotalPrice = dto.Items.Sum(i => i.Subtotal);
         }
-
+        dto.RemovedCount = removedCount;
         return dto;
     }
 
@@ -47,7 +48,7 @@ public class CartService : ICartService
     {
         var product = await _unitOfWork.Products.GetByIdAsync(dto.ProductId);
         if (product is null) return false;
-
+        if ((await _unitOfWork.Products.GetUnavailableIdsAsync(new[] { dto.ProductId })).Count > 0) return false;
         if (dto.Quantity <= 0 || dto.Quantity > product.StockQuantity) return false;
 
         var cart = await GetOrCreateCartAsync(customerId);
@@ -103,6 +104,20 @@ public class CartService : ICartService
         return true;
     }
 
+    // المنتجات اللي اتخفّت بتتشال من السلة تلقائيًا، وبترجّع عددها
+    private async Task<int> RemoveUnavailableItemsAsync(Cart cart)
+    {
+        if (cart.Items.Count == 0) return 0;
+
+        var unavailable = await _unitOfWork.Products.GetUnavailableIdsAsync(cart.Items.Select(i => i.ProductId).ToList());
+        if (unavailable.Count == 0) return 0;
+
+        var toRemove = cart.Items.Where(i => unavailable.Contains(i.ProductId)).ToList();
+        foreach (var item in toRemove) cart.Items.Remove(item);
+
+        await _unitOfWork.SaveChangesAsync();
+        return toRemove.Count;
+    }
     private async Task<Cart> GetOrCreateCartAsync(int customerId)
     {
         var cart = await _unitOfWork.Carts.GetByCustomerIdAsync(customerId);
@@ -114,4 +129,5 @@ public class CartService : ICartService
 
         return cart;
     }
+
 }

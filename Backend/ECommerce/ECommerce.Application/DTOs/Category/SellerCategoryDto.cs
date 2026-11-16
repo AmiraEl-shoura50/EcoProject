@@ -9,4 +9,6 @@ public class SellerCategoryDto
     public int? ParentCategoryId { get; set; }
     public string ParentCategoryName { get; set; } = string.Empty;
     public int ProductsCount { get; set; }
+    public bool IsHiddenBySeller { get; set; }
+    public bool IsHiddenByAdmin { get; set; }
 }

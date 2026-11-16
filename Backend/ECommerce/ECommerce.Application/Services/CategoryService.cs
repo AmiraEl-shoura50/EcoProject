@@ -37,23 +37,42 @@ public class CategoryService : ICategoryService
     public async Task<CategoryDto?> GetByIdAsync(int id)
     {
         var category = await _unitOfWork.Categories.GetByIdAsync(id);
-        return category is null ? null : _mapper.Map<CategoryDto>(category);
+        if (category is null || await IsHiddenAsync(category)) return null; // المخفي بيرجع NotFound للعامة
+
+        return _mapper.Map<CategoryDto>(category);
     }
 
     public async Task<IEnumerable<CategoryDto>> GetTopLevelWithChildrenAsync()
     {
-        var allCategories = await _unitOfWork.Categories.GetAllAsync();
+        var all = (await _unitOfWork.Categories.GetAllAsync()).ToList();
+        var byId = all.ToDictionary(c => c.Id);
 
-        var topLevel = allCategories.Where(c => c.ParentCategoryId is null);
+        bool IsHidden(Category c)
+            => c.IsHiddenBySeller || c.IsHiddenByAdmin ||
+               (c.ParentCategoryId is { } parentId && byId.TryGetValue(parentId, out var parent) &&
+                (parent.IsHiddenBySeller || parent.IsHiddenByAdmin));
+
+        var visible = all.Where(c => !IsHidden(c)).ToList();
+
+        var topLevel = visible.Where(c => c.ParentCategoryId is null);
         var dtos = _mapper.Map<List<CategoryDto>>(topLevel);
 
         foreach (var dto in dtos)
         {
-            var children = allCategories.Where(c => c.ParentCategoryId == dto.Id);
+            var children = visible.Where(c => c.ParentCategoryId == dto.Id);
             dto.SubCategories = _mapper.Map<List<CategoryDto>>(children);
         }
 
         return dtos;
+    }
+
+    private async Task<bool> IsHiddenAsync(Category category)
+    {
+        if (category.IsHiddenBySeller || category.IsHiddenByAdmin) return true;
+        if (category.ParentCategoryId is null) return false;
+
+        var parent = await _unitOfWork.Categories.GetByIdAsync(category.ParentCategoryId.Value);
+        return parent is not null && (parent.IsHiddenBySeller || parent.IsHiddenByAdmin);
     }
 
     public async Task<IEnumerable<SellerCategoryDto>> GetMineAsync(int sellerId)

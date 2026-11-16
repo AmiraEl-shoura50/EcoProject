@@ -29,4 +29,6 @@ public class ProductQueryParams
             _ => value
         };
     }
+    public bool IncludeHidden { get; set; }         // بيتحدد من الـ Controller بس، مش من المستخدم
+    public string? VisibilityFilter { get; set; }   // "hidden" | "visible"
 }

@@ -13,7 +13,7 @@ public class CategoryRepository : GenericRepository<Category>, ICategoryReposito
     public async Task<(List<Category> Items, int TotalCount)> SearchAsync(CategoryQueryParams queryParams)
     {
         var query = _dbSet.AsQueryable();
-
+        query = query.Visible();
         if (!string.IsNullOrWhiteSpace(queryParams.SearchTerm))
         {
             var term = queryParams.SearchTerm.Trim().ToLower();
@@ -32,20 +32,22 @@ public class CategoryRepository : GenericRepository<Category>, ICategoryReposito
         return (items, totalCount);
     }
     public async Task<List<SellerCategoryDto>> GetBySellerAsync(int sellerId)
-    => await _dbSet
-        .Where(c => c.CreatedBySellerId == sellerId)
-        .OrderBy(c => c.Name)
-        .Select(c => new SellerCategoryDto
-        {
-            Id = c.Id,
-            Name = c.Name,
-            Description = c.Description,
-            ImageUrl = c.ImageUrl,
-            ParentCategoryId = c.ParentCategoryId,
-            ParentCategoryName = c.ParentCategory != null ? c.ParentCategory.Name : string.Empty,
-            ProductsCount = c.Products.Count()
-        })
-        .ToListAsync();
+     => await _dbSet
+         .Where(c => c.CreatedBySellerId == sellerId)
+         .OrderBy(c => c.Name)
+         .Select(c => new SellerCategoryDto
+         {
+             Id = c.Id,
+             Name = c.Name,
+             Description = c.Description,
+             ImageUrl = c.ImageUrl,
+             ParentCategoryId = c.ParentCategoryId,
+             ParentCategoryName = c.ParentCategory != null ? c.ParentCategory.Name : string.Empty,
+             ProductsCount = c.Products.Count(),
+             IsHiddenBySeller = c.IsHiddenBySeller,
+             IsHiddenByAdmin = c.IsHiddenByAdmin
+         })
+         .ToListAsync();
 
     public async Task<List<AdminCategoryDto>> GetAdminTreeAsync()
     {
@@ -61,6 +63,8 @@ public class CategoryRepository : GenericRepository<Category>, ICategoryReposito
                 c.ImageUrl,
                 c.ParentCategoryId,
                 c.CreatedBySellerId,
+                c.IsHiddenBySeller,   // جديد
+                c.IsHiddenByAdmin,    // جديد
                 ProductsCount = c.Products.Count()
             })
             .ToListAsync();
@@ -78,6 +82,8 @@ public class CategoryRepository : GenericRepository<Category>, ICategoryReposito
                 Description = main.Description,
                 ImageUrl = main.ImageUrl,
                 ProductsCount = main.ProductsCount,
+                IsHiddenBySeller = main.IsHiddenBySeller,   // جديد
+                IsHiddenByAdmin = main.IsHiddenByAdmin,     // جديد
                 SubCategories = all
                     .Where(s => s.ParentCategoryId == main.Id)
                     .OrderBy(s => s.Name)
@@ -86,7 +92,9 @@ public class CategoryRepository : GenericRepository<Category>, ICategoryReposito
                         Id = s.Id,
                         Name = s.Name,
                         ProductsCount = s.ProductsCount,
-                        StoreName = StoreOf(s.CreatedBySellerId)
+                        StoreName = StoreOf(s.CreatedBySellerId),
+                        IsHiddenBySeller = s.IsHiddenBySeller,   // جديد
+                        IsHiddenByAdmin = s.IsHiddenByAdmin      // جديد
                     })
                     .ToList()
             })

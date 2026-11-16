@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ECommerce.Application.Common;
 using ECommerce.Application.Constants;
 using ECommerce.Application.DTOs.Common;
 using ECommerce.Application.DTOs.Product;
@@ -6,6 +7,7 @@ using ECommerce.Application.Interfaces.Repositories;
 using ECommerce.Application.Interfaces.Services;
 using ECommerce.Application.Pricing;
 using ECommerce.Domain.Entities;
+
 
 namespace ECommerce.Application.Services;
 
@@ -37,9 +39,11 @@ public class ProductService : IProductService
         return dtos;
     }
 
-    public async Task<ProductDto?> GetByIdAsync(int id)
+    public async Task<ProductDto?> GetByIdAsync(int id, int? viewerSellerId = null, bool isAdmin = false)
     {
         var product = await _unitOfWork.Products.GetWithDetailsAsync(id);
+        if (product is null) return null;
+        if (!ProductVisibility.IsVisible(product) && !isAdmin && product.SellerId != viewerSellerId) return null;
         if (product is null) return null;
 
         var dto = _mapper.Map<ProductDto>(product);
@@ -259,7 +263,9 @@ public class ProductService : IProductService
         var (outOfStock, lowStock) = await _unitOfWork.Products
             .GetStockSummaryForSellerAsync(sellerId, StockRules.LowStockThreshold);
 
-        return new StockSummaryDto { OutOfStock = outOfStock, LowStock = lowStock };
+        var hidden = await _unitOfWork.Products.CountHiddenBySellerAsync(sellerId);
+
+        return new StockSummaryDto { OutOfStock = outOfStock, LowStock = lowStock, HiddenCount = hidden };
     }
 
     // بترجّع الكمية الجديدة، أو null لو المنتج مش موجود أو مش بتاع البائع

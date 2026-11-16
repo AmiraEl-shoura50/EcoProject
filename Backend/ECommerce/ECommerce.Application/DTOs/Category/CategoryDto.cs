@@ -9,5 +9,7 @@ public class CategoryDto
     public string? ImageUrl { get; set; }
 
     public int? ParentCategoryId { get; set; }
+    public bool IsHiddenBySeller { get; set; }
+    public bool IsHiddenByAdmin { get; set; }
     public List<CategoryDto> SubCategories { get; set; } = new();
 }

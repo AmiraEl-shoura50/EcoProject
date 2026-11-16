@@ -25,16 +25,23 @@ public class ProductsController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> GetAll([FromQuery] ProductQueryParams queryParams)
     {
+        // دي صفحة عامة: الفلاتر دي للبائع والأدمن بس، فبنتجاهلها لو جت من الزوار
         queryParams.StockFilter = null;
+        queryParams.IncludeHidden = false;
+        queryParams.VisibilityFilter = null;
+
         var result = await _productService.SearchAsync(queryParams);
         return Ok(result);
     }
-
     [HttpGet("{id}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetById(int id)
     {
-        var product = await _productService.GetByIdAsync(id);
+        // المنتج المخفي بيفتح لصاحبه وللأدمن بس (للمعاينة)، وغيرهم بياخدوا NotFound
+        var isAdmin = User.IsInRole(Roles.Admin);
+        int? viewerSellerId = User.IsInRole(Roles.Seller) ? await GetCurrentSellerIdAsync() : null;
+
+        var product = await _productService.GetByIdAsync(id, viewerSellerId, isAdmin);
         if (product is null) return NotFound();
         return Ok(product);
     }
@@ -95,6 +102,8 @@ public class ProductsController : ControllerBase
         if (sellerId is null) return Forbid();
 
         queryParams.SellerId = sellerId.Value;
+        queryParams.IncludeHidden = true; // البائع بيشوف منتجاته المخفية كمان (لازم قبل الاستدعاء)
+
         var result = await _productService.SearchAsync(queryParams);
         return Ok(result);
     }

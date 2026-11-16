@@ -154,6 +154,12 @@ namespace ECommerce.Infrastructure.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsHiddenByAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsHiddenBySeller")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -466,6 +472,12 @@ namespace ECommerce.Infrastructure.Migrations
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsHiddenByAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsHiddenBySeller")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()

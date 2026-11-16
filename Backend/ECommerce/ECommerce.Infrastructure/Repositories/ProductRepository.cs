@@ -6,6 +6,7 @@ using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
 using ECommerce.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+
 namespace ECommerce.Infrastructure.Repositories;
 
 public class ProductRepository : GenericRepository<Product>, IProductRepository
@@ -13,25 +14,33 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
     public ProductRepository(AppDbContext context) : base(context) { }
 
     public async Task<IEnumerable<Product>> GetByCategoryAsync(int categoryId)
-     => await _dbSet
-         .Where(p => p.CategoryId == categoryId || p.Category.ParentCategoryId == categoryId)
-         .ToListAsync();
+        => await _dbSet.Where(p => p.CategoryId == categoryId).Visible().ToListAsync();
 
     public async Task<IEnumerable<Product>> GetBySellerAsync(int sellerId)
         => await _dbSet.Where(p => p.SellerId == sellerId).ToListAsync();
 
     public async Task<Product?> GetWithDetailsAsync(int id)
         => await _dbSet
-            .Include(p => p.Category)
+            .Include(p => p.Category).ThenInclude(c => c.ParentCategory)
             .Include(p => p.Seller)
             .FirstOrDefaultAsync(p => p.Id == id);
 
     public async Task<(List<Product> Items, int TotalCount)> SearchAsync(ProductQueryParams queryParams)
     {
         var query = _dbSet
-            .Include(p => p.Category)
+            .Include(p => p.Category).ThenInclude(c => c.ParentCategory)
             .Include(p => p.Seller)
             .AsQueryable();
+
+        // ✅ الزوار والعملاء ميشوفوش المنتجات المخفية (البائع والأدمن بيطلبوها بـ IncludeHidden)
+        if (!queryParams.IncludeHidden)
+            query = query.Visible();
+
+        // فلتر الإخفاء (للبائع والأدمن)
+        if (queryParams.VisibilityFilter == "hidden")
+            query = query.Where(p => p.IsHiddenBySeller || p.IsHiddenByAdmin);
+        else if (queryParams.VisibilityFilter == "visible")
+            query = query.Where(p => !p.IsHiddenBySeller && !p.IsHiddenByAdmin);
 
         // ✅ فلترة بالبحث (في الاسم أو الوصف)
         if (!string.IsNullOrWhiteSpace(queryParams.SearchTerm))
@@ -46,6 +55,7 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
             var categoryId = queryParams.CategoryId.Value;
             query = query.Where(p => p.CategoryId == categoryId || p.Category.ParentCategoryId == categoryId);
         }
+
         // ✅ فلترة بالسعر
         if (queryParams.MinPrice.HasValue)
         {
@@ -55,11 +65,13 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
         {
             query = query.Where(p => p.Price <= queryParams.MaxPrice.Value);
         }
+
         // ✅ فلترة بالبائع
         if (queryParams.SellerId.HasValue)
         {
             query = query.Where(p => p.SellerId == queryParams.SellerId.Value);
         }
+
         // ✅ فلتر المخزون (للبائع): نفذت / قاربت على النفاد / الاتنين
         if (!string.IsNullOrWhiteSpace(queryParams.StockFilter))
         {
@@ -94,20 +106,21 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
 
         return (items, totalCount);
     }
+
     public async Task<List<ProductPricingInfo>> GetPricingInfoAsync(IReadOnlyCollection<int> sellerIds)
-    => await _dbSet
-        .Where(p => sellerIds.Contains(p.SellerId))
-        .Select(p => new ProductPricingInfo(p.Id, p.CategoryId, p.SellerId, p.Price, p.Rating))
-        .ToListAsync();
+        => await _dbSet
+            .Where(p => sellerIds.Contains(p.SellerId))
+            .Visible()
+            .Select(p => new ProductPricingInfo(p.Id, p.CategoryId, p.SellerId, p.Price, p.Rating))
+            .ToListAsync();
 
     public async Task<List<Product>> GetByIdsWithDetailsAsync(IReadOnlyCollection<int> ids)
         => await _dbSet
             .Include(p => p.Category)
             .Include(p => p.Seller)
             .Where(p => ids.Contains(p.Id))
+            .Visible()
             .ToListAsync();
-    public async Task<int> CountBySellerAsync(int sellerId)
-    => await _dbSet.CountAsync(p => p.SellerId == sellerId);
 
     public async Task<(int OutOfStock, int LowStock)> GetStockSummaryForSellerAsync(int sellerId, int lowThreshold)
     {
@@ -153,7 +166,12 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
                         && (i.Order.Status == OrderStatus.Confirmed
                             || i.Order.Status == OrderStatus.Shipped
                             || i.Order.Status == OrderStatus.Delivered)
-                        && i.Product.StockQuantity > 0)
+                        && i.Product.StockQuantity > 0
+                        && !i.Product.IsHiddenBySeller && !i.Product.IsHiddenByAdmin
+                        && !i.Product.Category.IsHiddenBySeller && !i.Product.Category.IsHiddenByAdmin
+                        && (i.Product.Category.ParentCategory == null
+                            || (!i.Product.Category.ParentCategory.IsHiddenBySeller
+                                && !i.Product.Category.ParentCategory.IsHiddenByAdmin)))
             .GroupBy(i => i.ProductId)
             .Select(g => new { ProductId = g.Key, Sold = g.Sum(i => i.Quantity) })
             .OrderByDescending(x => x.Sold)
@@ -176,8 +194,23 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
             .OfType<Product>()
             .ToList();
     }
-}
 
+    public async Task<int> CountBySellerAsync(int sellerId, bool visibleOnly = false)
+    {
+        var query = _dbSet.Where(p => p.SellerId == sellerId);
+        if (visibleOnly) query = query.Visible();
 
+        return await query.CountAsync();
+    }
 
+    // أرقام المنتجات (من اللي اتبعتت) اللي مش ظاهرة للعملاء دلوقتي (لأي سبب)
+    public async Task<List<int>> GetUnavailableIdsAsync(IReadOnlyCollection<int> productIds)
+        => await _dbSet
+            .Where(p => productIds.Contains(p.Id))
+            .Hidden()
+            .Select(p => p.Id)
+            .ToListAsync();
 
+    public async Task<int> CountHiddenBySellerAsync(int sellerId)
+        => await _dbSet.CountAsync(p => p.SellerId == sellerId && (p.IsHiddenBySeller || p.IsHiddenByAdmin));
+} 

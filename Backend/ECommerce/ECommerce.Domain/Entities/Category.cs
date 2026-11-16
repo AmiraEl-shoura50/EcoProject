@@ -18,7 +18,8 @@ namespace ECommerce.Domain.Entities
 
         // ✅ جديد: البائع اللي أنشأ القسم (null لأقسام الأدمن)
         public int? CreatedBySellerId { get; set; }
-
+        public bool IsHiddenBySeller { get; set; }   // أخفاه صاحبه
+        public bool IsHiddenByAdmin { get; set; }    // أخفته الإدارة (البائع مش بيقدر يلغيه)
         public ICollection<Product> Products { get; set; } = new List<Product>();
     }
 }

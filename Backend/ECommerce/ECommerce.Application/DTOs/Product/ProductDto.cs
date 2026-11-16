@@ -22,4 +22,7 @@ public class ProductDto
     public decimal? DiscountedPrice { get; set; }
     public int? DiscountPercent { get; set; }
     public DateTime? DiscountEndDate { get; set; }
+    public bool IsHiddenBySeller { get; set; }
+    public bool IsHiddenByAdmin { get; set; }
+    public bool IsCategoryHidden { get; set; }
 }

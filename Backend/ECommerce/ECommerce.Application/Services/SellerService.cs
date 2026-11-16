@@ -21,7 +21,7 @@ public class SellerService : ISellerService
         var seller = await _unitOfWork.Sellers.GetByIdAsync(id);
         if (seller is null) return null;
 
-        var (average, reviewsCount, productsCount) = await GetStatsAsync(id);
+        var (average, reviewsCount, productsCount) = await GetStatsAsync(id, visibleOnly: true);
 
         return new SellerDto
         {
@@ -40,7 +40,7 @@ public class SellerService : ISellerService
         var seller = await _unitOfWork.Sellers.GetWithUserAsync(sellerId);
         if (seller is null) return null;
 
-        var (average, reviewsCount, productsCount) = await GetStatsAsync(sellerId);
+        var (average, reviewsCount, productsCount) = await GetStatsAsync(sellerId, visibleOnly: false);
 
         return new SellerProfileDto
         {
@@ -102,10 +102,11 @@ public class SellerService : ISellerService
         return true;
     }
 
-    private async Task<(double Average, int ReviewsCount, int ProductsCount)> GetStatsAsync(int sellerId)
+
+    private async Task<(double Average, int ReviewsCount, int ProductsCount)> GetStatsAsync(int sellerId, bool visibleOnly)
     {
         var (average, reviewsCount) = await _unitOfWork.Reviews.GetSellerStatsAsync(sellerId);
-        var productsCount = await _unitOfWork.Products.CountBySellerAsync(sellerId);
+        var productsCount = await _unitOfWork.Products.CountBySellerAsync(sellerId, visibleOnly);
 
         return (average, reviewsCount, productsCount);
     }

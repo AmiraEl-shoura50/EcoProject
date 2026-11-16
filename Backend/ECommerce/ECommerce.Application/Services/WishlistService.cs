@@ -24,6 +24,10 @@ public class WishlistService : IWishlistService
         var wishlist = await GetOrCreateWishlistAsync(customerId);
         var dto = _mapper.Map<WishlistDto>(wishlist);
 
+        // المنتجات المخفية بتختفي من العرض بس (مش بتتمسح)، وبترجع لو اتظهرت تاني
+        var unavailable = await _unitOfWork.Products.GetUnavailableIdsAsync(dto.Items.Select(i => i.ProductId).ToList());
+        dto.Items = dto.Items.Where(i => !unavailable.Contains(i.ProductId)).ToList();
+
         if (dto.Items.Count > 0)
         {
             var book = await _pricingService.LoadAsync();
@@ -45,7 +49,8 @@ public class WishlistService : IWishlistService
     {
         var product = await _unitOfWork.Products.GetByIdAsync(dto.ProductId);
         if (product is null) return false;
-
+        // في AddItemAsync بعد فحص product is null:
+        if ((await _unitOfWork.Products.GetUnavailableIdsAsync(new[] { dto.ProductId })).Count > 0) return false; 
         var wishlist = await GetOrCreateWishlistAsync(customerId);
 
         var alreadyExists = wishlist.Items.Any(i => i.ProductId == dto.ProductId);

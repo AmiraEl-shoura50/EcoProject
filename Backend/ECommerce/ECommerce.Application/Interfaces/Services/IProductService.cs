@@ -6,7 +6,7 @@ namespace ECommerce.Application.Interfaces.Services;
 public interface IProductService
 {
     Task<IEnumerable<ProductDto>> GetAllAsync();
-    Task<ProductDto?> GetByIdAsync(int id);
+    Task<ProductDto?> GetByIdAsync(int id, int? viewerSellerId = null, bool isAdmin = false);
     Task<IEnumerable<ProductDto>> GetByCategoryAsync(int categoryId);
     Task<ProductDto> CreateAsync(CreateProductDto dto, int sellerId); // ✅ sellerId بقى بارامتر منفصل
     Task<bool> UpdateAsync(int id, UpdateProductDto dto, int sellerId); // ✅ كمان هنا عشان نتأكد إنه صاحب المنتج

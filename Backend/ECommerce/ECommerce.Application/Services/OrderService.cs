@@ -48,7 +48,9 @@ public class OrderService : IOrderService
         var paymentMethod = await _unitOfWork.PaymentMethods.GetByIdAsync(dto.PaymentMethodId);
         if (paymentMethod is null || paymentMethod.IsHidden)
             return Enumerable.Empty<CheckoutResultDto>();
-
+        var unavailable = await _unitOfWork.Products.GetUnavailableIdsAsync(cart.Items.Select(i => i.ProductId).ToList());
+        if (unavailable.Count > 0)
+            return Enumerable.Empty<CheckoutResultDto>();
         foreach (var item in cart.Items)
         {
             if (item.Product.StockQuantity < item.Quantity)
