@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LucideAngularModule, Plus, Pencil, Trash2, X, ImagePlus } from 'lucide-angular';
+import { LucideAngularModule, Plus, Pencil, Trash2, X, ImagePlus ,Eye , EyeOff } from 'lucide-angular';
 import { CategoryService } from '../../../core/services/category';
 import { ToastService } from '../../../core/services/toast';
 import { AdminCategory, AdminSubCategory } from '../../../core/models/category.model';
@@ -19,7 +19,9 @@ export class AdminCategories implements OnInit {
   readonly TrashIcon = Trash2;
   readonly CloseIcon = X;
   readonly ImageIcon = ImagePlus;
-
+  readonly EyeIcon = Eye;
+  readonly EyeOffIcon = EyeOff;
+  togglingId = signal<number | null>(null);
   categories = signal<AdminCategory[]>([]);
   isLoading = signal<boolean>(true);
   deletingId = signal<number | null>(null);
@@ -167,5 +169,33 @@ export class AdminCategories implements OnInit {
   private refresh(): void {
     this.loadCategories();
     this.categoryService.loadTree();
+  }
+  // بيشتغل على قسم رئيسي أو فرعي (الاتنين نفس الشكل)
+  toggleVisibility(item: { id: number; name: string; isHiddenByAdmin: boolean }): void {
+    const hide = !item.isHiddenByAdmin;
+
+    const question = hide
+      ? `هل تريد إخفاء "${item.name}" ومنتجاته وأقسامه الفرعية عن العملاء؟ صاحب القسم (لو بائع) لن يقدر يظهره.`
+      : `هل تريد إظهار "${item.name}" للعملاء من جديد؟`;
+
+    if (!confirm(question)) return;
+
+    this.togglingId.set(item.id);
+
+    this.categoryService.setVisibility(item.id, hide).subscribe({
+      next: () => {
+        this.togglingId.set(null);
+        this.toastService.show(hide ? 'تم إخفاء القسم عن العملاء' : 'تم إظهار القسم للعملاء', 'success');
+
+        this.categories.update(list =>
+          list.map(c => ({
+            ...c,
+            isHiddenByAdmin: c.id === item.id ? hide : c.isHiddenByAdmin,
+            subCategories: c.subCategories.map(s => (s.id === item.id ? { ...s, isHiddenByAdmin: hide } : s))
+          }))
+        );
+      },
+      error: () => this.togglingId.set(null)
+    });
   }
 }

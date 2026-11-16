@@ -19,9 +19,13 @@ export class CartService {
   constructor(private http: HttpClient) {}
 
   loadCart(): void {
+    
     this.http.get<ApiResponse<Cart>>(this.apiUrl).subscribe({
+      
       next: (response) => this.cart.set(response.data)
+    
     });
+    
   }
 
   addItem(data: AddToCartRequest) {

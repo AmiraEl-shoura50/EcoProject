@@ -65,11 +65,28 @@
                 <p class="text-xs text-brand-brown mt-0.5 line-clamp-2">{{ category.description }}</p>
                 <p class="text-xs text-gray-500 mt-1">
                   {{ category.subCategories.length }} قسم فرعي · {{ category.productsCount }} منتج مباشر
+                               @if (category.isHiddenByAdmin) {
+                  <span class="inline-block text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-600 mt-1">مخفي عن العملاء</span>
+                }
                 </p>
               </div>
             </div>
 
             <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                            <button
+                type="button"
+                (click)="toggleVisibility(category)"
+                [disabled]="togglingId() === category.id"
+                class="w-9 h-9 rounded-lg border flex items-center justify-center transition-colors disabled:opacity-50"
+                [class.border-gray-200]="!category.isHiddenByAdmin"
+                [class.text-brand-black]="!category.isHiddenByAdmin"
+                [class.border-brand-gold]="category.isHiddenByAdmin"
+                [class.text-brand-gold]="category.isHiddenByAdmin"
+                [attr.aria-label]="category.isHiddenByAdmin ? 'إظهار القسم' : 'إخفاء القسم'"
+                [attr.title]="category.isHiddenByAdmin ? 'إظهار القسم' : 'إخفاء القسم'"
+              >
+                <lucide-angular [img]="category.isHiddenByAdmin ? EyeOffIcon : EyeIcon" [size]="16"></lucide-angular>
+              </button>
               <button
                 type="button"
                 (click)="openEdit(category)"
@@ -104,6 +121,16 @@
                     @if (sub.storeName) {
                       <span class="text-brand-brown">· {{ sub.storeName }}</span>
                     }
+                                        <button
+                      type="button"
+                      (click)="toggleVisibility(sub)"
+                      [disabled]="togglingId() === sub.id"
+                      class="w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-brand-gold hover:bg-brand-cream transition-colors disabled:opacity-50"
+                      [attr.aria-label]="sub.isHiddenByAdmin ? 'إظهار القسم' : 'إخفاء القسم'"
+                      [attr.title]="sub.isHiddenByAdmin ? 'إظهار القسم' : 'إخفاء القسم'"
+                    >
+                      <lucide-angular [img]="sub.isHiddenByAdmin ? EyeOffIcon : EyeIcon" [size]="13"></lucide-angular>
+                    </button>
                     <button
                       type="button"
                       (click)="deleteSub(sub)"
@@ -113,6 +140,7 @@
                     >
                       <lucide-angular [img]="CloseIcon" [size]="12"></lucide-angular>
                     </button>
+                    
                   </span>
                 }
               </div>

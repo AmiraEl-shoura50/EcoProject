@@ -4,14 +4,14 @@ import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, Subscription, debounceTime, distinctUntilChanged, map } from 'rxjs';
-import { LucideAngularModule, Plus, Pencil, Trash2, X, Search, ImagePlus } from 'lucide-angular';
+import { LucideAngularModule, Plus, Pencil, Trash2, X, Search, ImagePlus ,Eye ,EyeOff} from 'lucide-angular';
 import { ProductService } from '../../../core/services/product';
 import { CategoryService } from '../../../core/services/category';
 import { ToastService } from '../../../core/services/toast';
 import { Product, StockSummary } from '../../../core/models/product.model';
 import { Category } from '../../../core/models/category.model';
 
-type StockFilter = 'all' | 'attention' | 'low' | 'out';
+type StockFilter = 'all' | 'attention' | 'low' | 'out'| 'hidden';
 
 interface StockTab {
   key: StockFilter;
@@ -19,7 +19,7 @@ interface StockTab {
   count: number | null;
 }
 const MAX_STOCK = 1_000_000; // نفس حد الباك
-const STOCK_FILTERS: StockFilter[] = ['all', 'attention', 'low', 'out'];
+const STOCK_FILTERS: StockFilter[] = ['all', 'attention', 'low', 'out', 'hidden'];
 
 @Component({
   selector: 'app-seller-products',
@@ -35,7 +35,9 @@ export class SellerProducts implements OnInit {
   readonly CloseIcon = X;
   readonly SearchIcon = Search;
   readonly ImageIcon = ImagePlus;
-
+    readonly EyeIcon = Eye;
+    readonly EyeOffIcon = EyeOff;
+  togglingId = signal<number | null>(null);
   products = signal<Product[]>([]);
   categories = signal<Category[]>([]);
   isLoading = signal<boolean>(true);
@@ -64,7 +66,8 @@ export class SellerProducts implements OnInit {
       { key: 'all', label: 'كل المنتجات', count: null },
       { key: 'attention', label: 'يحتاج انتباه', count: summary ? summary.lowStock + summary.outOfStock : null },
       { key: 'low', label: 'قاربت على النفاد', count: summary ? summary.lowStock : null },
-      { key: 'out', label: 'نفذت', count: summary ? summary.outOfStock : null }
+      { key: 'out', label: 'نفذت', count: summary ? summary.outOfStock : null },
+      { key: 'hidden', label: 'مخفية', count: summary ? summary.hiddenCount : null } 
     ];
   });
 
@@ -229,9 +232,9 @@ export class SellerProducts implements OnInit {
       searchTerm: this.searchTerm().trim(),
       pageNumber: this.currentPage(),
       pageSize: this.pageSize,
-      // مع فلتر المخزون: الأقل مخزونًا الأول
-      sortBy: filter === 'all' ? 'newest' : 'stock_asc',
-      stockFilter: filter === 'all' ? undefined : filter
+      sortBy: filter === 'all' || filter === 'hidden' ? 'newest' : 'stock_asc',
+      stockFilter: filter === 'all' || filter === 'hidden' ? undefined : filter,
+      visibilityFilter: filter === 'hidden' ? 'hidden' : undefined
     }).subscribe({
       next: (response) => {
         const result = response.data;
@@ -415,6 +418,26 @@ export class SellerProducts implements OnInit {
         if (this.stockFilter() !== 'all') this.loadProducts();
       },
       error: () => this.isSavingStock.set(false) // رسالة الخطأ بتظهر من الـ Interceptor
+    });
+  }
+    toggleVisibility(product: Product): void {
+    if (product.isHiddenByAdmin) return; // إخفاء الإدارة مش بيتغيّر من البائع
+
+    const hide = !product.isHiddenBySeller;
+    if (hide && !confirm(`هل تريد إخفاء "${product.name}" عن العملاء؟ تقدر تظهره في أي وقت.`)) return;
+
+    this.togglingId.set(product.id);
+
+    this.productService.setVisibility(product.id, hide).subscribe({
+      next: () => {
+        this.togglingId.set(null);
+        this.toastService.show(hide ? 'تم إخفاء المنتج عن العملاء' : 'تم إظهار المنتج للعملاء', 'success');
+        this.products.update(list => list.map(p => (p.id === product.id ? { ...p, isHiddenBySeller: hide } : p)));
+        this.loadStockSummary();
+
+        if (this.stockFilter() === 'hidden') this.loadProducts();
+      },
+      error: () => this.togglingId.set(null)
     });
   }
 }

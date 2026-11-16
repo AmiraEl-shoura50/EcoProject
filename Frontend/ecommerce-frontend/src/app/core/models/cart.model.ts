@@ -12,6 +12,7 @@ export interface Cart {
   id: number;
   items: CartItem[];
   totalPrice: number;
+  removedCount: number;
 }
 
 export interface AddToCartRequest {

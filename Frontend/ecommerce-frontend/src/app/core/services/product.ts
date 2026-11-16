@@ -85,4 +85,7 @@ export class ProductService {
       params: { take }
     });
   }
+    setVisibility(id: number, isHidden: boolean): Observable<unknown> {
+    return this.http.put(`${this.apiUrl}/${id}/visibility`, { isHidden });
+  }
 }

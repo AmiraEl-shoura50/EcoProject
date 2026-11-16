@@ -116,11 +116,13 @@
         </button>
       } @else {
         <p class="text-brand-black font-medium mb-3">
-          {{ stockFilter() === 'out'
-              ? 'لا توجد منتجات نفذت كميتها'
-              : stockFilter() === 'low'
-                ? 'لا توجد منتجات قاربت على النفاد'
-                : 'مخزونك بخير، لا توجد منتجات تحتاج انتباه' }}
+                   {{ stockFilter() === 'hidden'
+              ? 'لا توجد منتجات مخفية'
+              : stockFilter() === 'out'
+                ? 'لا توجد منتجات نفذت كميتها'
+                : stockFilter() === 'low'
+                  ? 'لا توجد منتجات قاربت على النفاد'
+                  : 'مخزونك بخير، لا توجد منتجات تحتاج انتباه' }}
         </p>
         <button type="button" (click)="setStockFilter('all')" class="text-sm text-brand-gold hover:underline">
           عرض كل المنتجات
@@ -162,6 +164,13 @@
               <div class="min-w-0">
                 <p class="text-sm font-semibold text-brand-black line-clamp-1">{{ product.name }}</p>
                 <p class="text-xs text-brand-brown mt-0.5">{{ product.categoryName }}</p>
+                 @if (product.isHiddenByAdmin) {
+                  <span class="inline-block text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-600 mt-1">مخفي بواسطة الإدارة</span>
+                } @else if (product.isHiddenBySeller) {
+                  <span class="inline-block text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-gray-200 text-gray-600 mt-1">مخفي عن العملاء</span>
+                } @else if (product.isCategoryHidden) {
+                  <span class="inline-block text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-700 mt-1">قسمه مخفي</span>
+                }
                 @if (product.rating > 0) {
                   <p class="text-xs text-gray-500 mt-0.5">التقييم: {{ product.rating | number:'1.1-1' }}</p>
                 }
@@ -190,8 +199,22 @@
                   {{ stockEditId() === product.id ? 'إغلاق' : 'تعديل الكمية' }}
                 </button>
               </div>
-
+              
               <div class="flex items-center gap-2 shrink-0">
+                  <button
+                  type="button"
+                  (click)="toggleVisibility(product)"
+                  [disabled]="product.isHiddenByAdmin || togglingId() === product.id"
+                  class="w-9 h-9 rounded-lg border flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  [class.border-gray-200]="!product.isHiddenBySeller"
+                  [class.text-brand-black]="!product.isHiddenBySeller"
+                  [class.border-brand-gold]="product.isHiddenBySeller"
+                  [class.text-brand-gold]="product.isHiddenBySeller"
+                  [attr.aria-label]="product.isHiddenBySeller ? 'إظهار للعملاء' : 'إخفاء عن العملاء'"
+                  [attr.title]="product.isHiddenByAdmin ? 'مخفي بواسطة الإدارة' : (product.isHiddenBySeller ? 'إظهار للعملاء' : 'إخفاء عن العملاء')"
+                >
+                  <lucide-angular [img]="product.isHiddenBySeller ? EyeOffIcon : EyeIcon" [size]="16"></lucide-angular>
+                </button>
                 <button
                   type="button"
                   (click)="openEdit(product)"

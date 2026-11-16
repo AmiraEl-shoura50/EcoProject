@@ -14,6 +14,8 @@ export interface SellerCategory {
   parentCategoryId: number | null;
   parentCategoryName: string;
   productsCount: number;
+  isHiddenBySeller: boolean;
+  isHiddenByAdmin: boolean;
 }
 
 export interface AdminSubCategory {
@@ -21,6 +23,8 @@ export interface AdminSubCategory {
   name: string;
   productsCount: number;
   storeName: string | null;
+  isHiddenBySeller: boolean;
+  isHiddenByAdmin: boolean;
 }
 
 export interface AdminCategory {
@@ -30,4 +34,6 @@ export interface AdminCategory {
   imageUrl: string | null;
   productsCount: number;
   subCategories: AdminSubCategory[];
+  isHiddenBySeller: boolean;
+  isHiddenByAdmin: boolean;
 }

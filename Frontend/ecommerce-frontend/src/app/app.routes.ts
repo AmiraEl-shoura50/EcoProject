@@ -154,10 +154,15 @@ export const routes: Routes = [
       loadComponent: () => import('./features/admin/admin-payment-methods/admin-payment-methods').then(m => m.AdminPaymentMethods)
     },
     {
-  path: 'messages',
-  title: 'الرسائل | Smart Shop',
-  loadComponent: () => import('./features/admin/admin-messages/admin-messages').then(m => m.AdminMessages)
-}
+      path: 'messages',
+      title: 'الرسائل | Smart Shop',
+      loadComponent: () => import('./features/admin/admin-messages/admin-messages').then(m => m.AdminMessages)
+    },
+    {
+      path: 'products',
+      title: 'المنتجات | Smart Shop',
+      loadComponent: () => import('./features/admin/admin-products/admin-products').then(m => m.AdminProducts)
+    }
   ]
 },
 {

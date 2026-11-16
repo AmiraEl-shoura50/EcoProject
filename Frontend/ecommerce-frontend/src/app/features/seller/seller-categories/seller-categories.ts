@@ -1,7 +1,7 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LucideAngularModule, Plus, Pencil, Trash2, X, ImagePlus } from 'lucide-angular';
+import { LucideAngularModule, Plus, Pencil, Trash2, X, ImagePlus ,Eye ,EyeOff} from 'lucide-angular';
 import { CategoryService } from '../../../core/services/category';
 import { ToastService } from '../../../core/services/toast';
 import { SellerCategory } from '../../../core/models/category.model';
@@ -19,7 +19,9 @@ export class SellerCategories implements OnInit {
   readonly TrashIcon = Trash2;
   readonly CloseIcon = X;
   readonly ImageIcon = ImagePlus;
-
+  readonly EyeIcon = Eye;
+  readonly EyeOffIcon = EyeOff;
+  togglingId = signal<number | null>(null);
   categories = signal<SellerCategory[]>([]);
   isLoading = signal<boolean>(true);
   deletingId = signal<number | null>(null);
@@ -178,6 +180,26 @@ export class SellerCategories implements OnInit {
         this.categoryService.loadTree();
       },
       error: () => this.deletingId.set(null)
+    });
+  }
+
+  toggleVisibility(category: SellerCategory): void {
+    if (category.isHiddenByAdmin) return;
+
+    const hide = !category.isHiddenBySeller;
+    if (hide && !confirm(`هل تريد إخفاء القسم "${category.name}" ومنتجاته عن العملاء؟ تقدر تظهره في أي وقت.`)) return;
+
+    this.togglingId.set(category.id);
+
+    this.categoryService.setVisibility(category.id, hide).subscribe({
+      next: () => {
+        this.togglingId.set(null);
+        this.toastService.show(hide ? 'تم إخفاء القسم عن العملاء' : 'تم إظهار القسم للعملاء', 'success');
+        this.categories.update(list =>
+          list.map(c => (c.id === category.id ? { ...c, isHiddenBySeller: hide } : c))
+        );
+      },
+      error: () => this.togglingId.set(null)
     });
   }
 }

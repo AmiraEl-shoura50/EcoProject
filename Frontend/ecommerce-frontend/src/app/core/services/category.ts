@@ -55,4 +55,7 @@ loadTree(): void {
   delete(id: number): Observable<unknown> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
+    setVisibility(id: number, isHidden: boolean): Observable<unknown> {
+    return this.http.put(`${this.apiUrl}/${id}/visibility`, { isHidden });
+  }
 }

@@ -14,6 +14,9 @@ export interface Product {
   discountedPrice: number | null;
   discountPercent: number | null;
   discountEndDate: string | null;
+  isHiddenBySeller: boolean;
+  isHiddenByAdmin: boolean;
+  isCategoryHidden: boolean;
 }
 
 export interface ProductQueryParams {
@@ -26,7 +29,7 @@ export interface ProductQueryParams {
   pageSize?: number;
   sellerId?: number;
   stockFilter?: string;
-  
+  visibilityFilter?: string;
 }
 
 export interface PaginatedResult<T> {
@@ -46,4 +49,5 @@ export interface DeleteProductsResult {
 export interface StockSummary {
   outOfStock: number;
   lowStock: number;
+  hiddenCount: number;
 }

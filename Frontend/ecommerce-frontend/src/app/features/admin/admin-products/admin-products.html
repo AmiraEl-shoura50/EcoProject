@@ -1,0 +1,167 @@
+
+<div>
+
+  <div class="mb-5">
+    <h2 class="font-serif text-2xl text-brand-black">المنتجات</h2>
+    @if (!isLoading()) {
+      <p class="text-sm text-brand-brown mt-0.5">{{ totalCount() }} منتج</p>
+    }
+  </div>
+
+  <!-- الفلتر والبحث -->
+  <div class="flex flex-col sm:flex-row gap-3 mb-5">
+
+    <div class="flex gap-1 bg-white border border-gray-200 rounded-lg p-1 shrink-0">
+      @for (f of filters; track f.key) {
+        <button
+          type="button"
+          (click)="setFilter(f.key)"
+          class="px-4 py-1.5 rounded-md text-sm transition-colors"
+          [class.bg-brand-black]="filter() === f.key"
+          [class.text-white]="filter() === f.key"
+          [class.text-brand-brown]="filter() !== f.key"
+        >
+          {{ f.label }}
+        </button>
+      }
+    </div>
+
+    <div class="relative flex-1">
+      <input
+        #searchBox
+        type="text"
+        [value]="searchTerm()"
+        (input)="onSearchInput(searchBox.value)"
+        autocomplete="off"
+        placeholder="ابحث باسم المنتج أو وصفه..."
+        class="w-full bg-white border border-gray-300 rounded-full px-4 py-2.5 pr-14 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+      />
+      <lucide-angular
+        [img]="SearchIcon"
+        [size]="16"
+        class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+      ></lucide-angular>
+
+      @if (searchTerm()) {
+        <button
+          type="button"
+          (click)="clearSearch()"
+          class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-brand-black hover:bg-gray-100 transition-colors"
+          aria-label="مسح البحث"
+        >
+          <lucide-angular [img]="CloseIcon" [size]="14"></lucide-angular>
+        </button>
+      }
+    </div>
+
+  </div>
+
+  @if (isLoading()) {
+
+    <div class="space-y-3 animate-pulse">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="bg-white rounded-2xl h-24"></div>
+      }
+    </div>
+
+  } @else if (items().length === 0) {
+
+    <div class="bg-white rounded-2xl border border-gray-100 text-center py-16 px-4">
+      <p class="text-brand-brown">لا توجد منتجات مطابقة</p>
+    </div>
+
+  } @else {
+
+    <div class="space-y-3">
+      @for (product of items(); track product.id) {
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+
+          <div class="flex items-center gap-4 flex-1 min-w-0">
+
+            <div class="w-16 h-16 bg-gray-100 rounded-xl overflow-hidden shrink-0">
+              @if (product.imageUrl) {
+                <img [src]="product.imageUrl" [alt]="product.name" class="w-full h-full object-cover" />
+              }
+            </div>
+
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-brand-black line-clamp-1">{{ product.name }}</p>
+              <p class="text-xs text-brand-brown mt-0.5">
+                {{ product.categoryName }} ·
+                <a [routerLink]="['/store', product.sellerId]" class="hover:text-brand-gold hover:underline">{{ product.sellerStoreName }}</a>
+              </p>
+              <p class="text-xs text-gray-500 mt-0.5">{{ product.price | number }} جنيه · المخزون: {{ product.stockQuantity }}</p>
+
+              <div class="flex flex-wrap gap-1.5 mt-1.5">
+                @if (product.isHiddenByAdmin) {
+                  <span class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-600">مخفي بواسطة الإدارة</span>
+                }
+                @if (product.isHiddenBySeller) {
+                  <span class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-gray-200 text-gray-600">أخفاه البائع</span>
+                }
+                @if (product.isCategoryHidden) {
+                  <span class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-700">قسمه مخفي</span>
+                }
+              </div>
+            </div>
+
+          </div>
+
+          <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+
+            <a
+              [routerLink]="['/products', product.id]"
+              target="_blank"
+              class="text-sm text-brand-brown border border-gray-200 px-4 py-2 rounded-lg hover:border-brand-gold hover:text-brand-gold transition-colors"
+            >
+              معاينة
+            </a>
+
+            <button
+              type="button"
+              (click)="toggleVisibility(product)"
+              [disabled]="togglingId() === product.id"
+              class="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-lg border transition-colors disabled:opacity-50"
+              [class.border-red-200]="!product.isHiddenByAdmin"
+              [class.text-red-500]="!product.isHiddenByAdmin"
+              [class.hover:bg-red-50]="!product.isHiddenByAdmin"
+              [class.border-brand-gold]="product.isHiddenByAdmin"
+              [class.text-brand-gold]="product.isHiddenByAdmin"
+            >
+              <lucide-angular [img]="product.isHiddenByAdmin ? EyeIcon : EyeOffIcon" [size]="16"></lucide-angular>
+              {{ product.isHiddenByAdmin ? 'إلغاء الإخفاء' : 'إخفاء' }}
+            </button>
+
+          </div>
+
+        </div>
+
+      }
+    </div>
+
+    @if (totalPages() > 1) {
+      <div class="flex items-center justify-center gap-2 mt-8">
+        <button
+          type="button"
+          (click)="goToPage(currentPage() - 1)"
+          [disabled]="!hasPreviousPage()"
+          class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          السابق
+        </button>
+        <span class="text-sm text-brand-brown px-4">صفحة {{ currentPage() }} من {{ totalPages() }}</span>
+        <button
+          type="button"
+          (click)="goToPage(currentPage() + 1)"
+          [disabled]="!hasNextPage()"
+          class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          التالي
+        </button>
+      </div>
+    }
+
+  }
+
+</div>

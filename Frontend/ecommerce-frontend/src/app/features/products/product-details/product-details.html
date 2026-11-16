@@ -1,5 +1,17 @@
 <div class="bg-brand-cream min-h-screen">
-
+      @if (product()!.isHiddenBySeller || product()!.isHiddenByAdmin || product()!.isCategoryHidden) {
+        <div class="mb-6 bg-orange-50 border border-orange-200 text-orange-800 text-sm rounded-xl px-4 py-3">
+          <b>هذا المنتج غير ظاهر للعملاء حاليًا.</b>
+          @if (product()!.isHiddenByAdmin) {
+            تم إخفاؤه بواسطة الإدارة.
+          } @else if (product()!.isHiddenBySeller) {
+            أخفاه البائع، وتقدر تظهره من لوحة تحكم البائع.
+          } @else {
+            قسمه مخفي.
+          }
+          أنت تشاهده للمعاينة فقط.
+        </div>
+      }
   @if (isLoading()) {
     <div class="max-w-6xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-2 gap-10 animate-pulse">
       <div class="bg-gray-200 h-96 rounded-xl"></div>

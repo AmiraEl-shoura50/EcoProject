@@ -76,11 +76,30 @@
                     <p class="text-sm font-semibold text-brand-black line-clamp-1">{{ category.name }}</p>
                     <p class="text-xs text-brand-brown mt-0.5 line-clamp-1">{{ category.description }}</p>
                     <p class="text-xs text-gray-500 mt-0.5">{{ category.productsCount }} منتج</p>
+                       @if (category.isHiddenByAdmin) {
+                      <span class="inline-block text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-600 mt-1">مخفي بواسطة الإدارة</span>
+                    } @else if (category.isHiddenBySeller) {
+                      <span class="inline-block text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-gray-200 text-gray-600 mt-1">مخفي عن العملاء</span>
+                    }
                   </div>
                 </div>
 
                 <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-                  <button
+                   <button
+                    type="button"
+                    (click)="toggleVisibility(category)"
+                    [disabled]="category.isHiddenByAdmin || togglingId() === category.id"
+                    class="w-9 h-9 rounded-lg border flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    [class.border-gray-200]="!category.isHiddenBySeller"
+                    [class.text-brand-black]="!category.isHiddenBySeller"
+                    [class.border-brand-gold]="category.isHiddenBySeller"
+                    [class.text-brand-gold]="category.isHiddenBySeller"
+                    [attr.aria-label]="category.isHiddenBySeller ? 'إظهار القسم' : 'إخفاء القسم'"
+                    [attr.title]="category.isHiddenByAdmin ? 'مخفي بواسطة الإدارة' : (category.isHiddenBySeller ? 'إظهار القسم' : 'إخفاء القسم')"
+                  >
+                    <lucide-angular [img]="category.isHiddenBySeller ? EyeOffIcon : EyeIcon" [size]="16"></lucide-angular>
+                  </button>
+                 <button
                     type="button"
                     (click)="openEdit(category)"
                     class="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-brand-black hover:border-brand-gold hover:text-brand-gold transition-colors"
