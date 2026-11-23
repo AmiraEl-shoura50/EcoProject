@@ -127,7 +127,7 @@ public class ProductService : IProductService
         foreach (var item in wishlistItems) _unitOfWork.WishlistItems.Delete(item);
 
         var imageUrl = product.ImageUrl;
-
+        var galleryUrls = (await _unitOfWork.ProductImages.GetByProductAsync(id)).Select(i => i.ImageUrl).ToList();
         _unitOfWork.Products.Delete(product);
         await _unitOfWork.SaveChangesAsync();
 
@@ -136,7 +136,12 @@ public class ProductService : IProductService
             var publicId = _fileStorageService.ExtractPublicId(imageUrl);
             await _fileStorageService.DeleteImageAsync(publicId);
         }
-
+        // الصورة الرئيسية بتتمسح في الكود الحالي، فبنستثنيها ونمسح الباقي
+        foreach (var url in galleryUrls.Where(u => u != product.ImageUrl))
+        {
+            try { await _fileStorageService.DeleteImageAsync(_fileStorageService.ExtractPublicId(url)); }
+            catch { /* مش حرج */ }
+        }
         return DeleteProductResult.Deleted;
     }
 

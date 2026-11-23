@@ -28,6 +28,6 @@ public class OrderProfile : Profile
              .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.User.FirstName + " " + src.Customer.User.LastName))
              .ForMember(dest => dest.CustomerPhone, opt => opt.MapFrom(src => src.Customer.User.PhoneNumber))
              .ForMember(dest => dest.CustomerAddress, opt => opt.MapFrom(src => src.Customer.Address))
-             .ForMember(dest => dest.LatestPaymentProof, opt => opt.MapFrom(src => src.PaymentProofs.OrderByDescending(p => p.SubmittedAt).FirstOrDefault()));
+                 .ForMember(dest => dest.LatestPaymentProof, opt => opt.Ignore());
     }
 }

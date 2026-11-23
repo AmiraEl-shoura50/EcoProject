@@ -24,6 +24,9 @@ public class ProductProfile : Profile
         CreateMap<UpdateProductDto, Product>()
             .ForMember(dest => dest.ImageUrl, opt => opt.Ignore());
 
+        CreateMap<ProductImage, ProductImageDto>()
+           .ForMember(dest => dest.Url, opt => opt.MapFrom(src => src.ImageUrl));
+
 
     }
 }

@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
-import { DeleteProductsResult, PaginatedResult, Product, ProductQueryParams, StockSummary } from '../models/product.model';
+import { DeleteProductsResult, PaginatedResult, Product, ProductImage, ProductQueryParams, StockSummary } from '../models/product.model';
 
 @Injectable({
   providedIn: 'root'
@@ -87,5 +87,8 @@ export class ProductService {
   }
     setVisibility(id: number, isHidden: boolean): Observable<unknown> {
     return this.http.put(`${this.apiUrl}/${id}/visibility`, { isHidden });
+  }
+    updateImages(productId: number, data: FormData): Observable<ApiResponse<ProductImage[]>> {
+    return this.http.put<ApiResponse<ProductImage[]>>(`${this.apiUrl}/${productId}/images`, data);
   }
 }

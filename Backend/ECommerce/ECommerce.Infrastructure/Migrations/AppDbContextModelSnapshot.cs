@@ -349,6 +349,40 @@ namespace ECommerce.Infrastructure.Migrations
                     b.ToTable("OrderItems");
                 });
 
+            modelBuilder.Entity("ECommerce.Domain.Entities.PaymentGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PaymentMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("PaymentMethodId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("PaymentGroups");
+                });
+
             modelBuilder.Entity("ECommerce.Domain.Entities.PaymentMethod", b =>
                 {
                     b.Property<int>("Id")
@@ -396,7 +430,10 @@ namespace ECommerce.Infrastructure.Migrations
                     b.Property<bool?>("IsApproved")
                         .HasColumnType("bit");
 
-                    b.Property<int>("OrderId")
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PaymentGroupId")
                         .HasColumnType("int");
 
                     b.Property<string>("RejectionReason")
@@ -414,6 +451,8 @@ namespace ECommerce.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
+
+                    b.HasIndex("PaymentGroupId");
 
                     b.ToTable("PaymentProofs");
                 });
@@ -506,6 +545,32 @@ namespace ECommerce.Infrastructure.Migrations
                     b.HasIndex("SellerId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.ProductImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId", "SortOrder");
+
+                    b.ToTable("ProductImages");
                 });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.RefreshToken", b =>
@@ -793,6 +858,9 @@ namespace ECommerce.Infrastructure.Migrations
                     b.Property<bool>("IsDeletedBySeller")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("PaymentGroupId")
+                        .HasColumnType("int");
+
                     b.Property<int>("PaymentMethodId")
                         .HasColumnType("int");
 
@@ -805,6 +873,8 @@ namespace ECommerce.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("PaymentGroupId");
 
                     b.HasIndex("PaymentMethodId");
 
@@ -902,15 +972,40 @@ namespace ECommerce.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("ECommerce.Domain.Entities.PaymentGroup", b =>
+                {
+                    b.HasOne("ECommerce.Domain.Entities.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Domain.Entities.PaymentMethod", "PaymentMethod")
+                        .WithMany()
+                        .HasForeignKey("PaymentMethodId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("PaymentMethod");
+                });
+
             modelBuilder.Entity("ECommerce.Domain.Entities.PaymentProof", b =>
                 {
                     b.HasOne("Order", "Order")
                         .WithMany("PaymentProofs")
                         .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("ECommerce.Domain.Entities.PaymentGroup", "PaymentGroup")
+                        .WithMany("Proofs")
+                        .HasForeignKey("PaymentGroupId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Order");
+
+                    b.Navigation("PaymentGroup");
                 });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.PaymentTransaction", b =>
@@ -941,6 +1036,17 @@ namespace ECommerce.Infrastructure.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Seller");
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.ProductImage", b =>
+                {
+                    b.HasOne("ECommerce.Domain.Entities.Product", "Product")
+                        .WithMany("Images")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.Review", b =>
@@ -1070,6 +1176,11 @@ namespace ECommerce.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("ECommerce.Domain.Entities.PaymentGroup", "PaymentGroup")
+                        .WithMany("Orders")
+                        .HasForeignKey("PaymentGroupId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("ECommerce.Domain.Entities.PaymentMethod", "PaymentMethod")
                         .WithMany()
                         .HasForeignKey("PaymentMethodId")
@@ -1077,6 +1188,8 @@ namespace ECommerce.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
+
+                    b.Navigation("PaymentGroup");
 
                     b.Navigation("PaymentMethod");
                 });
@@ -1112,6 +1225,18 @@ namespace ECommerce.Infrastructure.Migrations
             modelBuilder.Entity("ECommerce.Domain.Entities.DiscountTarget", b =>
                 {
                     b.Navigation("Discount");
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.PaymentGroup", b =>
+                {
+                    b.Navigation("Orders");
+
+                    b.Navigation("Proofs");
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.Product", b =>
+                {
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.Seller", b =>

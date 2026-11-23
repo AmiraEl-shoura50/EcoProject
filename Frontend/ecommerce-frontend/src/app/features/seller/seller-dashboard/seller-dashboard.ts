@@ -44,14 +44,14 @@ export class SellerDashboardPage implements OnInit {
     const stockIssues = d.lowStockCount + d.outOfStockCount;
 
     return [
-      {
-        label: 'تحتاج مراجعة',
-        hint: d.ordersToReview > 0 ? 'إثبات دفع ينتظر قرارك' : 'لا يوجد ما ينتظر المراجعة',
-        value: d.ordersToReview,
+           {
+        label: 'في انتظار الدفع',
+        hint: d.ordersAwaitingPayment > 0 ? 'العميل لسه ما أتمّش الدفع' : 'لا توجد طلبات معلّقة',
+        value: d.ordersAwaitingPayment,
         tone: 'blue',
-        urgent: d.ordersToReview > 0,
+        urgent: false,
         link: '/seller/orders',
-        query: { filter: 'review' }
+        query: { filter: 'Pending' }
       },
       {
         label: 'جاهزة للشحن',

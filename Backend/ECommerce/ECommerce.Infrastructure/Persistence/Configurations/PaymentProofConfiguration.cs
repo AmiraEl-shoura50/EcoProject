@@ -12,5 +12,10 @@ public class PaymentProofConfiguration : IEntityTypeConfiguration<PaymentProof>
             .WithMany(o => o.PaymentProofs)
             .HasForeignKey(p => p.OrderId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(p => p.PaymentGroup)
+            .WithMany(g => g.Proofs)
+            .HasForeignKey(p => p.PaymentGroupId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

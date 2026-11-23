@@ -17,6 +17,7 @@ public class ProductDto
     public string SellerStoreName { get; set; } = string.Empty;
 
     public string? ImageUrl { get; set; }
+    public List<ProductImageDto> Images { get; set; } = new();
 
     // ✅ جديد: بيتملوا بس لو في خصم ساري
     public decimal? DiscountedPrice { get; set; }

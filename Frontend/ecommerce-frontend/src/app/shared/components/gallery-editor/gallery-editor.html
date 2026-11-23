@@ -1,0 +1,94 @@
+<div>
+
+  <div class="flex items-center justify-between mb-2">
+    <p class="text-sm font-medium text-brand-black">
+      صور المنتج
+      <span class="text-xs font-normal text-gray-400">(الأولى هي الرئيسية)</span>
+    </p>
+    <span class="text-xs text-gray-400">{{ items().length }} / {{ maxImages }}</span>
+  </div>
+
+  <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
+
+    @for (item of items(); track item.uid; let i = $index; let first = $first; let last = $last) {
+
+      <div
+        class="relative aspect-square rounded-xl overflow-hidden bg-gray-100 border-2"
+        [class.border-brand-gold]="first"
+        [class.border-transparent]="!first"
+      >
+        <img [src]="item.url" alt="صورة المنتج" class="w-full h-full object-cover" />
+
+        @if (first) {
+          <span class="absolute top-1.5 right-1.5 bg-brand-gold text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+            الرئيسية
+          </span>
+        }
+
+        <!-- الأزرار ظاهرة دايمًا (مفيش hover على الموبايل) -->
+        <div class="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 p-1.5 bg-gradient-to-t from-black/60 to-transparent">
+
+          <div class="flex gap-1">
+            <button
+              type="button"
+              (click)="move(i, -1)"
+              [disabled]="first"
+              class="w-6 h-6 rounded-full bg-white/90 text-brand-black flex items-center justify-center disabled:opacity-30"
+              aria-label="تقديم الصورة"
+              title="تقديم"
+            >
+              <lucide-angular [img]="EarlierIcon" [size]="14"></lucide-angular>
+            </button>
+            <button
+              type="button"
+              (click)="move(i, 1)"
+              [disabled]="last"
+              class="w-6 h-6 rounded-full bg-white/90 text-brand-black flex items-center justify-center disabled:opacity-30"
+              aria-label="تأخير الصورة"
+              title="تأخير"
+            >
+              <lucide-angular [img]="LaterIcon" [size]="14"></lucide-angular>
+            </button>
+          </div>
+
+          <div class="flex gap-1">
+            @if (!first) {
+              <button
+                type="button"
+                (click)="makeMain(i)"
+                class="w-6 h-6 rounded-full bg-white/90 text-brand-gold flex items-center justify-center"
+                aria-label="اجعلها الرئيسية"
+                title="اجعلها الرئيسية"
+              >
+                <lucide-angular [img]="StarIcon" [size]="14"></lucide-angular>
+              </button>
+            }
+            <button
+              type="button"
+              (click)="remove(item)"
+              class="w-6 h-6 rounded-full bg-white/90 text-red-500 flex items-center justify-center"
+              aria-label="حذف الصورة"
+              title="حذف"
+            >
+              <lucide-angular [img]="TrashIcon" [size]="14"></lucide-angular>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    }
+
+    @if (items().length < maxImages) {
+      <label class="aspect-square rounded-xl border-2 border-dashed border-gray-300 hover:border-brand-gold text-gray-400 hover:text-brand-gold transition-colors cursor-pointer flex flex-col items-center justify-center gap-1 text-center">
+        <input type="file" accept="image/*" multiple (change)="onFilesSelected($event)" class="hidden" />
+        <lucide-angular [img]="AddIcon" [size]="24"></lucide-angular>
+        <span class="text-xs">إضافة صور</span>
+      </label>
+    }
+
+  </div>
+
+  <p class="text-xs text-gray-400 mt-2">حتى {{ maxImages }} صور، كل صورة حتى 5 ميجابايت</p>
+
+</div>

@@ -1,0 +1,99 @@
+<div>
+
+  <!-- الصورة الكبيرة -->
+  <div class="relative bg-white rounded-xl overflow-hidden h-96 md:h-[500px]">
+
+    @if (current(); as src) {
+      <button type="button" (click)="open()" class="w-full h-full cursor-zoom-in" aria-label="تكبير الصورة">
+        <img [src]="src" [alt]="alt()" class="w-full h-full object-cover" />
+      </button>
+    } @else {
+      <div class="w-full h-full flex items-center justify-center text-gray-300">لا توجد صورة</div>
+    }
+
+    @if (images().length > 1) {
+      <button
+        type="button"
+        (click)="prev()"
+        class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow flex items-center justify-center text-brand-black hover:bg-white transition-colors"
+        aria-label="الصورة السابقة"
+      >
+        <lucide-angular [img]="PrevIcon" [size]="20"></lucide-angular>
+      </button>
+      <button
+        type="button"
+        (click)="next()"
+        class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow flex items-center justify-center text-brand-black hover:bg-white transition-colors"
+        aria-label="الصورة التالية"
+      >
+        <lucide-angular [img]="NextIcon" [size]="20"></lucide-angular>
+      </button>
+
+      <span class="absolute bottom-3 left-3 bg-black/60 text-white text-xs px-2.5 py-1 rounded-full">
+        {{ selectedIndex() + 1 }} / {{ images().length }}
+      </span>
+    }
+
+  </div>
+
+  <!-- الصور المصغّرة -->
+  @if (images().length > 1) {
+    <div class="flex gap-2 mt-3 overflow-x-auto no-scrollbar pb-1">
+      @for (src of images(); track $index; let i = $index) {
+        <button
+          type="button"
+          (click)="select(i)"
+          class="w-16 h-16 shrink-0 rounded-lg overflow-hidden border-2 transition-colors"
+          [class.border-brand-gold]="selectedIndex() === i"
+          [class.border-transparent]="selectedIndex() !== i"
+          [attr.aria-label]="'الصورة ' + (i + 1)"
+        >
+          <img [src]="src" [alt]="alt()" class="w-full h-full object-cover" />
+        </button>
+      }
+    </div>
+  }
+
+</div>
+
+<!-- التكبير -->
+@if (isOpen() && current(); as src) {
+  <div class="fixed inset-0 z-[70] bg-black/90 flex items-center justify-center p-4" (click)="close()">
+
+    <button
+      type="button"
+      (click)="close()"
+      class="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+      aria-label="إغلاق"
+    >
+      <lucide-angular [img]="CloseIcon" [size]="22"></lucide-angular>
+    </button>
+
+    @if (images().length > 1) {
+      <button
+        type="button"
+        (click)="prev(); $event.stopPropagation()"
+        class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+        aria-label="الصورة السابقة"
+      >
+        <lucide-angular [img]="PrevIcon" [size]="24"></lucide-angular>
+      </button>
+      <button
+        type="button"
+        (click)="next(); $event.stopPropagation()"
+        class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+        aria-label="الصورة التالية"
+      >
+        <lucide-angular [img]="NextIcon" [size]="24"></lucide-angular>
+      </button>
+    }
+
+    <img
+      [src]="src"
+      [alt]="alt()"
+      class="max-w-full max-h-[90vh] object-contain rounded-lg"
+      (click)="$event.stopPropagation()"
+    />
+
+  </div>
+}

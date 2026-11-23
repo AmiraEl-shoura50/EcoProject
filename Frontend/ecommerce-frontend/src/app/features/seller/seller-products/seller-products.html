@@ -369,22 +369,13 @@
 
       <form [formGroup]="productForm" (ngSubmit)="save()" class="space-y-4">
 
-        <!-- الصورة -->
-        <div>
-          <label class="block text-sm text-brand-black mb-1.5 font-medium">صورة المنتج</label>
-          <label class="block border-2 border-dashed border-gray-300 rounded-xl p-4 text-center cursor-pointer hover:border-brand-gold transition-colors">
-            <input type="file" accept="image/*" (change)="onFileSelected($event)" class="hidden" />
-
-            @if (previewUrl()) {
-              <img [src]="previewUrl()" alt="معاينة" class="max-h-44 mx-auto rounded-lg" />
-              <p class="text-xs text-brand-gold mt-2">اضغط لتغيير الصورة</p>
-            } @else {
-              <lucide-angular [img]="ImageIcon" [size]="32" class="mx-auto text-gray-300 mb-2"></lucide-angular>
-              <p class="text-sm text-gray-400">اضغط لاختيار صورة (حتى 5 ميجابايت)</p>
-            }
-          </label>
-        </div>
-
+      
+             <!-- صور المنتج -->
+        @if (isLoadingImages()) {
+          <div class="h-28 rounded-xl bg-gray-100 animate-pulse"></div>
+        } @else {
+          <app-gallery-editor [(items)]="gallery"></app-gallery-editor>
+        }
         <!-- الاسم -->
         <div>
           <label class="block text-sm text-brand-black mb-1.5 font-medium">اسم المنتج</label>
@@ -468,7 +459,7 @@
         <div class="flex gap-3 pt-2">
           <button
             type="submit"
-            [disabled]="isSaving()"
+           [disabled]="isSaving() || isLoadingImages()"
             class="flex-1 bg-brand-black text-white text-sm py-3 rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-50"
           >
             {{ isSaving() ? 'جاري الحفظ...' : (editingProduct() ? 'حفظ التعديلات' : 'إضافة المنتج') }}

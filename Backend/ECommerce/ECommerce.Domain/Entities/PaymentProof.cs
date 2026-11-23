@@ -4,9 +4,11 @@ public class PaymentProof
 {
     public int Id { get; set; }
 
-    public int OrderId { get; set; }
-    public Order Order { get; set; } = null!;
+    public int? OrderId { get; set; }          // كان int
+    public Order? Order { get; set; }          // كان Order
 
+    public int? PaymentGroupId { get; set; }
+    public PaymentGroup? PaymentGroup { get; set; }
     public string ImageUrl { get; set; } = string.Empty;
     public string? TransferReference { get; set; }
 

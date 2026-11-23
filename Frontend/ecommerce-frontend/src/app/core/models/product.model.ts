@@ -17,6 +17,7 @@ export interface Product {
   isHiddenBySeller: boolean;
   isHiddenByAdmin: boolean;
   isCategoryHidden: boolean;
+  images: ProductImage[];
 }
 
 export interface ProductQueryParams {
@@ -50,4 +51,8 @@ export interface StockSummary {
   outOfStock: number;
   lowStock: number;
   hiddenCount: number;
+}
+export interface ProductImage {
+  id: number;
+  url: string;
 }

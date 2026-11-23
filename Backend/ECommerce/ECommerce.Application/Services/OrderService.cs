@@ -157,7 +157,7 @@ public class OrderService : IOrderService
     {
         var order = await _unitOfWork.Orders.GetWithItemsAsync(orderId);
         if (order is null || order.CustomerId != customerId) return null;
-
+        if (order.PaymentGroupId is not null) return null; // الإثبات بيتم على الدفعة مش الطلب
         // ✅ الميزة دي بس لطريقة الدفع اليدوية
         if (order.PaymentMethod.Type != PaymentMethodType.Manual) return null;
 
@@ -197,7 +197,7 @@ public class OrderService : IOrderService
     {
         var order = await _unitOfWork.Orders.GetWithItemsAsync(orderId);
         if (order is null) return false;
-
+        if (order.PaymentGroupId is not null) return false; // مراجعة الدفع بقت للأدمن
         var hasSellerProduct = order.Items.Any(i => i.Product.SellerId == sellerId);
         if (!hasSellerProduct) return false;
 

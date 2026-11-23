@@ -24,10 +24,12 @@ public interface IUnitOfWork : IDisposable
     INotificationRepository Notifications { get; }
     IGenericRepository<PaymentProof> PaymentProofs { get; }
     IGenericRepository<PaymentTransaction> PaymentTransactions { get; }
+    IPaymentGroupRepository PaymentGroups { get; }
     IDashboardRepository Dashboard { get; }
     IContactMessageRepository ContactMessages { get; }
 
     IGenericRepository<RefreshToken> RefreshTokens { get; }
+    IProductImageRepository ProductImages { get; }
 
     Task<int> SaveChangesAsync();
 }

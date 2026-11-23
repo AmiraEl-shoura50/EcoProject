@@ -31,6 +31,9 @@ public static class DependencyInjection
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<IContactService, ContactService>();
         services.AddScoped<IProductVisibilityService, ProductVisibilityService>();
+        services.AddScoped<IProductImageService, ProductImageService>();
+        services.AddScoped<ICheckoutService, CheckoutService>();
+        services.AddScoped<IPaymentGroupService, PaymentGroupService>();
         return services;
     }
 }

@@ -191,4 +191,10 @@ onReviewSubmitted(): void {
 
   this.reviewTarget.set(null);
 }
+  // الطلبات الجديدة بتروح لصفحة الدفعة، والقديمة (قبل التحديث) لصفحة الإثبات القديمة
+  proofLink(order: Order): (string | number)[] {
+    return order.paymentGroupId
+      ? ['/payments', order.paymentGroupId]
+      : ['/orders', order.id, 'payment-proof'];
+  }
 }

@@ -15,7 +15,8 @@ public class Order
     public DateTime CreatedDate { get; set; }
     public DateTime? CompletedDate { get; set; }
     public decimal TotalAmount { get; set; }
-
+    public int? PaymentGroupId { get; set; }
+    public PaymentGroup? PaymentGroup { get; set; }
     public bool IsDeletedByCustomer { get; set; }
     public bool IsDeletedBySeller { get; set; }
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();

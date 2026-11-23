@@ -1,0 +1,283 @@
+<div>
+
+  <div class="mb-5">
+    <h2 class="font-serif text-2xl text-brand-black">الدفعات</h2>
+    @if (!isLoading()) {
+      <p class="text-sm text-brand-brown mt-0.5">{{ totalCount() }} دفعة</p>
+    }
+  </div>
+
+  <!-- الفلتر والبحث -->
+  <div class="flex flex-col gap-3 mb-5">
+
+    <div class="flex gap-1 bg-white border border-gray-200 rounded-lg p-1 overflow-x-auto no-scrollbar">
+      @for (f of filters; track f.key) {
+        <button
+          type="button"
+          (click)="setFilter(f.key)"
+          class="shrink-0 flex items-center gap-2 px-4 py-1.5 rounded-md text-sm transition-colors"
+          [class.bg-brand-black]="filter() === f.key"
+          [class.text-white]="filter() === f.key"
+          [class.text-brand-brown]="filter() !== f.key"
+        >
+          {{ f.label }}
+          @if (f.key === 'awaiting' && paymentService.awaitingCount() > 0) {
+            <span class="bg-red-500 text-white text-[10px] font-bold min-w-4 h-4 px-1 rounded-full flex items-center justify-center">
+              {{ paymentService.awaitingCount() }}
+            </span>
+          }
+        </button>
+      }
+    </div>
+
+    <div class="relative">
+      <input
+        #searchBox
+        type="text"
+        [value]="searchTerm()"
+        (input)="onSearchInput(searchBox.value)"
+        autocomplete="off"
+        placeholder="ابحث برقم الدفعة أو اسم العميل أو بريده..."
+        class="w-full bg-white border border-gray-300 rounded-full px-4 py-2.5 pr-10 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+      />
+      <lucide-angular
+        [img]="SearchIcon"
+        [size]="16"
+        class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+      ></lucide-angular>
+
+      @if (searchTerm()) {
+        <button
+          type="button"
+          (click)="clearSearch()"
+          class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-brand-black hover:bg-gray-100 transition-colors"
+          aria-label="مسح البحث"
+        >
+          <lucide-angular [img]="CloseIcon" [size]="14"></lucide-angular>
+        </button>
+      }
+    </div>
+
+  </div>
+
+  @if (isLoading()) {
+
+    <div class="space-y-4 animate-pulse">
+      @for (i of [1,2,3]; track i) {
+        <div class="bg-white rounded-2xl h-48"></div>
+      }
+    </div>
+
+  } @else if (items().length === 0) {
+
+    <div class="bg-white rounded-2xl border border-gray-100 text-center py-16 px-4">
+      @if (filter() === 'awaiting' && !searchTerm()) {
+        <p class="text-brand-black font-medium mb-1">لا توجد دفعات في انتظار المراجعة</p>
+        <p class="text-sm text-brand-brown">كل الإثباتات اتراجعت 👌</p>
+      } @else {
+        <p class="text-brand-brown">لا توجد دفعات مطابقة</p>
+      }
+    </div>
+
+  } @else {
+
+    <div class="space-y-4">
+      @for (group of items(); track group.id) {
+
+        <article
+          class="bg-white rounded-2xl border shadow-sm p-5"
+          [class.border-brand-gold]="group.status === 'AwaitingConfirmation'"
+          [class.border-gray-100]="group.status !== 'AwaitingConfirmation'"
+        >
+
+          <!-- الرأس -->
+          <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-brand-black">
+                دفعة #{{ group.id }}
+                <span class="text-xs font-normal text-brand-brown">· {{ group.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+              </p>
+              <p class="text-xs text-brand-brown mt-1">
+                {{ group.customerName }}
+                · <span dir="ltr" class="inline-block">{{ group.customerEmail }}</span>
+                @if (group.customerPhone) {
+                  · <span dir="ltr" class="inline-block">{{ group.customerPhone }}</span>
+                }
+              </p>
+              <p class="text-xs text-brand-brown mt-0.5">طريقة الدفع: {{ group.paymentMethodName }}</p>
+            </div>
+
+            <div class="text-end shrink-0">
+              <span class="inline-block text-xs font-medium px-3 py-1 rounded-full" [ngClass]="statusClass(group.status)">
+                {{ statusLabel(group.status) }}
+              </span>
+              <p class="font-serif text-2xl text-brand-gold font-semibold mt-1">{{ group.totalAmount | number:'1.0-2' }} جنيه</p>
+            </div>
+          </div>
+
+          <!-- توزيع المبلغ على البائعين -->
+          <div class="bg-brand-cream rounded-xl p-4 mb-4">
+            <p class="text-xs font-medium text-brand-brown mb-2">توزيع المبلغ على البائعين</p>
+            <ul class="space-y-1.5">
+              @for (order of group.orders; track order.orderId) {
+                <li class="flex items-center justify-between gap-3 text-sm">
+                  <span class="min-w-0 truncate" [class.line-through]="order.status === 'Cancelled'" [class.text-gray-400]="order.status === 'Cancelled'">
+                    <a [routerLink]="['/store', order.sellerId]" target="_blank" class="text-brand-black hover:text-brand-gold hover:underline">{{ order.storeName }}</a>
+                    <span class="text-xs text-gray-400">
+                      · طلب #{{ order.orderId }} · {{ order.items.length }} منتج
+                      @if (order.status === 'Cancelled') { · ملغي }
+                    </span>
+                  </span>
+                  <span class="shrink-0" [class.line-through]="order.status === 'Cancelled'" [class.text-gray-400]="order.status === 'Cancelled'">
+                    {{ order.amount | number:'1.0-2' }} جنيه
+                  </span>
+                </li>
+              }
+            </ul>
+            <div class="flex items-center justify-between border-t border-brand-brown/20 mt-3 pt-3 text-sm font-semibold">
+              <span class="text-brand-black">الإجمالي المطلوب تحويله</span>
+              <span class="text-brand-gold">{{ group.totalAmount | number:'1.0-2' }} جنيه</span>
+            </div>
+          </div>
+
+          <!-- الإثباتات -->
+          @if (group.proofs.length > 0) {
+            <div class="space-y-3 mb-4">
+              @for (proof of group.proofs; track proof.id; let first = $first) {
+                <div class="border border-gray-100 rounded-xl p-3 flex items-center gap-3" [class.opacity-60]="!first">
+
+                  <button
+                    type="button"
+                    (click)="previewImage.set(proof.imageUrl)"
+                    class="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 shrink-0"
+                    aria-label="عرض الصورة"
+                  >
+                    <img [src]="proof.imageUrl" alt="إثبات الدفع" class="w-full h-full object-cover" />
+                  </button>
+
+                  <div class="flex-1 min-w-0 text-sm">
+                    <p class="font-medium text-brand-black">
+                      {{ first ? 'آخر إثبات' : 'إثبات سابق' }}
+                      <span class="text-xs font-normal text-brand-brown">· {{ proof.submittedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </p>
+                    @if (proof.transferReference) {
+                      <p class="text-xs text-brand-brown mt-0.5">
+                        رقم العملية: <span dir="ltr" class="inline-block">{{ proof.transferReference }}</span>
+                      </p>
+                    }
+                    @if (proof.isApproved === null) {
+                      <p class="text-xs text-blue-600 mt-0.5">في انتظار مراجعتك</p>
+                    } @else if (proof.isApproved) {
+                      <p class="text-xs text-green-600 mt-0.5">تم قبوله</p>
+                    } @else {
+                      <p class="text-xs text-red-500 mt-0.5">تم رفضه: {{ proof.rejectionReason }}</p>
+                    }
+                  </div>
+
+                </div>
+              }
+            </div>
+          }
+
+          <!-- الإجراءات -->
+          @if (canReview(group)) {
+
+            @if (rejectingId() === group.id) {
+
+              <div class="space-y-3">
+                <textarea
+                  [(ngModel)]="rejectionReason"
+                  rows="2"
+                  maxlength="300"
+                  placeholder="اكتب سبب الرفض ليظهر للعميل (مثلًا: المبلغ غير مطابق)"
+                  class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all resize-none"
+                ></textarea>
+                <div class="flex gap-2">
+                  <button
+                    type="button"
+                    (click)="confirmReject(group)"
+                    [disabled]="busyId() === group.id"
+                    class="bg-red-500 text-white text-sm px-5 py-2 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+                  >
+                    {{ busyId() === group.id ? 'جاري الرفض...' : 'تأكيد الرفض' }}
+                  </button>
+                  <button
+                    type="button"
+                    (click)="cancelReject()"
+                    class="text-sm text-brand-brown border border-gray-200 px-4 py-2 rounded-lg hover:bg-brand-cream transition-colors"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </div>
+
+            } @else {
+
+              <div class="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  (click)="approve(group)"
+                  [disabled]="busyId() === group.id"
+                  class="bg-brand-black text-white text-sm px-5 py-2 rounded-lg hover:bg-brand-gold transition-colors disabled:opacity-50"
+                >
+                  {{ busyId() === group.id ? 'جاري التأكيد...' : 'تأكيد الدفع' }}
+                </button>
+                <button
+                  type="button"
+                  (click)="startReject(group)"
+                  [disabled]="busyId() === group.id"
+                  class="text-sm text-red-500 border border-red-200 px-5 py-2 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                >
+                  رفض الإثبات
+                </button>
+              </div>
+
+            }
+
+          }
+
+        </article>
+
+      }
+    </div>
+
+    @if (totalPages() > 1) {
+      <div class="flex items-center justify-center gap-2 mt-8">
+        <button
+          type="button"
+          (click)="goToPage(currentPage() - 1)"
+          [disabled]="!hasPreviousPage()"
+          class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          السابق
+        </button>
+        <span class="text-sm text-brand-brown px-4">صفحة {{ currentPage() }} من {{ totalPages() }}</span>
+        <button
+          type="button"
+          (click)="goToPage(currentPage() + 1)"
+          [disabled]="!hasNextPage()"
+          class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          التالي
+        </button>
+      </div>
+    }
+
+  }
+
+</div>
+
+<!-- معاينة صورة الإثبات -->
+@if (previewImage(); as image) {
+  <div class="fixed inset-0 z-[70] bg-black/90 flex items-center justify-center p-4" (click)="previewImage.set(null)">
+    <button
+      type="button"
+      (click)="previewImage.set(null)"
+      class="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+      aria-label="إغلاق"
+    >
+      <lucide-angular [img]="CloseIcon" [size]="22"></lucide-angular>
+    </button>
+    <img [src]="image" alt="إثبات الدفع" class="max-w-full max-h-[90vh] object-contain rounded-lg" (click)="$event.stopPropagation()" />
+  </div>
+}

@@ -97,9 +97,8 @@ export class SellerOrders implements OnInit {
     return this.statusClasses[status] ?? 'bg-gray-100 text-gray-600';
   }
 
-  // إثبات دفع مرفوع وبانتظار قرار البائع
-  needsReview(order: SellerOrder): boolean {
-    return order.status === 'AwaitingConfirmation' && order.latestPaymentProof?.isApproved === null;
+    needsReview(order: SellerOrder): boolean {
+    return false; // مراجعة الدفع بقت للأدمن
   }
 
   countFor(key: string): number {

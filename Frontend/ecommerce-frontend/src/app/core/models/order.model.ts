@@ -22,6 +22,7 @@ export interface Order {
   totalAmount: number;
   paymentMethodName: string;
   paymentMethodType: 'Manual' | 'Gateway';
+  paymentGroupId: number | null;
   items: OrderItem[];
   paymentTransferUrl: string | null;
 }
@@ -52,4 +53,9 @@ export interface SellerOrder {
   customerAddress: string;
   items: OrderItem[];
   latestPaymentProof: PaymentProof | null;
+}
+export interface CheckoutResponse {
+  paymentGroupId: number | null;
+  totalAmount: number;
+  orders: CheckoutResult[];
 }

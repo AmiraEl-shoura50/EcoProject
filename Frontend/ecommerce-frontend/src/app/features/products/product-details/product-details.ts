@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal ,computed} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router ,RouterLink} from '@angular/router';
 import { LucideAngularModule, Heart, Minus, Plus, ShoppingCart } from 'lucide-angular';
@@ -10,11 +10,12 @@ import { ToastService } from '../../../core/services/toast';
 import { Product } from '../../../core/models/product.model';
 import { ProductReviews } from '../../../shared/components/product-reviews/product-reviews';
 import { Stars } from '../../../shared/components/stars/stars';
+import { ProductGallery } from '../../../shared/components/product-gallery/product-gallery';
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, ProductReviews, Stars , RouterLink],
+  imports: [CommonModule, LucideAngularModule, ProductReviews, Stars , RouterLink, ProductGallery],
   templateUrl: './product-details.html',
   styleUrl: './product-details.css'
 })
@@ -122,4 +123,11 @@ export class ProductDetails implements OnInit {
     const role = this.authService.userRole();
     return role === 'Seller' || role === 'Admin';
   }
+  galleryImages = computed<string[]>(() => {
+  const product = this.product();
+  if (!product) return [];
+
+  const urls = product.images?.map(image => image.url) ?? [];
+  return urls.length > 0 ? urls : (product.imageUrl ? [product.imageUrl] : []);
+});
 }

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
-import { CheckoutResult, CreateOrderRequest, Order, PaymentProof, SellerOrder } from '../models/order.model';
+import { CheckoutResponse, CheckoutResult, CreateOrderRequest, Order, PaymentProof, SellerOrder } from '../models/order.model';
 import { CartService } from './cart';
 import { PaginatedResult } from '../models/product.model';
 
@@ -19,9 +19,9 @@ export class OrderService {
     private cartService: CartService
   ) {}
 
-  checkout(data: CreateOrderRequest): Observable<ApiResponse<CheckoutResult[]>> {
-    return this.http.post<ApiResponse<CheckoutResult[]>>(`${this.apiUrl}/checkout`, data).pipe(
-      tap(() => this.cartService.loadCart()) // ✅ الكارت بيتفضّى بعد الطلب، نحدّثه
+   checkout(data: CreateOrderRequest): Observable<ApiResponse<CheckoutResponse>> {
+    return this.http.post<ApiResponse<CheckoutResponse>>(`${this.apiUrl}/checkout`, data).pipe(
+      tap(() => this.cartService.loadCart()) // السلة بتتفضّى بعد الطلب، نحدّثها
     );
   }
  submitPaymentProof(orderId: number, image: File, transferReference?: string): Observable<ApiResponse<PaymentProof>> {

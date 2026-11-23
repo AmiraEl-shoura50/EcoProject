@@ -2,9 +2,9 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { OrderService } from '../../../core/services/order';
+import { PaymentGroupService } from '../../../core/services/payment-group';
 import { ToastService } from '../../../core/services/toast';
-import { Order } from '../../../core/models/order.model';
+import { PendingPayment } from '../../../core/models/payment.model';
 
 const SHARE_CACHE = 'shared-receipts-v1';
 
@@ -19,15 +19,15 @@ export class ShareReceipt implements OnInit {
   isLoading = signal<boolean>(true);
   file = signal<File | null>(null);
   previewUrl = signal<string | null>(null);
-  orders = signal<Order[]>([]);
-  selectedOrderId = signal<number | null>(null);
+  payments = signal<PendingPayment[]>([]);
+  selectedPaymentId = signal<number | null>(null);
   isSubmitting = signal<boolean>(false);
   transferReference = '';
 
   private readonly maxImageSize = 5 * 1024 * 1024; // 5MB
 
   constructor(
-    private orderService: OrderService,
+    private paymentGroupService: PaymentGroupService,
     private toastService: ToastService,
     private router: Router
   ) {}
@@ -35,23 +35,19 @@ export class ShareReceipt implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.readShared();
 
-    // الطلبات اللي لسه محتاجة إثبات دفع يدوي
-    this.orderService.getMyOrders(1, 50).subscribe({
+    // الدفعات اللي لسه في انتظار الدفع
+    this.paymentGroupService.getPending().subscribe({
       next: (response) => {
-        const eligible = response.data.items.filter(
-          o => o.status === 'Pending' && o.paymentMethodType === 'Manual'
-        );
-
-        this.orders.set(eligible);
-        if (eligible.length === 1) this.selectedOrderId.set(eligible[0].id);
+        this.payments.set(response.data);
+        if (response.data.length === 1) this.selectedPaymentId.set(response.data[0].id);
         this.isLoading.set(false);
       },
       error: () => this.isLoading.set(false)
     });
   }
 
-  selectOrder(orderId: number): void {
-    this.selectedOrderId.set(orderId);
+  selectPayment(paymentId: number): void {
+    this.selectedPaymentId.set(paymentId);
   }
 
   async discard(): Promise<void> {
@@ -61,11 +57,11 @@ export class ShareReceipt implements OnInit {
 
   submit(): void {
     const file = this.file();
-    const orderId = this.selectedOrderId();
+    const paymentId = this.selectedPaymentId();
 
     if (!file) return;
-    if (!orderId) {
-      this.toastService.show('اختر الطلب الذي تريد إرفاق الإيصال به', 'error');
+    if (!paymentId) {
+      this.toastService.show('اختر الدفعة التي تريد إرفاق الإيصال بها', 'error');
       return;
     }
     if (!file.type.startsWith('image/')) {
@@ -79,12 +75,12 @@ export class ShareReceipt implements OnInit {
 
     this.isSubmitting.set(true);
 
-    this.orderService.submitPaymentProof(orderId, file, this.transferReference.trim() || undefined).subscribe({
+    this.paymentGroupService.submitProof(paymentId, file, this.transferReference.trim() || undefined).subscribe({
       next: async () => {
         this.isSubmitting.set(false);
         await this.clearShared();
-        this.toastService.show('تم رفع إثبات الدفع بنجاح، في انتظار مراجعة البائع', 'success');
-        this.router.navigate(['/orders']);
+        this.toastService.show('تم رفع إثبات الدفع، في انتظار مراجعة الإدارة', 'success');
+        this.router.navigate(['/payments', paymentId]);
       },
       error: () => this.isSubmitting.set(false)
     });

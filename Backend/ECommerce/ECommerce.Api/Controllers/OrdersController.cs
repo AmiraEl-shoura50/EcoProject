@@ -1,10 +1,11 @@
-﻿using System.Security.Claims;
-using ECommerce.Application.DTOs.Order;
+﻿using ECommerce.Application.DTOs.Order;
 using ECommerce.Application.Interfaces.Repositories;
 using ECommerce.Application.Interfaces.Services;
 using ECommerce.Domain.Constants;
+using ECommerce.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ECommerce.API.Controllers;
 
@@ -14,11 +15,13 @@ namespace ECommerce.API.Controllers;
 public class OrdersController : ControllerBase
 {
     private readonly IOrderService _orderService;
+    private readonly ICheckoutService _checkoutService;
     private readonly IUnitOfWork _unitOfWork;
 
-    public OrdersController(IOrderService orderService, IUnitOfWork unitOfWork)
+    public OrdersController(IOrderService orderService, ICheckoutService checkoutService, IUnitOfWork unitOfWork)
     {
         _orderService = orderService;
+        _checkoutService = checkoutService;
         _unitOfWork = unitOfWork;
     }
 
@@ -29,12 +32,33 @@ public class OrdersController : ControllerBase
         var customerId = await GetCurrentCustomerIdAsync();
         if (customerId is null) return Forbid();
 
-        var results = await _orderService.CheckoutAsync(customerId.Value, dto);
-        //if (!results.Any())
-        //    return BadRequest("تعذر إتمام الطلب - تأكدي من الكارت وطريقة الدفع والمخزون المتاح");
+        const string failure = "تعذر إتمام الطلب - تأكد من السلة وطريقة الدفع والمخزون المتاح";
 
-        return Ok(results);
+        var method = await _unitOfWork.PaymentMethods.GetByIdAsync(dto.PaymentMethodId);
+
+        // التحويل اليدوي: دفعة واحدة لكل السلة (حتى لو فيها أكتر من بائع)
+        if (method is { Type: PaymentMethodType.Manual })
+        {
+            var result = await _checkoutService.CheckoutAsync(customerId.Value, dto.PaymentMethodId);
+            if (result is null) return BadRequest(failure);
+
+            return Ok(result);
+        }
+
+        // بوابة الدفع الإلكتروني: نفس السلوك القديم لحد ما نضيف Paymob
+        var results = (await _orderService.CheckoutAsync(customerId.Value, dto)).ToList();
+        if (results.Count == 0) return BadRequest(failure);
+
+        return Ok(new CheckoutResponseDto
+        {
+            TotalAmount = results.Sum(r => r.Order.TotalAmount),
+            Orders = results
+        });
     }
+
+  
+
+    
 
     [HttpPost("{id}/payment-proof")]
     [Authorize(Roles = Roles.Customer)]

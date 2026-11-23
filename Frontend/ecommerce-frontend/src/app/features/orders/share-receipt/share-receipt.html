@@ -19,15 +19,14 @@
 
     } @else {
 
-      <!-- الإيصال -->
       <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-5 text-center">
         <img [src]="previewUrl()" alt="إيصال التحويل" class="max-h-72 mx-auto rounded-lg" />
       </div>
 
-      @if (orders().length === 0) {
+      @if (payments().length === 0) {
 
         <div class="bg-white rounded-2xl border border-gray-100 text-center py-10 px-4">
-          <p class="text-brand-black font-medium mb-2">لا توجد طلبات في انتظار الدفع</p>
+          <p class="text-brand-black font-medium mb-2">لا توجد دفعات في انتظار الدفع</p>
           <p class="text-sm text-brand-brown mb-5">أتمم طلبًا جديدًا أولًا، ثم أرسل الإيصال</p>
           <button
             type="button"
@@ -42,29 +41,29 @@
 
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
 
-          <p class="text-sm font-medium text-brand-black mb-3">اختر الطلب المرتبط بهذا الإيصال</p>
+          <p class="text-sm font-medium text-brand-black mb-3">اختر الدفعة المرتبطة بهذا الإيصال</p>
 
           <div class="space-y-3 mb-5">
-            @for (order of orders(); track order.id) {
+            @for (payment of payments(); track payment.id) {
               <label
                 class="flex items-center gap-3 border-2 rounded-lg p-4 cursor-pointer transition-all"
-                [class.border-brand-gold]="selectedOrderId() === order.id"
-                [class.border-gray-200]="selectedOrderId() !== order.id"
+                [class.border-brand-gold]="selectedPaymentId() === payment.id"
+                [class.border-gray-200]="selectedPaymentId() !== payment.id"
               >
                 <input
                   type="radio"
-                  name="order"
-                  [checked]="selectedOrderId() === order.id"
-                  (change)="selectOrder(order.id)"
+                  name="payment"
+                  [checked]="selectedPaymentId() === payment.id"
+                  (change)="selectPayment(payment.id)"
                   class="accent-brand-gold"
                 />
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-brand-black">طلب رقم #{{ order.id }}</p>
+                  <p class="text-sm font-medium text-brand-black">دفعة رقم #{{ payment.id }}</p>
                   <p class="text-xs text-brand-brown">
-                    {{ order.paymentMethodName }} · {{ order.createdDate | date:'dd/MM/yyyy' }}
+                    {{ payment.paymentMethodName }} · {{ payment.ordersCount }} طلب · {{ payment.createdAt | date:'dd/MM/yyyy' }}
                   </p>
                 </div>
-                <p class="text-sm font-semibold text-brand-gold shrink-0">{{ order.totalAmount | number:'1.0-2' }} جنيه</p>
+                <p class="text-sm font-semibold text-brand-gold shrink-0">{{ payment.totalAmount | number:'1.0-2' }} جنيه</p>
               </label>
             }
           </div>
@@ -72,6 +71,7 @@
           <input
             type="text"
             [(ngModel)]="transferReference"
+            maxlength="100"
             placeholder="رقم العملية (اختياري)"
             class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all mb-5"
           />

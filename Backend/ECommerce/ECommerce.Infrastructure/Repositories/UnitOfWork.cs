@@ -27,9 +27,11 @@ public class UnitOfWork : IUnitOfWork
         Notifications = new NotificationRepository(_context);
         PaymentProofs = new GenericRepository<PaymentProof>(_context);
         PaymentTransactions = new GenericRepository<PaymentTransaction>(_context);
+        PaymentGroups = new PaymentGroupRepository(_context); // في الـ constructor
         RefreshTokens = new GenericRepository<RefreshToken>(_context);
         ContactMessages = new ContactMessageRepository(_context); // في الـ constructor
         Dashboard = new DashboardRepository(_context);
+        ProductImages = new ProductImageRepository(_context);
     }
 
     public IProductRepository Products { get; }
@@ -50,9 +52,11 @@ public class UnitOfWork : IUnitOfWork
     public INotificationRepository Notifications { get; }
     public IGenericRepository<PaymentProof> PaymentProofs { get; }
     public IGenericRepository<PaymentTransaction> PaymentTransactions { get; }
+    public IPaymentGroupRepository PaymentGroups { get; }
     public IGenericRepository<RefreshToken> RefreshTokens { get; }
     public IContactMessageRepository ContactMessages { get; }
     public IDashboardRepository Dashboard { get; }
+    public IProductImageRepository ProductImages { get; }
     public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
 
     public void Dispose() => _context.Dispose();

@@ -6,7 +6,7 @@ import { OrderService } from '../../../core/services/order';
 import { PaymentMethodService } from '../../../core/services/payment-method';
 import { PaymentMethod } from '../../../core/models/payment-method.model';
 import { ToastService } from '../../../core/services/toast';
-import { CheckoutResult } from '../../../core/models/order.model';
+import { CheckoutResponse, CheckoutResult } from '../../../core/models/order.model';
 
 @Component({
   selector: 'app-checkout',
@@ -61,19 +61,22 @@ export class Checkout implements OnInit {
     });
   }
 
-  private handleCheckoutResult(results: CheckoutResult[]): void {
-  const gatewayResult = results.find(r => r.paymentUrl);
+    private handleCheckoutResult(result: CheckoutResponse): void {
+    // التحويل اليدوي: دفعة واحدة لكل السلة، نوديه لصفحة الدفع
+    if (result.paymentGroupId) {
+      this.toastService.show('تم إنشاء طلبك، أتمم الدفع وارفع إثبات التحويل', 'success');
+      this.router.navigate(['/payments', result.paymentGroupId]);
+      return;
+    }
 
-  if (gatewayResult?.paymentUrl) {
-    window.location.href = gatewayResult.paymentUrl;
-  } else {
-    // ✅ بدل التوجيه لـ /orders، نوديه لصفحة رفع الإثبات مع رقم الأوردر
-    const firstOrder = results[0]?.order;
-    if (firstOrder) {
-      this.router.navigate(['/orders', firstOrder.id, 'payment-proof']);
+    // بوابة الدفع الإلكتروني
+    const gatewayResult = result.orders.find(r => r.paymentUrl);
+
+    if (gatewayResult?.paymentUrl) {
+      window.location.href = gatewayResult.paymentUrl;
     } else {
+      this.toastService.show('تم إنشاء طلبك بنجاح', 'success');
       this.router.navigate(['/orders']);
     }
   }
-}
 }

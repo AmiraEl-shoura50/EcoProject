@@ -162,6 +162,11 @@ export const routes: Routes = [
       path: 'products',
       title: 'المنتجات | Smart Shop',
       loadComponent: () => import('./features/admin/admin-products/admin-products').then(m => m.AdminProducts)
+    },
+    {
+      path: 'payments',
+      title: 'الدفعات | Smart Shop',
+      loadComponent: () => import('./features/admin/admin-payments/admin-payments').then(m => m.AdminPayments)
     }
   ]
 },
@@ -179,6 +184,12 @@ export const routes: Routes = [
   path: 'store/:id',
   title: 'المتجر | Smart Shop',
   loadComponent: () => import('./features/store/store-page/store-page').then(m => m.StorePage)
+},
+{
+  path: 'payments/:id',
+  title: 'الدفع | Smart Shop',
+  loadComponent: () => import('./features/payments/payment-page/payment-page').then(m => m.PaymentPage),
+  canActivate: [roleGuard('Customer')]
 },
 {
   path: '**',

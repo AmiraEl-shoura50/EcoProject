@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject, Subscription, debounceTime, distinctUntilChanged, map } from 'rxjs';
+import { Subject, Subscription,Observable, debounceTime, distinctUntilChanged, map , switchMap, catchError, of} from 'rxjs';
 import { LucideAngularModule, Plus, Pencil, Trash2, X, Search, ImagePlus ,Eye ,EyeOff} from 'lucide-angular';
 import { ProductService } from '../../../core/services/product';
 import { CategoryService } from '../../../core/services/category';
 import { ToastService } from '../../../core/services/toast';
 import { Product, StockSummary } from '../../../core/models/product.model';
 import { Category } from '../../../core/models/category.model';
+import { GalleryEditor, GalleryItem } from '../../../shared/components/gallery-editor/gallery-editor';
 
 type StockFilter = 'all' | 'attention' | 'low' | 'out'| 'hidden';
 
@@ -24,7 +25,7 @@ const STOCK_FILTERS: StockFilter[] = ['all', 'attention', 'low', 'out', 'hidden'
 @Component({
   selector: 'app-seller-products',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, GalleryEditor],
   templateUrl: './seller-products.html',
   styleUrl: './seller-products.css'
 })
@@ -89,14 +90,16 @@ export class SellerProducts implements OnInit {
   // ---- النافذة (إضافة / تعديل) ----
   isModalOpen = signal<boolean>(false);
   editingProduct = signal<Product | null>(null);
-  selectedFile = signal<File | null>(null);
-  previewUrl = signal<string | null>(null);
+  gallery = signal<GalleryItem[]>([]);
+  isLoadingImages = signal<boolean>(false);
+  
   isSaving = signal<boolean>(false);
 
   productForm: FormGroup;
 
   private readonly pageSize = 8;
-  private readonly maxImageSize = 5 * 1024 * 1024; // 5MB
+  // private readonly maxImageSize = 5 * 1024 * 1024; // 5MB
+  private originalImageIds: number[] = [];
   private productsRequest?: Subscription;
   private destroyRef = inject(DestroyRef);
 
@@ -257,12 +260,11 @@ export class SellerProducts implements OnInit {
     });
   }
 
-  // ---- النافذة ----
-  openCreate(): void {
+   openCreate(): void {
     this.editingProduct.set(null);
     this.productForm.reset({ name: '', description: '', price: null, stockQuantity: 0, categoryId: null });
-    this.selectedFile.set(null);
-    this.previewUrl.set(null);
+    this.gallery.set([]);
+    this.originalImageIds = [];
     this.isModalOpen.set(true);
   }
 
@@ -275,37 +277,33 @@ export class SellerProducts implements OnInit {
       stockQuantity: product.stockQuantity,
       categoryId: product.categoryId
     });
-    this.selectedFile.set(null);
-    this.previewUrl.set(product.imageUrl);
+    this.gallery.set([]);
+    this.originalImageIds = [];
     this.isModalOpen.set(true);
+
+    // المعرض الكامل (بترتيبه) بيتجاب من تفاصيل المنتج، لأن القايمة فيها الصورة الرئيسية بس
+    this.isLoadingImages.set(true);
+
+    this.productService.getById(product.id).subscribe({
+      next: (response) => {
+        const images = response.data.images ?? [];
+        this.originalImageIds = images.map(i => i.id);
+        this.gallery.set(images.map(i => ({ uid: `e${i.id}`, url: i.url, file: null, imageId: i.id })));
+        this.isLoadingImages.set(false);
+      },
+      error: () => {
+        this.isLoadingImages.set(false);
+        this.isModalOpen.set(false);
+      }
+    });
   }
 
   closeModal(): void {
     this.isModalOpen.set(false);
   }
 
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      this.toastService.show('من فضلك اختر ملف صورة فقط', 'error');
-      input.value = '';
-      return;
-    }
-
-    if (file.size > this.maxImageSize) {
-      this.toastService.show('حجم الصورة كبير، الحد الأقصى 5 ميجابايت', 'error');
-      input.value = '';
-      return;
-    }
-
-    this.selectedFile.set(file);
-    this.previewUrl.set(URL.createObjectURL(file));
-  }
-
-  save(): void {
+ 
+   save(): void {
     if (this.productForm.invalid) {
       this.productForm.markAllAsTouched();
       return;
@@ -313,7 +311,7 @@ export class SellerProducts implements OnInit {
 
     const value = this.productForm.getRawValue();
 
-    // الأسماء بحرف كبير عشان تطابق CreateProductDto / UpdateProductDto
+    // الأسماء بحرف كبير عشان تطابق CreateProductDto / UpdateProductDto (الصور بقت ليها طلب منفصل)
     const formData = new FormData();
     formData.append('Name', value.name.trim());
     formData.append('Description', value.description.trim());
@@ -321,28 +319,68 @@ export class SellerProducts implements OnInit {
     formData.append('StockQuantity', String(value.stockQuantity));
     formData.append('CategoryId', String(value.categoryId));
 
-    const file = this.selectedFile();
-    if (file) formData.append('Image', file);
-
     this.isSaving.set(true);
 
     const editing = this.editingProduct();
-    const request = editing
-      ? this.productService.update(editing.id, formData)
-      : this.productService.create(formData);
 
-    request.subscribe({
-      next: () => {
-        this.isSaving.set(false);
-        this.isModalOpen.set(false);
-        this.toastService.show(editing ? 'تم تعديل المنتج بنجاح' : 'تمت إضافة المنتج بنجاح', 'success');
+    const saveProduct$: Observable<number> = editing
+      ? this.productService.update(editing.id, formData).pipe(map(() => editing.id))
+      : this.productService.create(formData).pipe(map(response => response.data.id));
 
-        if (!editing) this.currentPage.set(1); // الجديد بيظهر في الأول
-        this.loadProducts();
-        this.loadStockSummary(); // الكمية ممكن تكون اتغيّرت
-      },
-      error: () => this.isSaving.set(false)
-    });
+    saveProduct$
+      .pipe(
+        switchMap(productId =>
+          this.syncImages(productId).pipe(
+            map(() => true),
+            catchError(() => of(false)) // المنتج اتحفظ، والصور بس هي اللي فشلت
+          )
+        )
+      )
+      .subscribe({
+        next: (imagesSaved) => {
+          this.isSaving.set(false);
+          this.isModalOpen.set(false);
+
+          this.toastService.show(
+            !imagesSaved
+              ? 'تم حفظ المنتج لكن تعذر حفظ الصور، افتح التعديل وحاول مرة أخرى'
+              : editing ? 'تم تعديل المنتج بنجاح' : 'تمت إضافة المنتج بنجاح',
+            imagesSaved ? 'success' : 'error'
+          );
+
+          if (!editing) this.currentPage.set(1); // الجديد بيظهر في الأول
+          this.loadProducts();
+          this.loadStockSummary();
+        },
+        error: () => this.isSaving.set(false)
+      });
+  }
+
+  // بيبعت المعرض النهائي في طلب واحد (لو في تغيير)
+  private syncImages(productId: number): Observable<unknown> {
+    const items = this.gallery();
+    const currentIds = items.map(i => i.imageId);
+
+    const unchanged =
+      items.every(i => i.imageId !== null) &&
+      currentIds.length === this.originalImageIds.length &&
+      currentIds.every((id, index) => id === this.originalImageIds[index]);
+
+    if (unchanged) return of(null); // مفيش تغيير في الصور
+
+    const formData = new FormData();
+    let newIndex = 0;
+
+    for (const item of items) {
+      if (item.file) {
+        formData.append('Order', `n:${newIndex++}`);
+        formData.append('NewFiles', item.file);
+      } else {
+        formData.append('Order', `e:${item.imageId}`);
+      }
+    }
+
+    return this.productService.updateImages(productId, formData);
   }
 
   // ---- حذف منتج واحد ----

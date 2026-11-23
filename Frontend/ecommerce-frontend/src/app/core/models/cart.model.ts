@@ -13,6 +13,7 @@ export interface Cart {
   items: CartItem[];
   totalPrice: number;
   removedCount: number;
+  
 }
 
 export interface AddToCartRequest {

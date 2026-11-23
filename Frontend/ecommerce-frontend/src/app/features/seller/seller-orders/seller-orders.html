@@ -168,7 +168,11 @@
               </button>
             </div>
           }
-
+          @if (order.status === 'Pending' || order.status === 'AwaitingConfirmation') {
+            <p class="mt-4 text-xs text-brand-brown bg-brand-cream rounded-lg px-3 py-2">
+              {{ order.status === 'Pending' ? 'العميل لم يتمم الدفع بعد' : 'الدفع قيد المراجعة من الإدارة' }}. جهّز الطلب بعد تأكيد الدفع وهيوصلك إشعار.
+            </p>
+          }
           <!-- الإجراءات -->
           <div class="mt-4">
 

@@ -32,6 +32,8 @@ namespace ECommerce.Infrastructure.Persistence
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<ContactMessage> ContactMessages { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<ProductImage> ProductImages { get; set; }
+        public DbSet<PaymentGroup> PaymentGroups { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder); // مهم جدًا - ده بيظبط جداول Identity الأساسية

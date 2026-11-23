@@ -20,11 +20,11 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
         => await _dbSet.Where(p => p.SellerId == sellerId).ToListAsync();
 
     public async Task<Product?> GetWithDetailsAsync(int id)
-        => await _dbSet
-            .Include(p => p.Category).ThenInclude(c => c.ParentCategory)
-            .Include(p => p.Seller)
-            .FirstOrDefaultAsync(p => p.Id == id);
-
+    => await _dbSet
+        .Include(p => p.Category).ThenInclude(c => c.ParentCategory)
+        .Include(p => p.Seller)
+        .Include(p => p.Images.OrderBy(i => i.SortOrder).ThenBy(i => i.Id))
+        .FirstOrDefaultAsync(p => p.Id == id);
     public async Task<(List<Product> Items, int TotalCount)> SearchAsync(ProductQueryParams queryParams)
     {
         var query = _dbSet

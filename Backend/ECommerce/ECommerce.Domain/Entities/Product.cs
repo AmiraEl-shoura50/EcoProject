@@ -21,7 +21,7 @@ namespace ECommerce.Domain.Entities
         public float Rating { get; set; }
         public int ReviewsCount { get; set; }
         public string? ImageUrl { get; set; }
-
+        public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
         public bool IsHiddenBySeller { get; set; }   // أخفاه صاحبه
         public bool IsHiddenByAdmin { get; set; }    // أخفته الإدارة (البائع مش بيقدر يلغيه)
     }

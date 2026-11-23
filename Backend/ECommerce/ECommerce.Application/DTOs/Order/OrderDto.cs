@@ -8,6 +8,7 @@ public class OrderDto
     public DateTime? CompletedDate { get; set; }
     public decimal TotalAmount { get; set; }
     public string PaymentMethodName { get; set; } = string.Empty;
+    public int? PaymentGroupId { get; set; }
     public List<OrderItemDto> Items { get; set; } = new();
     public string PaymentMethodType { get; set; } = string.Empty;
     public string? PaymentTransferUrl { get; set; }
