@@ -8,7 +8,8 @@
     ".NETCoreApp,Version=v10.0": {
       "ECommerce.Domain/1.0.0": {
         "dependencies": {
-          "Microsoft.Extensions.Identity.Stores": "10.0.10"
+          "Microsoft.Extensions.Identity.Stores": "10.0.10",
+          "System.Security.Cryptography.Pkcs": "10.0.13"
         },
         "runtime": {
           "ECommerce.Domain.dll": {}
@@ -208,6 +209,22 @@
             "fileVersion": "10.0.1026.32716"
           }
         }
+      },
+      "System.Security.Cryptography.Pkcs/10.0.13": {
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.Pkcs.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.1326.50504"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net10.0/System.Security.Cryptography.Pkcs.dll": {
+            "rid": "win",
+            "assetType": "runtime",
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.1326.50504"
+          }
+        }
       }
     }
   },
@@ -335,6 +352,13 @@
       "sha512": "sha512-5wu/GrYVd8mG2DVUw3vFJzF+O336TyTGg/Kmcgw9bfwYhCoFiV5lR5QeEmKecJyrW4W54nMfD3p3589E8a7czQ==",
       "path": "microsoft.extensions.primitives/10.0.10",
       "hashPath": "microsoft.extensions.primitives.10.0.10.nupkg.sha512"
+    },
+    "System.Security.Cryptography.Pkcs/10.0.13": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-a+EovgC1fBnwdlQ6cn3j4JFBfKqiFaFvoAhjisOoSvazLAcIznaBzPQP0oYnvccmeXfqUH1KebVZOxSeH6rMaw==",
+      "path": "system.security.cryptography.pkcs/10.0.13",
+      "hashPath": "system.security.cryptography.pkcs.10.0.13.nupkg.sha512"
     }
   }
 }

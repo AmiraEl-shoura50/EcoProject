@@ -97,6 +97,8 @@ public static class DependencyInjection
         // background service for order cleanup
         services.AddHostedService<OrderCleanupBackgroundService>();
 
+        services.AddScoped<IExcelReportService, ExcelReportService>();
+
         services.Configure<ContactSettings>(configuration.GetSection("Contact"));
         return services;
     }

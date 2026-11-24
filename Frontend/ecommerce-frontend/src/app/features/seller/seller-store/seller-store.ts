@@ -20,6 +20,14 @@ export class SellerStore implements OnInit {
   readonly TrashIcon = Trash2;
   readonly LinkIcon = ExternalLink;
 
+  // جوه الكلاس: خيارات طريقة التحويل
+readonly payoutMethods = [
+  { value: '', label: 'غير محدد' },
+  { value: 'VodafoneCash', label: 'فودافون كاش' },
+  { value: 'InstaPay', label: 'إنستاباي' },
+  { value: 'BankAccount', label: 'حساب بنكي' }
+];
+
   profile = signal<SellerProfile | null>(null);
   isLoading = signal<boolean>(true);
   isSaving = signal<boolean>(false);
@@ -44,8 +52,10 @@ export class SellerStore implements OnInit {
     private sellerService: SellerService,
     private toastService: ToastService
   ) {
-    this.form = this.fb.group({
-      storeName: ['', [Validators.required, Validators.maxLength(150)]]
+       this.form = this.fb.group({
+      storeName: ['', [Validators.required, Validators.maxLength(150)]],
+      payoutMethod: [''],
+      payoutAccount: ['', [Validators.maxLength(100)]]
     });
   }
 
@@ -93,15 +103,38 @@ export class SellerStore implements OnInit {
     this.removeImage.set(false);
   }
 
+  // نفس قواعد الباك: الطريقة والحساب مع بعض، وفودافون كاش رقم موبايل مصري
+  payoutError(): string | null {
+    const method = String(this.form.value.payoutMethod ?? '');
+    const account = String(this.form.value.payoutAccount ?? '').trim();
+
+    if (!method && !account) return null;
+    if (!method) return 'اختر طريقة التحويل';
+    if (!account) return 'أدخل رقم أو عنوان التحويل';
+    if (method === 'VodafoneCash' && !/^01[0125][0-9]{8}$/.test(account)) {
+      return 'رقم فودافون كاش غير صحيح (11 رقمًا يبدأ بـ 01)';
+    }
+
+    return null;
+  }
+
   save(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
+    const payoutError = this.payoutError();
+    if (payoutError) {
+      this.toastService.show(payoutError, 'error');
+      return;
+    }
+
     // الأسماء بحرف كبير عشان تطابق UpdateSellerDto
     const formData = new FormData();
     formData.append('StoreName', this.form.value.storeName.trim());
+    formData.append('PayoutMethod', String(this.form.value.payoutMethod ?? ''));
+    formData.append('PayoutAccount', String(this.form.value.payoutAccount ?? '').trim());
 
     const file = this.selectedFile();
     if (file) {
@@ -120,13 +153,18 @@ export class SellerStore implements OnInit {
       },
       error: () => this.isSaving.set(false) // رسالة الخطأ (زي اسم مكرر) بتظهر من الـ Interceptor
     });
+  
   }
 
   private load(): void {
     this.sellerService.getMine().subscribe({
       next: (response) => {
         this.profile.set(response.data);
-        this.form.reset({ storeName: response.data.storeName });
+        this.form.reset({
+          storeName: response.data.storeName,
+          payoutMethod: response.data.payoutMethod ?? '',
+          payoutAccount: response.data.payoutAccount ?? ''
+        });
         this.selectedFile.set(null);
         this.previewUrl.set(null);
         this.removeImage.set(false);

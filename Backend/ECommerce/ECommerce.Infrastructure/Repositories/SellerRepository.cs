@@ -13,4 +13,6 @@ public class SellerRepository : GenericRepository<Seller>, ISellerRepository
         => await _dbSet
             .Include(s => s.User)
             .FirstOrDefaultAsync(s => s.Id == id);
+    public async Task<List<Seller>> GetAllWithUserAsync()
+    => await _dbSet.AsNoTracking().Include(s => s.User).ToListAsync();
 }

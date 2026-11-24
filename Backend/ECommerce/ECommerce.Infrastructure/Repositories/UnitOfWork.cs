@@ -32,6 +32,7 @@ public class UnitOfWork : IUnitOfWork
         ContactMessages = new ContactMessageRepository(_context); // في الـ constructor
         Dashboard = new DashboardRepository(_context);
         ProductImages = new ProductImageRepository(_context);
+        Settlements = new SettlementRepository(_context);
     }
 
     public IProductRepository Products { get; }
@@ -57,6 +58,7 @@ public class UnitOfWork : IUnitOfWork
     public IContactMessageRepository ContactMessages { get; }
     public IDashboardRepository Dashboard { get; }
     public IProductImageRepository ProductImages { get; }
+    public ISettlementRepository Settlements { get; }
     public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
 
     public void Dispose() => _context.Dispose();

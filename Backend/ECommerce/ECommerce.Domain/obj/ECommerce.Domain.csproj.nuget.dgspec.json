@@ -55,6 +55,10 @@
             "Microsoft.Extensions.Identity.Stores": {
               "target": "Package",
               "version": "[10.0.10, )"
+            },
+            "System.Security.Cryptography.Pkcs": {
+              "target": "Package",
+              "version": "[10.0.13, )"
             }
           },
           "imports": [

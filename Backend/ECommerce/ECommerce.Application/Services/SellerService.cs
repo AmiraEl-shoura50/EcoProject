@@ -1,6 +1,7 @@
 ﻿using ECommerce.Application.DTOs.Seller;
 using ECommerce.Application.Interfaces.Repositories;
 using ECommerce.Application.Interfaces.Services;
+using ECommerce.Domain.Enums;
 
 namespace ECommerce.Application.Services;
 
@@ -52,7 +53,10 @@ public class SellerService : ISellerService
             ProductsCount = productsCount,
             FirstName = seller.User.FirstName,
             LastName = seller.User.LastName,
-            Email = seller.User.Email ?? string.Empty
+            Email = seller.User.Email ?? string.Empty,
+            CommissionPercent = seller.CommissionPercent,
+            PayoutMethod = seller.PayoutMethod?.ToString(),
+            PayoutAccount = seller.PayoutAccount,
         };
     }
 
@@ -85,6 +89,17 @@ public class SellerService : ISellerService
         {
             oldImageUrl = seller.ImageUrl;
             seller.ImageUrl = null;
+        }
+        // بيانات استلام المستحقات (الفاضي = مسحها)
+        if (Enum.TryParse<PayoutMethod>(dto.PayoutMethod, out var payoutMethod) && !string.IsNullOrWhiteSpace(dto.PayoutAccount))
+        {
+            seller.PayoutMethod = payoutMethod;
+            seller.PayoutAccount = dto.PayoutAccount.Trim();
+        }
+        else
+        {
+            seller.PayoutMethod = null;
+            seller.PayoutAccount = null;
         }
 
         seller.StoreName = name;

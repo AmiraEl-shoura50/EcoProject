@@ -27,6 +27,7 @@ public interface IUnitOfWork : IDisposable
     IPaymentGroupRepository PaymentGroups { get; }
     IDashboardRepository Dashboard { get; }
     IContactMessageRepository ContactMessages { get; }
+    ISettlementRepository Settlements { get; }
 
     IGenericRepository<RefreshToken> RefreshTokens { get; }
     IProductImageRepository ProductImages { get; }

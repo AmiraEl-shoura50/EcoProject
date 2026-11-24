@@ -517,6 +517,229 @@
         }
       }
     },
+    "/api/admin/settlements/balances": {
+      "get": {
+        "tags": [
+          "AdminSettlements"
+        ],
+        "parameters": [
+          {
+            "name": "cutoff",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tzOffset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/settlements/sellers/{sellerId}/commission": {
+      "put": {
+        "tags": [
+          "AdminSettlements"
+        ],
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetCommissionDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetCommissionDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetCommissionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/settlements/sellers/{sellerId}/settle": {
+      "post": {
+        "tags": [
+          "AdminSettlements"
+        ],
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSettlementDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSettlementDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSettlementDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/settlements/history": {
+      "get": {
+        "tags": [
+          "AdminSettlements"
+        ],
+        "parameters": [
+          {
+            "name": "sellerId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/settlements/{id}/export": {
+      "get": {
+        "tags": [
+          "AdminSettlements"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "tzOffset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/settlements/report/export": {
+      "get": {
+        "tags": [
+          "AdminSettlements"
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tzOffset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Auth/register": {
       "post": {
         "tags": [
@@ -2786,6 +3009,82 @@
         }
       }
     },
+    "/api/sellers/me/earnings": {
+      "get": {
+        "tags": [
+          "SellerEarnings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/sellers/me/earnings/settlements": {
+      "get": {
+        "tags": [
+          "SellerEarnings"
+        ],
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/sellers/me/earnings/settlements/{id}/export": {
+      "get": {
+        "tags": [
+          "SellerEarnings"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "tzOffset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Sellers/{id}": {
       "get": {
         "tags": [
@@ -2839,6 +3138,12 @@
                   },
                   "RemoveImage": {
                     "type": "boolean"
+                  },
+                  "PayoutMethod": {
+                    "type": "string"
+                  },
+                  "PayoutAccount": {
+                    "type": "string"
                   }
                 }
               },
@@ -2850,6 +3155,12 @@
                   "style": "form"
                 },
                 "RemoveImage": {
+                  "style": "form"
+                },
+                "PayoutMethod": {
+                  "style": "form"
+                },
+                "PayoutAccount": {
                   "style": "form"
                 }
               }
@@ -3098,6 +3409,36 @@
         },
         "additionalProperties": false
       },
+      "CreateSettlementDto": {
+        "type": "object",
+        "properties": {
+          "cutoff": {
+            "type": "string",
+            "nullable": true
+          },
+          "tzOffset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "expectedOrdersCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "adjustmentAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "adjustmentNote": {
+            "type": "string",
+            "nullable": true
+          },
+          "reference": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "DeleteOrdersDto": {
         "type": "object",
         "properties": {
@@ -3222,6 +3563,16 @@
         },
         "additionalProperties": false
       },
+      "SetCommissionDto": {
+        "type": "object",
+        "properties": {
+          "commissionPercent": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
       "SetPaymentMethodVisibilityDto": {
         "type": "object",
         "properties": {
@@ -3339,6 +3690,9 @@
       "name": "AdminProducts"
     },
     {
+      "name": "AdminSettlements"
+    },
+    {
       "name": "Auth"
     },
     {
@@ -3385,6 +3739,9 @@
     },
     {
       "name": "Reviews"
+    },
+    {
+      "name": "SellerEarnings"
     },
     {
       "name": "Sellers"

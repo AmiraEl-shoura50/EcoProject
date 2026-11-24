@@ -116,6 +116,11 @@ export const routes: Routes = [
       loadComponent: () => import('./features/seller/seller-discounts/seller-discounts').then(m => m.SellerDiscounts)
     },
     {
+      path: 'earnings',
+      title: 'المستحقات | Smart Shop',
+      loadComponent: () => import('./features/seller/seller-earnings/seller-earnings').then(m => m.SellerEarningsPage)
+    },
+    {
       path: 'store',
       title: 'متجري | Smart Shop',
       loadComponent: () => import('./features/seller/seller-store/seller-store').then(m => m.SellerStore)
@@ -157,6 +162,11 @@ export const routes: Routes = [
       path: 'messages',
       title: 'الرسائل | Smart Shop',
       loadComponent: () => import('./features/admin/admin-messages/admin-messages').then(m => m.AdminMessages)
+    },
+    {
+      path: 'settlements',
+      title: 'التسويات | Smart Shop',
+      loadComponent: () => import('./features/admin/admin-settlements/admin-settlements').then(m => m.AdminSettlements)
     },
     {
       path: 'products',

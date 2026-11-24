@@ -264,6 +264,142 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "ECommerce.API.Controllers.AdminSettlementsController",
+    "Method": "ExportSettlement",
+    "RelativePath": "api/admin/settlements/{id}/export",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "tzOffset",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AdminSettlementsController",
+    "Method": "GetBalances",
+    "RelativePath": "api/admin/settlements/balances",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "cutoff",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "tzOffset",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AdminSettlementsController",
+    "Method": "GetHistory",
+    "RelativePath": "api/admin/settlements/history",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sellerId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AdminSettlementsController",
+    "Method": "ExportPeriodReport",
+    "RelativePath": "api/admin/settlements/report/export",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "from",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "to",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "tzOffset",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AdminSettlementsController",
+    "Method": "SetCommission",
+    "RelativePath": "api/admin/settlements/sellers/{sellerId}/commission",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sellerId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "ECommerce.Application.DTOs.Settlement.SetCommissionDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.AdminSettlementsController",
+    "Method": "Settle",
+    "RelativePath": "api/admin/settlements/sellers/{sellerId}/settle",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sellerId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "ECommerce.Application.DTOs.Settlement.CreateSettlementDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "ECommerce.API.Controllers.AdminController",
     "Method": "GetUsers",
     "RelativePath": "api/admin/users",
@@ -1781,6 +1917,16 @@
         "Name": "RemoveImage",
         "Type": "System.Boolean",
         "IsRequired": false
+      },
+      {
+        "Name": "PayoutMethod",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "PayoutAccount",
+        "Type": "System.String",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []
@@ -1793,6 +1939,58 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [
+      {
+        "Name": "tzOffset",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.SellerEarningsController",
+    "Method": "GetEarnings",
+    "RelativePath": "api/sellers/me/earnings",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.SellerEarningsController",
+    "Method": "GetSettlements",
+    "RelativePath": "api/sellers/me/earnings/settlements",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ECommerce.API.Controllers.SellerEarningsController",
+    "Method": "Export",
+    "RelativePath": "api/sellers/me/earnings/settlements/{id}/export",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
       {
         "Name": "tzOffset",
         "Type": "System.Int32",

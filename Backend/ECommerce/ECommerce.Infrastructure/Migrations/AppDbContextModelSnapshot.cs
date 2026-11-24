@@ -649,8 +649,18 @@ namespace ECommerce.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal?>("CommissionPercent")
+                        .HasColumnType("decimal(5,2)");
+
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PayoutAccount")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("PayoutMethod")
+                        .HasColumnType("int");
 
                     b.Property<float>("Rating")
                         .HasColumnType("real");
@@ -668,6 +678,69 @@ namespace ECommerce.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Sellers");
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.Settlement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AdjustmentAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("AdjustmentNote")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<decimal>("CommissionAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("CommissionPercent")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CutoffDay")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("GrossAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("NetAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("OrdersCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PayoutAccount")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PayoutMethod")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Reference")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("SellerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SellerId", "CreatedAt");
+
+                    b.ToTable("Settlements");
                 });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.Wishlist", b =>
@@ -864,6 +937,9 @@ namespace ECommerce.Infrastructure.Migrations
                     b.Property<int>("PaymentMethodId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("SettlementId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -877,6 +953,8 @@ namespace ECommerce.Infrastructure.Migrations
                     b.HasIndex("PaymentGroupId");
 
                     b.HasIndex("PaymentMethodId");
+
+                    b.HasIndex("SettlementId");
 
                     b.ToTable("Orders");
                 });
@@ -1087,6 +1165,17 @@ namespace ECommerce.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ECommerce.Domain.Entities.Settlement", b =>
+                {
+                    b.HasOne("ECommerce.Domain.Entities.Seller", "Seller")
+                        .WithMany()
+                        .HasForeignKey("SellerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Seller");
+                });
+
             modelBuilder.Entity("ECommerce.Domain.Entities.Wishlist", b =>
                 {
                     b.HasOne("ECommerce.Domain.Entities.Customer", "Customer")
@@ -1187,11 +1276,18 @@ namespace ECommerce.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("ECommerce.Domain.Entities.Settlement", "Settlement")
+                        .WithMany("Orders")
+                        .HasForeignKey("SettlementId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Customer");
 
                     b.Navigation("PaymentGroup");
 
                     b.Navigation("PaymentMethod");
+
+                    b.Navigation("Settlement");
                 });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.ApplicationUser", b =>
@@ -1242,6 +1338,11 @@ namespace ECommerce.Infrastructure.Migrations
             modelBuilder.Entity("ECommerce.Domain.Entities.Seller", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.Settlement", b =>
+                {
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.Wishlist", b =>

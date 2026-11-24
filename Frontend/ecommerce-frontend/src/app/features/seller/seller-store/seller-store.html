@@ -50,7 +50,49 @@
       </div>
 
     </div>
+      <!-- استلام المستحقات -->
+      <div class="space-y-4">
+        <div>
+          <h4 class="text-sm font-medium text-brand-black">بيانات استلام المستحقات</h4>
+          <p class="text-xs text-gray-400 mt-1">بيحوّل لك الموقع مبيعاتك المتوصّلة (بعد خصم العمولة) على الحساب ده، ومبتظهرش للعملاء</p>
+        </div>
 
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm text-brand-black mb-1.5 font-medium">طريقة التحويل</label>
+            <select
+              formControlName="payoutMethod"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+            >
+              @for (method of payoutMethods; track method.value) {
+                <option [value]="method.value">{{ method.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm text-brand-black mb-1.5 font-medium">رقم أو عنوان التحويل</label>
+            <input
+              type="text"
+              formControlName="payoutAccount"
+              dir="ltr"
+              maxlength="100"
+              placeholder="01xxxxxxxxx"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-right focus:outline-none focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold transition-all"
+            />
+          </div>
+        </div>
+
+        @if (payoutError(); as error) {
+          <p class="text-red-500 text-xs">{{ error }}</p>
+        }
+
+        <p class="text-xs text-brand-brown">
+          نسبة عمولة الموقع على متجرك:
+          <b>{{ profile()!.commissionPercent !== null ? (profile()!.commissionPercent | number:'1.0-2') + '%' : 'لم تُحدد بعد' }}</b>
+          · <a routerLink="/seller/earnings" class="text-brand-gold hover:underline">عرض مستحقاتك</a>
+        </p>
+      </div>
     <!-- بيانات المتجر -->
     <form [formGroup]="form" (ngSubmit)="save()" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
 

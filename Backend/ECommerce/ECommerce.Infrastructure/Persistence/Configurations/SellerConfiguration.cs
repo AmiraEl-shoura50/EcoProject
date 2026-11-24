@@ -11,5 +11,8 @@ public class SellerConfiguration : IEntityTypeConfiguration<Seller>
         builder.HasOne(s => s.User)
             .WithOne(u => u.Seller)
             .HasForeignKey<Seller>(s => s.UserId);
+
+        builder.Property(s => s.CommissionPercent).HasColumnType("decimal(5,2)");
+        builder.Property(s => s.PayoutAccount).HasMaxLength(100);
     }
 }

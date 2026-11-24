@@ -2,7 +2,7 @@
   "version": 4,
   "targets": {
     "net10.0": {
-      "AutoMapper/16.2.0": {
+      "AutoMapper/17.0.0": {
         "type": "package",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "10.0.0",
@@ -481,11 +481,34 @@
           }
         }
       },
+      "System.Security.Cryptography.Pkcs/10.0.13": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/System.Security.Cryptography.Pkcs.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/System.Security.Cryptography.Pkcs.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net10.0/System.Security.Cryptography.Pkcs.dll": {
+            "assetType": "runtime",
+            "rid": "win"
+          }
+        }
+      },
       "ECommerce.Domain/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
-          "Microsoft.Extensions.Identity.Stores": "10.0.10"
+          "Microsoft.Extensions.Identity.Stores": "10.0.10",
+          "System.Security.Cryptography.Pkcs": "10.0.13"
         },
         "compile": {
           "bin/placeholder/ECommerce.Domain.dll": {}
@@ -497,26 +520,24 @@
     }
   },
   "libraries": {
-    "AutoMapper/16.2.0": {
-      "sha512": "PE8HgPc5BZJnAFwjvDTE72gWL6YrYib+V7+vxtLXDYz0CH/fFgbVcwLUC9UHk5ALwspZ6Vbmoo6PHvseIk/0ZA==",
+    "AutoMapper/17.0.0": {
+      "sha512": "SQaIR+EKMkvyPqO1siHJXk286tjSSVSpZavFYxhMV4eq9DAL8sXMjNwqEZcu+C1R52aucNEnPkphhtGpGqoTVA==",
       "type": "package",
-      "path": "automapper/16.2.0",
+      "path": "automapper/17.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "LICENSE.md",
         "README.md",
-        "automapper.16.2.0.nupkg.sha512",
+        "automapper.17.0.0.nupkg.sha512",
         "automapper.nuspec",
         "icon.png",
         "lib/net10.0/AutoMapper.dll",
         "lib/net10.0/AutoMapper.xml",
+        "lib/net11.0/AutoMapper.dll",
+        "lib/net11.0/AutoMapper.xml",
         "lib/net471/AutoMapper.dll",
         "lib/net471/AutoMapper.xml",
-        "lib/net8.0/AutoMapper.dll",
-        "lib/net8.0/AutoMapper.xml",
-        "lib/net9.0/AutoMapper.dll",
-        "lib/net9.0/AutoMapper.xml",
         "lib/netstandard2.0/AutoMapper.dll",
         "lib/netstandard2.0/AutoMapper.xml"
       ]
@@ -1259,6 +1280,42 @@
         "system.identitymodel.tokens.jwt.nuspec"
       ]
     },
+    "System.Security.Cryptography.Pkcs/10.0.13": {
+      "sha512": "a+EovgC1fBnwdlQ6cn3j4JFBfKqiFaFvoAhjisOoSvazLAcIznaBzPQP0oYnvccmeXfqUH1KebVZOxSeH6rMaw==",
+      "type": "package",
+      "path": "system.security.cryptography.pkcs/10.0.13",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/System.Security.Cryptography.Pkcs.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net8.0/_._",
+        "buildTransitive/netcoreapp2.0/System.Security.Cryptography.Pkcs.targets",
+        "lib/net10.0/System.Security.Cryptography.Pkcs.dll",
+        "lib/net10.0/System.Security.Cryptography.Pkcs.xml",
+        "lib/net462/System.Security.Cryptography.Pkcs.dll",
+        "lib/net462/System.Security.Cryptography.Pkcs.xml",
+        "lib/net8.0/System.Security.Cryptography.Pkcs.dll",
+        "lib/net8.0/System.Security.Cryptography.Pkcs.xml",
+        "lib/net9.0/System.Security.Cryptography.Pkcs.dll",
+        "lib/net9.0/System.Security.Cryptography.Pkcs.xml",
+        "lib/netstandard2.0/System.Security.Cryptography.Pkcs.dll",
+        "lib/netstandard2.0/System.Security.Cryptography.Pkcs.xml",
+        "lib/netstandard2.1/System.Security.Cryptography.Pkcs.dll",
+        "lib/netstandard2.1/System.Security.Cryptography.Pkcs.xml",
+        "runtimes/win/lib/net10.0/System.Security.Cryptography.Pkcs.dll",
+        "runtimes/win/lib/net10.0/System.Security.Cryptography.Pkcs.xml",
+        "runtimes/win/lib/net8.0/System.Security.Cryptography.Pkcs.dll",
+        "runtimes/win/lib/net8.0/System.Security.Cryptography.Pkcs.xml",
+        "runtimes/win/lib/net9.0/System.Security.Cryptography.Pkcs.dll",
+        "runtimes/win/lib/net9.0/System.Security.Cryptography.Pkcs.xml",
+        "system.security.cryptography.pkcs.10.0.13.nupkg.sha512",
+        "system.security.cryptography.pkcs.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
     "ECommerce.Domain/1.0.0": {
       "type": "project",
       "path": "../ECommerce.Domain/ECommerce.Domain.csproj",
@@ -1267,12 +1324,13 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
-      "AutoMapper >= 16.2.0",
+      "AutoMapper >= 17.0.0",
       "ECommerce.Domain >= 1.0.0",
       "FluentValidation >= 12.1.1",
       "FluentValidation.DependencyInjectionExtensions >= 12.1.1",
       "Microsoft.AspNetCore.Http.Features >= 5.0.17",
-      "System.IdentityModel.Tokens.Jwt >= 8.21.0"
+      "System.IdentityModel.Tokens.Jwt >= 8.21.0",
+      "System.Security.Cryptography.Pkcs >= 10.0.13"
     ]
   },
   "packageFolders": {
@@ -1333,7 +1391,7 @@
         "dependencies": {
           "AutoMapper": {
             "target": "Package",
-            "version": "[16.2.0, )"
+            "version": "[17.0.0, )"
           },
           "FluentValidation": {
             "target": "Package",
@@ -1350,6 +1408,10 @@
           "System.IdentityModel.Tokens.Jwt": {
             "target": "Package",
             "version": "[8.21.0, )"
+          },
+          "System.Security.Cryptography.Pkcs": {
+            "target": "Package",
+            "version": "[10.0.13, )"
           }
         },
         "imports": [

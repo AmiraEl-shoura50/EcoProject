@@ -58,7 +58,7 @@
           "dependencies": {
             "AutoMapper": {
               "target": "Package",
-              "version": "[16.2.0, )"
+              "version": "[17.0.0, )"
             },
             "FluentValidation": {
               "target": "Package",
@@ -75,6 +75,10 @@
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
               "version": "[8.21.0, )"
+            },
+            "System.Security.Cryptography.Pkcs": {
+              "target": "Package",
+              "version": "[10.0.13, )"
             }
           },
           "imports": [
@@ -422,6 +426,10 @@
             "Microsoft.Extensions.Identity.Stores": {
               "target": "Package",
               "version": "[10.0.10, )"
+            },
+            "System.Security.Cryptography.Pkcs": {
+              "target": "Package",
+              "version": "[10.0.13, )"
             }
           },
           "imports": [

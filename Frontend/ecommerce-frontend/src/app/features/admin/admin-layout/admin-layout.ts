@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { LucideAngularModule, LayoutDashboard, Users, Package, Layers, Wallet, CreditCard, Mail } from 'lucide-angular';
+import { LucideAngularModule, LayoutDashboard, Users, Package, Layers, Wallet, CreditCard, Mail, Banknote } from 'lucide-angular';
 import { AdminMessageService } from '../../../core/services/admin-message';
 import { AdminPaymentService } from '../../../core/services/admin-payment';
 
@@ -22,6 +22,7 @@ export class AdminLayout implements OnInit {
     { path: '/admin/products', label: 'المنتجات', icon: Package, exact: false, badge: null as BadgeKind },
     { path: '/admin/categories', label: 'الأقسام الرئيسية', icon: Layers, exact: false, badge: null as BadgeKind },
     { path: '/admin/payment-methods', label: 'طرق الدفع', icon: CreditCard, exact: false, badge: null as BadgeKind },
+        { path: '/admin/settlements', label: 'التسويات', icon: Banknote, exact: false, badge: null as BadgeKind },
     { path: '/admin/messages', label: 'الرسائل', icon: Mail, exact: false, badge: 'messages' as BadgeKind }
   ];
 

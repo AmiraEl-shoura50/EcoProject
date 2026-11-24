@@ -521,3 +521,13 @@ D:\reposcsharp\EcoProject\Backend\ECommerce\ECommerce.Api\obj\Debug\net10.0\refi
 D:\reposcsharp\EcoProject\Backend\ECommerce\ECommerce.Api\obj\Debug\net10.0\ECommerce.API.pdb
 D:\reposcsharp\EcoProject\Backend\ECommerce\ECommerce.Api\obj\Debug\net10.0\ECommerce.API.genruntimeconfig.cache
 D:\reposcsharp\EcoProject\Backend\ECommerce\ECommerce.Api\obj\Debug\net10.0\ref\ECommerce.API.dll
+D:\reposcsharp\EcoProject\Backend\ECommerce\ECommerce.Api\bin\Debug\net10.0\ClosedXML.dll
+D:\reposcsharp\EcoProject\Backend\ECommerce\ECommerce.Api\bin\Debug\net10.0\ClosedXML.Parser.dll
+D:\reposcsharp\EcoProject\Backend\ECommerce\ECommerce.Api\bin\Debug\net10.0\DocumentFormat.OpenXml.dll
+D:\reposcsharp\EcoProject\Backend\ECommerce\ECommerce.Api\bin\Debug\net10.0\DocumentFormat.OpenXml.Framework.dll
+D:\reposcsharp\EcoProject\Backend\ECommerce\ECommerce.Api\bin\Debug\net10.0\ExcelNumberFormat.dll
+D:\reposcsharp\EcoProject\Backend\ECommerce\ECommerce.Api\bin\Debug\net10.0\RBush.dll
+D:\reposcsharp\EcoProject\Backend\ECommerce\ECommerce.Api\bin\Debug\net10.0\SixLabors.Fonts.dll
+D:\reposcsharp\EcoProject\Backend\ECommerce\ECommerce.Api\bin\Debug\net10.0\System.IO.Packaging.dll
+D:\reposcsharp\EcoProject\Backend\ECommerce\ECommerce.Api\bin\Debug\net10.0\System.Security.Cryptography.Pkcs.dll
+D:\reposcsharp\EcoProject\Backend\ECommerce\ECommerce.Api\bin\Debug\net10.0\runtimes\win\lib\net10.0\System.Security.Cryptography.Pkcs.dll

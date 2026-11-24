@@ -1,0 +1,167 @@
+<div>
+
+  <h2 class="font-serif text-2xl text-brand-black mb-5">المستحقات</h2>
+
+  @if (isLoading()) {
+
+    <div class="space-y-4 animate-pulse">
+      <div class="bg-white rounded-2xl h-32"></div>
+      <div class="bg-white rounded-2xl h-24"></div>
+    </div>
+
+  } @else if (earnings(); as e) {
+
+    <!-- تنبيهات الإعداد -->
+    @if (e.commissionPercent === null) {
+      <div class="bg-orange-50 border border-orange-200 text-orange-800 text-sm rounded-xl px-4 py-3 mb-4">
+        الإدارة لم تحدد نسبة عمولة متجرك بعد. هتظهر النسبة هنا فور تحديدها، وتتم التسوية بعدها.
+      </div>
+    }
+
+    @if (!e.payoutAccount) {
+      <div class="bg-orange-50 border border-orange-200 text-orange-800 text-sm rounded-xl px-4 py-3 mb-4">
+        لم تضف بيانات استلام مستحقاتك بعد. أضفها من صفحة
+        <a routerLink="/seller/store" class="font-semibold underline">متجري</a> عشان تقدر الإدارة تحوّل لك.
+      </div>
+    }
+
+    <!-- المستحق الحالي -->
+    <div class="bg-white rounded-2xl border border-brand-gold shadow-sm p-6 mb-5 text-center">
+      <p class="text-sm text-brand-brown">مستحقاتك الحالية (لم تُحوَّل بعد)</p>
+      <p class="font-serif text-4xl text-brand-gold font-semibold mt-1">
+        {{ e.netAmount | number:'1.0-2' }} <span class="font-sans text-base text-brand-brown">جنيه</span>
+      </p>
+      <p class="text-xs text-gray-400 mt-2">
+        من {{ e.unsettledOrdersCount }} طلب متوصّل · إجمالي المبيعات {{ e.grossAmount | number:'1.0-2' }}
+        @if (e.commissionPercent !== null) {
+          − عمولة {{ e.commissionPercent | number:'1.0-2' }}% ({{ e.commissionAmount | number:'1.0-2' }})
+        }
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <p class="text-xs text-brand-brown mb-1">نسبة عمولة الموقع</p>
+        <p class="font-serif text-2xl text-brand-black">
+          {{ e.commissionPercent !== null ? (e.commissionPercent | number:'1.0-2') + '%' : 'غير محددة' }}
+        </p>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <p class="text-xs text-brand-brown mb-1">اتحوّل لك إجمالًا</p>
+        <p class="font-serif text-2xl text-brand-black">{{ e.totalPaid | number:'1.0-2' }} <span class="font-sans text-sm text-brand-brown">جنيه</span></p>
+        <p class="text-xs text-gray-400 mt-1">{{ e.settlementsCount }} تسوية</p>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <p class="text-xs text-brand-brown mb-1">استلام المستحقات على</p>
+        @if (e.payoutAccount) {
+          <p class="text-sm font-medium text-brand-black">{{ payoutLabel(e.payoutMethod) }}</p>
+          <p dir="ltr" class="text-sm text-brand-brown text-end">{{ e.payoutAccount }}</p>
+        } @else {
+          <p class="text-sm text-gray-400">غير محدد</p>
+        }
+      </div>
+
+    </div>
+
+    <p class="text-xs text-gray-400 mb-6">
+      المستحقات بتتحسب من الطلبات اللي <b>اتوصّلت</b> للعملاء. الطلبات اللي لسه في الطريق بتدخل بعد توصيلها.
+    </p>
+
+  }
+
+  <!-- سجل التحويلات -->
+  <h3 class="font-serif text-xl text-brand-black mb-3">سجل التحويلات</h3>
+
+  @if (isLoadingHistory()) {
+
+    <div class="space-y-3 animate-pulse">
+      @for (i of [1,2]; track i) {
+        <div class="bg-white rounded-2xl h-24"></div>
+      }
+    </div>
+
+  } @else if (history().length === 0) {
+
+    <div class="bg-white rounded-2xl border border-gray-100 text-center py-12 px-4">
+      <p class="text-brand-brown">لا توجد تحويلات بعد</p>
+    </div>
+
+  } @else {
+
+    <div class="space-y-3">
+      @for (s of history(); track s.id) {
+        <article class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-brand-black">تحويل #{{ s.id }}</p>
+              <p class="text-xs text-brand-brown mt-1">
+                {{ s.createdAt | date:'dd/MM/yyyy HH:mm' }} · حتى يوم {{ s.cutoffDay | date:'dd/MM/yyyy':'UTC' }} · {{ s.ordersCount }} طلب
+              </p>
+              <p class="text-xs text-brand-brown mt-0.5">
+                {{ payoutLabel(s.payoutMethod) }}: <span dir="ltr" class="inline-block">{{ s.payoutAccount }}</span>
+                @if (s.reference) {
+                  · رقم العملية: <span dir="ltr" class="inline-block">{{ s.reference }}</span>
+                }
+              </p>
+            </div>
+
+            <div class="text-end shrink-0">
+              <p class="font-serif text-2xl text-brand-gold font-semibold">{{ s.netAmount | number:'1.0-2' }} جنيه</p>
+              <p class="text-xs text-gray-400">
+                {{ s.grossAmount | number:'1.0-2' }} − عمولة {{ s.commissionPercent | number:'1.0-2' }}% ({{ s.commissionAmount | number:'1.0-2' }})
+                @if (s.adjustmentAmount !== 0) {
+                  {{ s.adjustmentAmount > 0 ? '+' : '−' }} تعديل {{ (s.adjustmentAmount < 0 ? -s.adjustmentAmount : s.adjustmentAmount) | number:'1.0-2' }}
+                }
+              </p>
+            </div>
+          </div>
+
+          @if (s.adjustmentNote) {
+            <p class="text-xs text-brand-brown bg-brand-cream rounded-lg px-3 py-2 mt-3">سبب التعديل: {{ s.adjustmentNote }}</p>
+          }
+
+          <div class="mt-3">
+            <button
+              type="button"
+              (click)="exportSettlement(s)"
+              [disabled]="exportingId() === s.id"
+              class="inline-flex items-center gap-2 text-sm text-brand-gold border border-brand-gold px-4 py-1.5 rounded-lg hover:bg-brand-gold hover:text-white transition-colors disabled:opacity-50"
+            >
+              <lucide-angular [img]="DownloadIcon" [size]="14"></lucide-angular>
+              {{ exportingId() === s.id ? 'جاري التجهيز...' : 'تحميل التفاصيل (Excel)' }}
+            </button>
+          </div>
+
+        </article>
+      }
+    </div>
+
+    @if (totalPages() > 1) {
+      <div class="flex items-center justify-center gap-2 mt-8">
+        <button
+          type="button"
+          (click)="goToPage(currentPage() - 1)"
+          [disabled]="currentPage() <= 1"
+          class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          السابق
+        </button>
+        <span class="text-sm text-brand-brown px-4">صفحة {{ currentPage() }} من {{ totalPages() }}</span>
+        <button
+          type="button"
+          (click)="goToPage(currentPage() + 1)"
+          [disabled]="currentPage() >= totalPages()"
+          class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm hover:border-brand-gold hover:text-brand-gold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          التالي
+        </button>
+      </div>
+    }
+
+  }
+
+</div>

@@ -19,6 +19,8 @@ public class Order
     public PaymentGroup? PaymentGroup { get; set; }
     public bool IsDeletedByCustomer { get; set; }
     public bool IsDeletedBySeller { get; set; }
+    public int? SettlementId { get; set; }
+    public Settlement? Settlement { get; set; }
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
     public ICollection<PaymentProof> PaymentProofs { get; set; } = new List<PaymentProof>();
     public ICollection<PaymentTransaction> PaymentTransactions { get; set; } = new List<PaymentTransaction>(); // ✅ جديد

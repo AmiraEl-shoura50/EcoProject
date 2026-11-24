@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "Af6dqkhsmiQ=",
+  "dgSpecHash": "pOYnPCb9zQU=",
   "success": true,
   "projectFilePath": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Application\\ECommerce.Application.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\YAS\\.nuget\\packages\\automapper\\16.2.0\\automapper.16.2.0.nupkg.sha512",
+    "C:\\Users\\YAS\\.nuget\\packages\\automapper\\17.0.0\\automapper.17.0.0.nupkg.sha512",
     "C:\\Users\\YAS\\.nuget\\packages\\fluentvalidation\\12.1.1\\fluentvalidation.12.1.1.nupkg.sha512",
     "C:\\Users\\YAS\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\12.1.1\\fluentvalidation.dependencyinjectionextensions.12.1.1.nupkg.sha512",
     "C:\\Users\\YAS\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\10.0.10\\microsoft.aspnetcore.cryptography.internal.10.0.10.nupkg.sha512",
@@ -30,7 +30,8 @@
     "C:\\Users\\YAS\\.nuget\\packages\\microsoft.identitymodel.jsonwebtokens\\8.21.0\\microsoft.identitymodel.jsonwebtokens.8.21.0.nupkg.sha512",
     "C:\\Users\\YAS\\.nuget\\packages\\microsoft.identitymodel.logging\\8.21.0\\microsoft.identitymodel.logging.8.21.0.nupkg.sha512",
     "C:\\Users\\YAS\\.nuget\\packages\\microsoft.identitymodel.tokens\\8.21.0\\microsoft.identitymodel.tokens.8.21.0.nupkg.sha512",
-    "C:\\Users\\YAS\\.nuget\\packages\\system.identitymodel.tokens.jwt\\8.21.0\\system.identitymodel.tokens.jwt.8.21.0.nupkg.sha512"
+    "C:\\Users\\YAS\\.nuget\\packages\\system.identitymodel.tokens.jwt\\8.21.0\\system.identitymodel.tokens.jwt.8.21.0.nupkg.sha512",
+    "C:\\Users\\YAS\\.nuget\\packages\\system.security.cryptography.pkcs\\10.0.13\\system.security.cryptography.pkcs.10.0.13.nupkg.sha512"
   ],
   "logs": []
 }

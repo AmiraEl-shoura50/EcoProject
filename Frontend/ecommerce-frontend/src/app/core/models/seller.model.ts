@@ -11,4 +11,7 @@ export interface SellerProfile extends Seller {
   firstName: string;
   lastName: string;
   email: string;
+  commissionPercent: number | null;
+  payoutMethod: string | null;
+  payoutAccount: string | null;
 }

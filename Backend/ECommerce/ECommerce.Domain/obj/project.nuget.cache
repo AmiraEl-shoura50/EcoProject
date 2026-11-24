@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "vYb5lYuxHkM=",
+  "dgSpecHash": "Ax+OU1fSo74=",
   "success": true,
   "projectFilePath": "D:\\reposcsharp\\EcoProject\\Backend\\ECommerce\\ECommerce.Domain\\ECommerce.Domain.csproj",
   "expectedPackageFiles": [
@@ -20,7 +20,8 @@
     "C:\\Users\\YAS\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.10\\microsoft.extensions.logging.abstractions.10.0.10.nupkg.sha512",
     "C:\\Users\\YAS\\.nuget\\packages\\microsoft.extensions.options\\10.0.10\\microsoft.extensions.options.10.0.10.nupkg.sha512",
     "C:\\Users\\YAS\\.nuget\\packages\\microsoft.extensions.options.configurationextensions\\10.0.10\\microsoft.extensions.options.configurationextensions.10.0.10.nupkg.sha512",
-    "C:\\Users\\YAS\\.nuget\\packages\\microsoft.extensions.primitives\\10.0.10\\microsoft.extensions.primitives.10.0.10.nupkg.sha512"
+    "C:\\Users\\YAS\\.nuget\\packages\\microsoft.extensions.primitives\\10.0.10\\microsoft.extensions.primitives.10.0.10.nupkg.sha512",
+    "C:\\Users\\YAS\\.nuget\\packages\\system.security.cryptography.pkcs\\10.0.13\\system.security.cryptography.pkcs.10.0.13.nupkg.sha512"
   ],
   "logs": []
 }

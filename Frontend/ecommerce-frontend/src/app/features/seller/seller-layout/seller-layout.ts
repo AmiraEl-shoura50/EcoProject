@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { LucideAngularModule, LayoutDashboard, ClipboardList, Package, Layers, Percent, Store } from 'lucide-angular';
+import { LucideAngularModule, LayoutDashboard, ClipboardList, Package, Layers, Percent, Store, Wallet } from 'lucide-angular';
 
 @Component({
   selector: 'app-seller-layout',
@@ -16,6 +16,8 @@ export class SellerLayout {
     { path: '/seller/products', label: 'المنتجات', icon: Package, exact: false },
     { path: '/seller/categories', label: 'الأقسام الفرعية', icon: Layers, exact: false },
     { path: '/seller/discounts', label: 'الخصومات', icon: Percent, exact: false },
-    { path: '/seller/store', label: 'متجري', icon: Store, exact: false }
+   { path: '/seller/earnings', label: 'المستحقات', icon: Wallet, exact: false },
+    { path: '/seller/store', label: 'متجري', icon: Store, exact: false },
+    
   ];
 }
